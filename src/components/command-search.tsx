@@ -214,8 +214,8 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
       className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-3 py-1 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-8 relative w-full justify-start sm:pe-12 md:w-36 lg:w-56"
     >
       <Search className="me-2 h-3.5 w-3.5" />
-      <span className="hidden lg:inline-flex">Search...</span>
-      <span className="inline-flex lg:hidden">Search...</span>
+      <span className="hidden lg:inline-flex">חיפוש...</span>
+      <span className="inline-flex lg:hidden">חיפוש...</span>
       <kbd className="pointer-events-none absolute end-1.5 top-1.5 hidden h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
         <span className="text-xs">⌘</span>K
       </kbd>

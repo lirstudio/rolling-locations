@@ -44,6 +44,12 @@ Use logical properties or the `rtl:` variant for directional spacing:
 <div className="ml-4">
 ```
 
+## Dashboard sidebar side
+
+- When `dir="rtl"` (Hebrew), the main dashboard sidebar **must render on the physical right**.
+- In `DashboardLayout` / dashboard shells, pass `side="right"` to `AppSidebar` (or derive the side from the active locale) instead of hardcoding `side="left"`.
+- Do **not** try to fix RTL by editing shadcn primitives in `src/components/ui` (for example `src/components/ui/sidebar.tsx`). Prefer layout wrappers like `DashboardLayout`, `BaseLayout`, or `SidebarConfigProvider`.
+
 ## next-intl setup
 
 - Wrap the app with `NextIntlClientProvider` in the root layout.

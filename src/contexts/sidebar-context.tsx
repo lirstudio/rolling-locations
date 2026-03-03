@@ -19,7 +19,8 @@ export function SidebarConfigProvider({ children }: { children: React.ReactNode 
   const [config, setConfig] = React.useState<SidebarConfig>({
     variant: "inset",
     collapsible: "offcanvas", 
-    side: "right"
+    // Hebrew (RTL) dashboard: sidebar on the right by default
+    side: "right",
   })
 
   const updateConfig = React.useCallback((newConfig: Partial<SidebarConfig>) => {

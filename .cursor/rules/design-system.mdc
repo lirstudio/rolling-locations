@@ -44,4 +44,8 @@ For secondary actions use `variant="outline"` or `variant="ghost"`.
 <html lang="he" dir="rtl">
 ```
 
-Switch `dir` per locale. All margin/padding spacing must use logical properties or Tailwind `rtl:` variant when needed.
+Switch `dir` per locale.
+
+- For Hebrew (RTL), the authenticated dashboard sidebar **opens from the right** (`side="right"` on `AppSidebar`).
+- All margin/padding spacing must use logical properties or Tailwind `rtl:` variant when needed.
+- Never modify shadcn primitives in `src/components/ui` to “fix” RTL; use layout wrappers and feature components instead.

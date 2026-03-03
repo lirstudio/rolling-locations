@@ -29,47 +29,24 @@ export default function DashboardLayout({
         } as React.CSSProperties}
         className={config.collapsible === "none" ? "sidebar-none-mode" : ""}
       >
-        {config.side === "left" ? (
-          <>
-            <AppSidebar
-              role={role}
-              variant={config.variant}
-              collapsible={config.collapsible}
-              side={config.side}
-            />
-            <SidebarInset>
-              <SiteHeader />
-              <div className="flex flex-1 flex-col">
-                <div className="@container/main flex flex-1 flex-col gap-2">
-                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    {children}
-                  </div>
-                </div>
+        <AppSidebar
+          role={role}
+          variant={config.variant}
+          collapsible={config.collapsible}
+          // Hebrew (RTL) layout: sidebar must stay on the physical right
+          side="right"
+        />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                {children}
               </div>
-              <SiteFooter />
-            </SidebarInset>
-          </>
-        ) : (
-          <>
-            <SidebarInset>
-              <SiteHeader />
-              <div className="flex flex-1 flex-col">
-                <div className="@container/main flex flex-1 flex-col gap-2">
-                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    {children}
-                  </div>
-                </div>
-              </div>
-              <SiteFooter />
-            </SidebarInset>
-            <AppSidebar
-              role={role}
-              variant={config.variant}
-              collapsible={config.collapsible}
-              side={config.side}
-            />
-          </>
-        )}
+            </div>
+          </div>
+          <SiteFooter />
+        </SidebarInset>
       </SidebarProvider>
     </AuthGuard>
   );

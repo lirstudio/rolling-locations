@@ -26,4 +26,4 @@ export const locationSchema = z.object({
   status: z.enum(["draft", "published", "paused"]).default("draft"),
 });
 
-export type LocationFormValues = z.infer<typeof locationSchema>;
+export type LocationFormValues = z.input<typeof locationSchema>;

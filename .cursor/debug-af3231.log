@@ -1,0 +1,23 @@
+{
+    "data":  {
+                 "ok":  true
+             },
+    "hypothesisId":  "HP",
+    "message":  "probe log",
+    "runId":  "probe",
+    "sessionId":  "af3231",
+    "timestamp":  1772572178000,
+    "location":  "shell:probe"
+}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H4","location":"auth-store.ts:subscribeAuth:start","message":"subscribeAuth called","data":{},"timestamp":1772565541085}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H4","location":"auth-store.ts:subscribeAuth:getSession","message":"initial session fetched","data":{"hasSession":false},"timestamp":1772565541189}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H5","location":"login-form-1.tsx:onEmailSubmit:start","message":"email submit handler entered","data":{"mode":"link","emailLength":16},"timestamp":1772565546857}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H1","location":"auth-store.ts:sendMagicLink:start","message":"sendMagicLink invoked","data":{"hasRedirectTo":true,"redirectPath":true,"emailLength":16},"timestamp":1772565546858}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H2","location":"auth-store.ts:sendMagicLink:afterSignInWithOtp","message":"signInWithOtp returned","data":{"hasError":true,"errorMessage":"Error sending confirmation email"},"timestamp":1772565550726}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H2","location":"login-form-1.tsx:onEmailSubmit:afterSendMagicLink","message":"sendMagicLink promise resolved","data":{"storeError":"Error sending confirmation email"},"timestamp":1772565550807}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H4","location":"auth-store.ts:subscribeAuth:start","message":"subscribeAuth called","data":{},"timestamp":1772567938879}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H4","location":"auth-store.ts:subscribeAuth:getSession","message":"initial session fetched","data":{"hasSession":false},"timestamp":1772567938903}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H5","location":"login-form-1.tsx:onEmailSubmit:start","message":"email submit handler entered","data":{"mode":"link","emailLength":18},"timestamp":1772567970093}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H1","location":"auth-store.ts:sendMagicLink:start","message":"sendMagicLink invoked","data":{"hasRedirectTo":true,"redirectPath":true,"emailLength":18},"timestamp":1772567970094}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H2","location":"auth-store.ts:sendMagicLink:afterSignInWithOtp","message":"signInWithOtp returned","data":{"hasError":false,"errorMessage":null},"timestamp":1772567973369}
+{"sessionId":"af3231","runId":"pre-fix","hypothesisId":"H2","location":"login-form-1.tsx:onEmailSubmit:afterSendMagicLink","message":"sendMagicLink promise resolved","data":{"storeError":null},"timestamp":1772567973375}
