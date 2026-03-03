@@ -1,0 +1,25 @@
+const common = {
+  appName: "Rollin Locations",
+  tagline: "מצאו ובצעו הזמנה של לוקיישנים ייחודיים לצילום.",
+  loading: "טוען...",
+  error: "אירעה שגיאה",
+  retry: "נסה שוב",
+  save: "שמור",
+  cancel: "ביטול",
+  confirm: "אישור",
+  delete: "מחק",
+  edit: "עריכה",
+  view: "צפייה",
+  back: "חזרה",
+  next: "הבא",
+  previous: "הקודם",
+  search: "חיפוש",
+  filter: "סינון",
+  clear: "נקה",
+  submit: "שלח",
+  close: "סגור",
+  noResults: "לא נמצאו תוצאות",
+  emptyState: "אין פריטים להצגה",
+} as const;
+
+export default common;

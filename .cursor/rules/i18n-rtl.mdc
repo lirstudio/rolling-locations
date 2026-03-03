@@ -1,0 +1,51 @@
+---
+description: i18n and RTL rules for Rollin Locations – Hebrew default, locale switching, and text direction conventions.
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# i18n + RTL
+
+## Default locale: Hebrew (RTL)
+
+```tsx
+// src/app/layout.tsx – root layout
+<html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+```
+
+Always derive `dir` from the active locale; never hardcode `dir="rtl"`.
+
+## All user-facing strings must use i18n keys
+
+```tsx
+// ✅ Correct
+const t = useTranslations('booking')
+<p>{t('requestTitle')}</p>
+
+// ❌ Wrong – hardcoded Hebrew or English in JSX
+<p>בקשת הזמנה</p>
+<p>Booking Request</p>
+```
+
+Message files live in `src/locales/he/` and `src/locales/en/`.
+
+## Tailwind RTL-aware spacing
+
+Use logical properties or the `rtl:` variant for directional spacing:
+
+```tsx
+// ✅ Logical (works in both directions)
+<div className="ms-4 me-2">
+
+// ✅ Explicit RTL override
+<div className="ml-4 rtl:ml-0 rtl:mr-4">
+
+// ❌ Hard left/right without RTL counterpart
+<div className="ml-4">
+```
+
+## next-intl setup
+
+- Wrap the app with `NextIntlClientProvider` in the root layout.
+- Keep translation namespaces flat and feature-scoped (e.g. `common`, `locations`, `bookings`, `auth`).
+- Never put i18n keys inside `src/components/ui` (shadcn primitives are UI-only).

@@ -1,0 +1,47 @@
+---
+description: Rollin Locations design system – brand tokens, CTA rules, RTL, and UI conventions.
+globs: **/*.tsx,**/*.css
+alwaysApply: false
+---
+
+# Design System
+
+## Brand tokens
+
+Primary (Rollin red): `#ca2527` → `hsl(var(--primary))` = `359 68% 47%`
+Background: `#ffffff` → `--background: 0 0% 100%`
+Surface/muted: `#f7f9fc` → `--muted: 220 33% 97%`
+Text: `#3e4243` → `--foreground: 180 3% 25%`
+Default theme: **light only** (no dark theme in v1).
+
+## CTA rule
+
+One `primary` CTA per screen. Use `variant="default"` (fills with primary).
+
+```tsx
+// ✅ One primary CTA per screen
+<Button>Request Booking</Button>
+
+// ❌ Multiple primary CTAs on same screen
+<Button>Request Booking</Button>
+<Button>Save</Button>
+```
+
+For secondary actions use `variant="outline"` or `variant="ghost"`.
+
+## Layout & surfaces
+
+- Pages sit on `bg-background`.
+- Panels, cards, sidebars sit on `bg-muted`.
+- Borders: always `border border-border` (1px). No heavy box-shadows.
+- Focus: rely on `ring` (= primary) for accessibility, never remove `focus-visible`.
+- Border radius: `--radius: 0.75rem` (12px). Use `rounded-xl` for cards/modals.
+
+## RTL default
+
+```tsx
+// globals layout – Hebrew default
+<html lang="he" dir="rtl">
+```
+
+Switch `dir` per locale. All margin/padding spacing must use logical properties or Tailwind `rtl:` variant when needed.

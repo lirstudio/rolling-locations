@@ -1,0 +1,36 @@
+---
+description: Rollin Locations project structure – where to put files, and how to avoid duplication.
+globs: 
+alwaysApply: true
+---
+
+# Project Structure
+
+```
+src/
+  app/                        # Next.js App Router pages
+    (dashboard)/              # Authenticated dashboard shell
+    (auth)/                   # Auth pages (sign-in, sign-up)
+    api/                      # Route handlers
+  components/
+    ui/                       # shadcn primitives – NEVER modify directly
+    <feature>/                # Domain components (e.g. locations/, bookings/)
+    layouts/                  # Shared layout wrappers
+  hooks/                      # Custom React hooks
+  lib/                        # Supabase client, utility helpers
+  utils/                      # Pure formatting/transform functions
+  types/                      # Shared TypeScript types/interfaces
+  locales/                    # i18n message files (he/, en/)
+docs/
+  design-reference/           # Inspiration images, mockups – agent uses as UI reference
+```
+
+## Rules
+
+- **Check before creating:** Before adding a component, hook, or util, search `src/components`, `src/hooks`, and `src/lib` for an existing one. Do not duplicate.
+- **Feature components** go in `src/components/<feature-name>/` (e.g. `src/components/locations/`, `src/components/bookings/`).
+- **Page-local components** (used only by one route) stay in `src/app/.../<route>/components/`.
+- **Shared hooks** go in `src/hooks/`; one hook per file named `use-<name>.ts`.
+- **Types** shared across features go in `src/types/`; collocated types stay in the file that owns them.
+- Never create a new shadcn primitive – run `npx shadcn@latest add <component>` instead and place in `src/components/ui`.
+- **UI / screens:** When building or refining a screen, check `docs/design-reference/INDEX.md` for inspiration images; load the relevant image with the Read tool and adapt to Rollin design tokens.

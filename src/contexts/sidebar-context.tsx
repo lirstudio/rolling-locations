@@ -19,7 +19,7 @@ export function SidebarConfigProvider({ children }: { children: React.ReactNode 
   const [config, setConfig] = React.useState<SidebarConfig>({
     variant: "inset",
     collapsible: "offcanvas", 
-    side: "left"
+    side: "right"
   })
 
   const updateConfig = React.useCallback((newConfig: Partial<SidebarConfig>) => {

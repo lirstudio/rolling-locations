@@ -2,21 +2,23 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore, roleRedirectPath } from "@/stores/auth-store";
 
 export default function HomePage() {
   const router = useRouter();
+  const { isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
-    router.replace("/dashboard");
-  }, [router]);
+    if (isAuthenticated && user) {
+      router.replace(roleRedirectPath(user.role));
+    } else {
+      router.replace("/sign-in");
+    }
+  }, [isAuthenticated, user, router]);
 
-  // Show a loading state while redirecting
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-2">Redirecting to dashboard...</p>
-      </div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
     </div>
   );
 }

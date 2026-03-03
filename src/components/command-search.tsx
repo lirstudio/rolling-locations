@@ -7,15 +7,11 @@ import {
   Search,
   LayoutPanelLeft,
   LayoutDashboard,
-  Mail,
   CheckSquare,
-  MessageCircle,
   Calendar,
   Shield,
   AlertTriangle,
   Settings,
-  HelpCircle,
-  CreditCard,
   User,
   Bell,
   Link2,
@@ -127,23 +123,17 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const commandRef = React.useRef<HTMLDivElement>(null)
 
   const searchItems: SearchItem[] = [
-    // Dashboards
-    { title: "Dashboard 1", url: "/dashboard", group: "Dashboards", icon: LayoutDashboard },
-    { title: "Dashboard 2", url: "/dashboard-2", group: "Dashboards", icon: LayoutPanelLeft },
-
-    // Apps
-    { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
-    { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
-    { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },
+    // Dashboards & Apps
+    { title: "Dashboard", url: "/dashboard", group: "Dashboards", icon: LayoutDashboard },
     { title: "Calendar", url: "/calendar", group: "Apps", icon: Calendar },
+    { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
+    { title: "Users", url: "/users", group: "Apps", icon: User },
+    { title: "Landing", url: "/landing", group: "Pages", icon: LayoutPanelLeft },
 
     // Auth Pages
-    { title: "Sign In 1", url: "/auth/sign-in", group: "Auth Pages", icon: Shield },
-    { title: "Sign In 2", url: "/auth/sign-in-2", group: "Auth Pages", icon: Shield },
-    { title: "Sign Up 1", url: "/auth/sign-up", group: "Auth Pages", icon: Shield },
-    { title: "Sign Up 2", url: "/auth/sign-up-2", group: "Auth Pages", icon: Shield },
-    { title: "Forgot Password 1", url: "/auth/forgot-password", group: "Auth Pages", icon: Shield },
-    { title: "Forgot Password 2", url: "/auth/forgot-password-2", group: "Auth Pages", icon: Shield },
+    { title: "Sign In", url: "/sign-in", group: "Auth Pages", icon: Shield },
+    { title: "Sign Up", url: "/sign-up", group: "Auth Pages", icon: Shield },
+    { title: "Forgot Password", url: "/forgot-password", group: "Auth Pages", icon: Shield },
 
     // Errors
     { title: "Unauthorized", url: "/errors/unauthorized", group: "Errors", icon: AlertTriangle },
@@ -155,14 +145,9 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     // Settings
     { title: "User Settings", url: "/settings/user", group: "Settings", icon: User },
     { title: "Account Settings", url: "/settings/account", group: "Settings", icon: Settings },
-    { title: "Plans & Billing", url: "/settings/billing", group: "Settings", icon: CreditCard },
     { title: "Appearance", url: "/settings/appearance", group: "Settings", icon: Palette },
     { title: "Notifications", url: "/settings/notifications", group: "Settings", icon: Bell },
     { title: "Connections", url: "/settings/connections", group: "Settings", icon: Link2 },
-
-    // Pages
-    { title: "FAQs", url: "/faqs", group: "Pages", icon: HelpCircle },
-    { title: "Pricing", url: "/pricing", group: "Pages", icon: CreditCard },
   ]
 
   const groupedItems = searchItems.reduce((acc, item) => {
@@ -226,12 +211,12 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 px-3 py-1 relative w-full justify-start text-muted-foreground sm:pr-12 md:w-36 lg:w-56"
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-3 py-1 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 h-8 relative w-full justify-start sm:pe-12 md:w-36 lg:w-56"
     >
-      <Search className="mr-2 h-3.5 w-3.5" />
+      <Search className="me-2 h-3.5 w-3.5" />
       <span className="hidden lg:inline-flex">Search...</span>
       <span className="inline-flex lg:hidden">Search...</span>
-      <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+      <kbd className="pointer-events-none absolute end-1.5 top-1.5 hidden h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
         <span className="text-xs">⌘</span>K
       </kbd>
     </button>

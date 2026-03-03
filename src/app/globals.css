@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-heebo);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -43,38 +43,58 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Rollin Locations brand tokens (spec: docs/project-specification.md) */
+  --radius: 0.75rem;                           /* 12px – spec: rounded-xl */
+
+  /* Base */
+  --background: oklch(1 0 0);                  /* #ffffff */
+  --foreground: oklch(0.28 0.005 195);         /* #3e4243 – text-primary */
+
+  /* Card / popover */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.28 0.005 195);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.28 0.005 195);
+
+  /* Primary – Rollin red #ca2527 */
+  --primary: oklch(0.44 0.22 27);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary / muted – #f7f9fc */
+  --secondary: oklch(0.976 0.008 248);
+  --secondary-foreground: oklch(0.28 0.005 195);
+  --muted: oklch(0.976 0.008 248);
+  --muted-foreground: oklch(0.51 0.018 242);
+
+  /* Accent */
+  --accent: oklch(0.955 0.01 248);
+  --accent-foreground: oklch(0.28 0.005 195);
+
+  /* Destructive */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Borders + inputs */
+  --border: oklch(0.912 0.008 248);
+  --input: oklch(0.912 0.008 248);
+  --ring: oklch(0.44 0.22 27);                 /* = primary */
+
+  /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Sidebar */
+  --sidebar: oklch(0.976 0.008 248);
+  --sidebar-foreground: oklch(0.28 0.005 195);
+  --sidebar-primary: oklch(0.44 0.22 27);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.955 0.01 248);
+  --sidebar-accent-foreground: oklch(0.28 0.005 195);
+  --sidebar-border: oklch(0.912 0.008 248);
+  --sidebar-ring: oklch(0.44 0.22 27);
 }
 
 .dark {
@@ -116,9 +136,18 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans;
   }
 }
 
@@ -148,25 +177,30 @@
   }
 }
 
+/* RTL alignment fixes for dashboard shell/sidebar primitives */
+[dir="rtl"] [data-sidebar="menu-button"],
+[dir="rtl"] [data-slot="sidebar-menu-sub-button"] {
+  text-align: start;
+}
+
+[dir="rtl"] [data-slot="sidebar-group-action"],
+[dir="rtl"] [data-slot="sidebar-menu-action"] {
+  right: auto;
+  left: 0.25rem;
+}
+
+[dir="rtl"] [data-slot="sidebar-menu-badge"] {
+  right: auto;
+  left: 0.25rem;
+}
+
+[dir="rtl"] [data-slot="sidebar-menu-sub"] {
+  border-left-width: 0;
+  border-right-width: 1px;
+}
+
 /* Smooth scrolling for the entire page */
 html {
   scroll-behavior: smooth;
 }
 
-/* Logo carousel animation */
-@keyframes logo-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-144rem); /* 12 items * 12rem = 144rem */
-  }
-}
-
-.animate-logo-scroll {
-  animation: logo-scroll 30s linear infinite;
-}
-
-.animate-logo-scroll:hover {
-  animation-play-state: paused;
-}

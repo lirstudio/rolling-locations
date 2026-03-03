@@ -1,8 +1,8 @@
-import { Inter } from 'next/font/google'
+import { Heebo } from "next/font/google"
 
-// Configure Inter font to match exactly what Next.js optimizes for
-export const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
+// Hebrew-first font for both body and headings.
+export const heebo = Heebo({
+  subsets: ["hebrew", "latin"],
+  display: "swap",
+  variable: "--font-heebo",
 })

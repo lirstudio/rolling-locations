@@ -1,57 +1,112 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordFormValues,
+} from "@/schemas/auth";
 
 export function ForgotPasswordForm1({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const t = useTranslations("auth");
+  const [sent, setSent] = useState(false);
+
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
+  });
+
+  async function onSubmit(_data: ForgotPasswordFormValues) {
+    await new Promise((r) => setTimeout(r, 400));
+    setSent(true);
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={className} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Forgot your password?</CardTitle>
-          <CardDescription>
-            Enter your email address and we&apos;ll send you a link to reset your password
-          </CardDescription>
+          <CardTitle className="text-xl">
+            {t("forgotPasswordTitle")}
+          </CardTitle>
+          <CardDescription>{t("forgotPasswordDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="grid gap-6">
-              <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full cursor-pointer">
-                  Send Reset Link
+          {sent ? (
+            <div className="grid gap-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                {t("resetLinkSent")}
+              </p>
+              <Link href="/sign-in">
+                <Button variant="outline" className="w-full cursor-pointer">
+                  {t("backToSignIn")}
                 </Button>
-              </div>
-              <div className="text-center text-sm">
-                Remember your password?{" "}
-                <a href="/auth/sign-in" className="underline underline-offset-4">
-                  Back to sign in
-                </a>
-              </div>
+              </Link>
             </div>
-          </form>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="grid gap-6">
+                  <div className="grid gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("email")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="name@example.com"
+                              autoComplete="email"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full cursor-pointer">
+                      {t("sendResetLink")}
+                    </Button>
+                  </div>
+                  <div className="text-center text-sm">
+                    {t("rememberPassword")}{" "}
+                    <Link
+                      href="/sign-in"
+                      className="underline underline-offset-4"
+                    >
+                      {t("backToSignIn")}
+                    </Link>
+                  </div>
+                </div>
+              </form>
+            </Form>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

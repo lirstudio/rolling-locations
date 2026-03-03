@@ -51,21 +51,11 @@ export const statuses = [
   },
 ]
 
-export const priorities = [
-  {
-    label: "Minor",
-    value: "minor"
-  },
-  {
-    label: "Normal",
-    value: "normal"
-  },
-  {
-    label: "Important",
-    value: "important"
-  },
-  {
-    label: "Critical",
-    value: "critical"
-  },
+import type { LucideIcon } from "lucide-react"
+
+export const priorities: { label: string; value: string; icon?: LucideIcon }[] = [
+  { label: "Minor", value: "minor" },
+  { label: "Normal", value: "normal" },
+  { label: "Important", value: "important" },
+  { label: "Critical", value: "critical" },
 ]

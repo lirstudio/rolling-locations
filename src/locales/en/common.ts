@@ -1,0 +1,25 @@
+const common = {
+  appName: "Rollin Locations",
+  tagline: "Find and book unique shoot locations by the hour.",
+  loading: "Loading...",
+  error: "Something went wrong",
+  retry: "Try again",
+  save: "Save",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  delete: "Delete",
+  edit: "Edit",
+  view: "View",
+  back: "Back",
+  next: "Next",
+  previous: "Previous",
+  search: "Search",
+  filter: "Filter",
+  clear: "Clear",
+  submit: "Submit",
+  close: "Close",
+  noResults: "No results found",
+  emptyState: "Nothing to show here",
+} as const;
+
+export default common;

@@ -1,0 +1,34 @@
+---
+description: Rollin Locations tech stack – mandatory libraries, patterns, and constraints for all agents.
+globs: 
+alwaysApply: true
+---
+
+# Tech Stack
+
+## Core
+
+- **Framework:** Next.js (App Router) + TypeScript
+- **Styling:** Tailwind CSS v4 + shadcn/ui (`src/components/ui`)
+- **Icons:** lucide-react only
+- **Forms:** react-hook-form + zod (always paired; never raw state for forms)
+- **State:** Zustand for client state; TanStack Query for server/async state
+- **Backend:** Supabase (Postgres DB, Auth, Storage)
+- **Email:** Resend for all transactional emails
+- **Maps:** Mapbox or Google Maps (place autocomplete + map pin)
+- **i18n:** next-intl + RTL support (Hebrew default)
+- **Payments (v2+):** Stripe
+
+## Hard constraints
+
+- Always use shadcn/ui primitives from `src/components/ui` before creating raw HTML/Tailwind elements.
+- Never use `any` in TypeScript — use explicit types or `unknown`.
+- All Supabase table access from the client must use RLS-protected queries. No unprotected `select *`.
+- All user-facing strings must go through i18n keys; never hardcode Hebrew or English text in JSX.
+- Do not add new dependencies without checking if the functionality is already covered by the stack above.
+
+## File conventions
+
+- Server components by default; add `"use client"` only when hooks/events are needed.
+- Route handlers live in `src/app/api/`.
+- Supabase client: use the project's shared client helper, never instantiate directly in components.

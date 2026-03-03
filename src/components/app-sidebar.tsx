@@ -2,24 +2,19 @@
 
 import * as React from "react"
 import {
-  LayoutPanelLeft,
   LayoutDashboard,
-  Mail,
-  CheckSquare,
-  MessageCircle,
-  Calendar,
-  Shield,
-  AlertTriangle,
-  Settings,
-  HelpCircle,
-  CreditCard,
-  LayoutTemplate,
+  MapPin,
+  CalendarDays,
+  Inbox,
+  BookOpen,
+  FileText,
   Users,
+  Tags,
+  ShieldCheck,
+  Settings,
 } from "lucide-react"
 import Link from "next/link"
 import { Logo } from "@/components/logo"
-import { SidebarNotification } from "@/components/sidebar-notification"
-
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -31,185 +26,98 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import type { LucideIcon } from "lucide-react"
+import type { UserRole } from "@/types"
+import { useAuthStore } from "@/stores/auth-store"
 
-const data = {
-  user: {
-    name: "ShadcnStore",
-    email: "store@example.com",
-    avatar: "",
-  },
-  navGroups: [
+type NavItem = {
+  title: string
+  url: string
+  icon: LucideIcon
+  items?: { title: string; url: string }[]
+}
+
+type NavGroup = {
+  label: string
+  items: NavItem[]
+}
+
+const navByRole: Record<Exclude<UserRole, "guest">, NavGroup[]> = {
+  admin: [
     {
-      label: "Dashboards",
+      label: "ניהול",
       items: [
-        {
-          title: "Dashboard 1",
-          url: "/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          title: "Dashboard 2",
-          url: "/dashboard-2",
-          icon: LayoutPanelLeft,
-        },
+        { title: "לוח בקרה", url: "/dashboard", icon: LayoutDashboard },
+        { title: "משתמשים", url: "/admin/users", icon: Users },
+        { title: "קטגוריות", url: "/admin/categories", icon: Tags },
+        { title: "לוקיישנים", url: "/admin/locations", icon: MapPin },
+        { title: "הזמנות", url: "/admin/bookings", icon: BookOpen },
       ],
     },
     {
-      label: "Apps",
+      label: "הגדרות",
       items: [
         {
-          title: "Mail",
-          url: "/mail",
-          icon: Mail,
-        },
-        {
-          title: "Tasks",
-          url: "/tasks",
-          icon: CheckSquare,
-        },
-        {
-          title: "Chat",
-          url: "/chat",
-          icon: MessageCircle,
-        },
-        {
-          title: "Calendar",
-          url: "/calendar",
-          icon: Calendar,
-        },
-        {
-          title: "Users",
-          url: "/users",
-          icon: Users,
-        },
-      ],
-    },
-    {
-      label: "Pages",
-      items: [
-        {
-          title: "Landing",
-          url: "/landing",
-          target: "_blank",
-          icon: LayoutTemplate,
-        },
-        {
-          title: "Auth Pages",
-          url: "#",
-          icon: Shield,
-          items: [
-            {
-              title: "Sign In 1",
-              url: "/sign-in",
-            },
-            {
-              title: "Sign In 2",
-              url: "/sign-in-2",
-            },
-            {
-              title: "Sign In 3",
-              url: "/sign-in-3",
-            },
-            {
-              title: "Sign Up 1",
-              url: "/sign-up",
-            },
-            {
-              title: "Sign Up 2",
-              url: "/sign-up-2",
-            },
-            {
-              title: "Sign Up 3",
-              url: "/sign-up-3",
-            },
-            {
-              title: "Forgot Password 1",
-              url: "/forgot-password",
-            },
-            {
-              title: "Forgot Password 2",
-              url: "/forgot-password-2",
-            },
-            {
-              title: "Forgot Password 3",
-              url: "/forgot-password-3",
-            }
-          ],
-        },
-        {
-          title: "Errors",
-          url: "#",
-          icon: AlertTriangle,
-          items: [
-            {
-              title: "Unauthorized",
-              url: "/errors/unauthorized",
-            },
-            {
-              title: "Forbidden",
-              url: "/errors/forbidden",
-            },
-            {
-              title: "Not Found",
-              url: "/errors/not-found",
-            },
-            {
-              title: "Internal Server Error",
-              url: "/errors/internal-server-error",
-            },
-            {
-              title: "Under Maintenance",
-              url: "/errors/under-maintenance",
-            },
-          ],
-        },
-        {
-          title: "Settings",
+          title: "הגדרות",
           url: "#",
           icon: Settings,
           items: [
-            {
-              title: "User Settings",
-              url: "/settings/user",
-            },
-            {
-              title: "Account Settings",
-              url: "/settings/account",
-            },
-            {
-              title: "Plans & Billing",
-              url: "/settings/billing",
-            },
-            {
-              title: "Appearance",
-              url: "/settings/appearance",
-            },
-            {
-              title: "Notifications",
-              url: "/settings/notifications",
-            },
-            {
-              title: "Connections",
-              url: "/settings/connections",
-            },
+            { title: "כללי", url: "/admin/settings" },
+            { title: "עמלות", url: "/admin/settings/commission" },
           ],
         },
-        {
-          title: "FAQs",
-          url: "/faqs",
-          icon: HelpCircle,
-        },
-        {
-          title: "Pricing",
-          url: "/pricing",
-          icon: CreditCard,
-        },
+      ],
+    },
+  ],
+  host: [
+    {
+      label: "מארח",
+      items: [
+        { title: "סקירה", url: "/host/overview", icon: LayoutDashboard },
+        { title: "הלוקיישנים שלי", url: "/host/locations", icon: MapPin },
+        { title: "זמינות", url: "/host/availability", icon: CalendarDays },
+        { title: "בקשות", url: "/host/requests", icon: Inbox },
+      ],
+    },
+    {
+      label: "הגדרות",
+      items: [
+        { title: "הגדרות", url: "/host/settings", icon: Settings },
+      ],
+    },
+  ],
+  creator: [
+    {
+      label: "יוצר",
+      items: [
+        { title: "סקירה", url: "/creator/overview", icon: LayoutDashboard },
+        { title: "ההזמנות שלי", url: "/creator/bookings", icon: BookOpen },
+        { title: "חשבוניות", url: "/creator/invoices", icon: FileText },
+      ],
+    },
+    {
+      label: "הגדרות",
+      items: [
+        { title: "הגדרות", url: "/creator/settings", icon: Settings },
       ],
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  role?: Exclude<UserRole, "guest">
+}
+
+export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
+  const navGroups = navByRole[role]
+  const authUser = useAuthStore((s) => s.user)
+
+  const user = {
+    name: authUser?.name ?? "",
+    email: authUser?.email ?? "",
+    avatar: "",
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -220,9 +128,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Logo size={24} className="text-current" />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">ShadcnStore</span>
-                  <span className="truncate text-xs">Admin Dashboard</span>
+                <div className="grid flex-1 text-start text-sm leading-tight">
+                  <span className="truncate font-medium">Rollin Locations</span>
+                  <span className="truncate text-xs text-muted-foreground capitalize">{role}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -230,13 +138,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {data.navGroups.map((group) => (
+        {navGroups.map((group) => (
           <NavMain key={group.label} label={group.label} items={group.items} />
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <SidebarNotification />
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -1,0 +1,50 @@
+---
+description: Supabase usage rules – RLS policies, Storage, Auth patterns, and security constraints for Rollin Locations.
+globs: **/supabase/**,**/lib/supabase*,**/api/**
+alwaysApply: false
+---
+
+# Supabase & RLS
+
+## RLS is mandatory
+
+Enable Row Level Security on **every** table exposed to the client. Never disable RLS as a workaround.
+
+```sql
+-- Example: locations table
+alter table locations enable row level security;
+
+-- Guests: read published locations only
+create policy "public read published locations"
+  on locations for select
+  using (status = 'published');
+
+-- Hosts: full control of own locations
+create policy "hosts manage own locations"
+  on locations for all
+  using (auth.uid() = host_id);
+```
+
+## Roles
+
+Define policies per role: **Guest** (anonymous), **Creator**, **Host**, **Admin**.
+Always document the intent of each policy in a comment above the `create policy` statement.
+
+## Storage
+
+- Published location images/videos → public bucket (fast CDN, no auth overhead).
+- Private/draft assets or user documents → private bucket + signed URLs.
+- v1 video constraints: max 1 featured video per location, enforce max file size in upload handler.
+
+```ts
+// Signed URL example (private bucket)
+const { data } = await supabase.storage
+  .from('private-assets')
+  .createSignedUrl(path, 60 * 60) // 1 hour TTL
+```
+
+## Auth
+
+- Use `supabase.auth.getUser()` server-side (never trust client-side session alone for security decisions).
+- Wrap protected API routes with a session check before any DB query.
+- Do not expose the `service_role` key on the client; keep it in server-only env vars.
