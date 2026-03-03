@@ -56,8 +56,8 @@ export function NavUser({
     .slice(0, 2)
     .toUpperCase();
 
-  function handleSignOut() {
-    signOut();
+  async function handleSignOut() {
+    await signOut();
     router.push("/sign-in");
   }
 

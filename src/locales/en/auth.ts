@@ -16,7 +16,7 @@ const auth = {
   welcomeBack: "Welcome back",
   createAccount: "Create account",
 
-  signInDescription: "Enter your credentials to sign in to your account",
+  signInDescription: "Enter your email and we'll send you a sign-in link or code",
   signUpDescription: "Enter your details to create a new account",
   forgotPasswordTitle: "Forgot your password?",
   forgotPasswordDescription: "Enter your email address and we'll send you a reset link",
@@ -38,6 +38,15 @@ const auth = {
   invalidCredentials: "Invalid email or password",
   emailAlreadyExists: "This email address is already registered",
   resetLinkSent: "A password reset link has been sent to your email",
+
+  sendMagicLink: "Send sign-in link",
+  sendCode: "Send code to email",
+  magicLinkSent: "Sign-in link sent to your email",
+  checkYourEmail: "Check your inbox — link or 6-digit code",
+  enterCode: "Enter code",
+  verify: "Verify",
+  codePlaceholder: "000000",
+  continueWithEmail: "Continue with email",
 } as const;
 
 export default auth;

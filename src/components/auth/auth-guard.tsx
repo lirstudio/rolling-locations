@@ -11,6 +11,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -18,12 +19,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, []);
 
   useEffect(() => {
-    if (hydrated && !isAuthenticated) {
+    if (hydrated && isInitialized && !isAuthenticated) {
       router.replace("/sign-in");
     }
-  }, [hydrated, isAuthenticated, router]);
+  }, [hydrated, isInitialized, isAuthenticated, router]);
 
-  if (!hydrated || !isAuthenticated) {
+  if (!hydrated || !isInitialized || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />

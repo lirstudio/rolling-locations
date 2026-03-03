@@ -16,7 +16,7 @@ const auth = {
   welcomeBack: "ברוך שובך",
   createAccount: "יצירת חשבון",
 
-  signInDescription: "הזן את פרטי ההתחברות שלך כדי להיכנס לחשבון",
+  signInDescription: "הזן את האימייל שלך ונשלח אליך קישור או קוד כניסה",
   signUpDescription: "הזן את הפרטים שלך כדי ליצור חשבון חדש",
   forgotPasswordTitle: "שכחת את הסיסמה?",
   forgotPasswordDescription: "הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס",
@@ -38,6 +38,15 @@ const auth = {
   invalidCredentials: "אימייל או סיסמה שגויים",
   emailAlreadyExists: "כתובת אימייל זו כבר רשומה במערכת",
   resetLinkSent: "קישור לאיפוס סיסמה נשלח לאימייל שלך",
+
+  sendMagicLink: "שלח קישור כניסה",
+  sendCode: "שלח קוד לאימייל",
+  magicLinkSent: "נשלח אליך קישור כניסה למייל",
+  checkYourEmail: "בדוק את תיבת המייל — קישור או קוד בן 6 ספרות",
+  enterCode: "הזן את הקוד",
+  verify: "אימות",
+  codePlaceholder: "000000",
+  continueWithEmail: "המשך עם אימייל",
 } as const;
 
 export default auth;

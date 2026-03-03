@@ -26,6 +26,7 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/schemas/auth";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function ForgotPasswordForm1({
   className,
@@ -33,15 +34,18 @@ export function ForgotPasswordForm1({
 }: React.ComponentProps<"div">) {
   const t = useTranslations("auth");
   const [sent, setSent] = useState(false);
+  const { sendMagicLink, isLoading, error, clearError } = useAuthStore();
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });
 
-  async function onSubmit(_data: ForgotPasswordFormValues) {
-    await new Promise((r) => setTimeout(r, 400));
-    setSent(true);
+  async function onSubmit(data: ForgotPasswordFormValues) {
+    clearError();
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    await sendMagicLink(data.email, `${origin}/auth/callback`);
+    if (!useAuthStore.getState().error) setSent(true);
   }
 
   return (
@@ -57,7 +61,7 @@ export function ForgotPasswordForm1({
           {sent ? (
             <div className="grid gap-4 text-center">
               <p className="text-sm text-muted-foreground">
-                {t("resetLinkSent")}
+                {t("checkYourEmail")}
               </p>
               <Link href="/sign-in">
                 <Button variant="outline" className="w-full cursor-pointer">
@@ -88,8 +92,17 @@ export function ForgotPasswordForm1({
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full cursor-pointer">
-                      {t("sendResetLink")}
+                    {error && (
+                      <p className="text-sm text-destructive text-center">
+                        {error}
+                      </p>
+                    )}
+                    <Button
+                      type="submit"
+                      className="w-full cursor-pointer"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "..." : t("sendMagicLink")}
                     </Button>
                   </div>
                   <div className="text-center text-sm">
