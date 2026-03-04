@@ -1,1 +1,87 @@
-# rolling-locations
+# Rollin Locations 🎬
+
+**Rollin Locations** היא פלטפורמה (Marketplace) למציאת והזמנת לוקיישנים ייחודיים לצילום לפי שעה. הפלטפורמה מחברת בין יוצרי תוכן וצוותי הפקה (Creators) לבין בעלי נכסים ומארחים (Hosts).
+
+---
+
+## 🚀 טכנולוגיות (Tech Stack)
+
+הפרויקט בנוי בסטנדרטים הגבוהים ביותר של פיתוח ווב מודרני:
+
+- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router) + TypeScript.
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/).
+- **Icons:** [Lucide React](https://lucide.dev/).
+- **State Management:** [Zustand](https://docs.pmnd.rs/zustand/) (Client) & [TanStack Query](https://tanstack.com/query/latest) (Server/Async).
+- **Backend & Auth:** [Supabase](https://supabase.com/) (Postgres, Auth, Storage, RLS).
+- **Forms:** React Hook Form + Zod.
+- **i18n:** `next-intl` עם תמיכה מלאה ב-RTL (עברית כשפת ברירת מחדל).
+- **Emails:** [Resend](https://resend.com/) לשליחת מיילים טרנזקציונליים.
+
+---
+
+## 🛠️ מבנה הפרויקט
+
+הפרויקט מאורגן לפי פיצ'רים (Feature-based structure):
+
+```text
+src/
+ ├── app/              # Next.js App Router (Pages & API)
+ ├── components/
+ │    ├── ui/          # shadcn/ui primitives (אין לערוך ישירות)
+ │    └── <feature>/   # רכיבים לפי דומיין (locations, bookings וכו')
+ ├── hooks/            # Custom Hooks משותפים
+ ├── lib/              # קונפיגורציה (Supabase client וכו')
+ ├── utils/            # פונקציות עזר טהורות
+ ├── types/            # הגדרות TypeScript משותפות
+ └── locales/          # קבצי תרגום (he, en)
+```
+
+---
+
+## 🏁 איך מתחילים?
+
+### 1. התקנת תלויות
+```bash
+npm install
+# או
+pnpm install
+```
+
+### 2. הגדרת משתני סביבה
+יש ליצור קובץ `.env.local` ולהוסיף את המפתחות הבאים:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+RESEND_API_KEY=your_resend_key
+```
+
+### 3. הרצת שרת הפיתוח
+```bash
+npm run dev
+```
+האפליקציה תהיה זמינה בכתובת `http://localhost:3000`.
+
+---
+
+## 📐 דגשי פיתוח (Rules of Play)
+
+- **UI First:** תמיד להשתמש ברכיבי `shadcn/ui` מתוך `src/components/ui` לפני יצירת אלמנטים חדשים.
+- **RTL & i18n:** אין להשתמש בטקסט קשיח (Hardcoded). כל המחרוזות חייבות לעבור דרך מפתחות תרגום ב-`locales/`.
+- **Security:** כל הגישה לטבלאות Supabase חייבת להתבצע תחת חוקי RLS (Row Level Security).
+- **Icons:** שימוש ב-`lucide-react` בלבד.
+- **Server Components:** השתמשו ב-Server Components כברירת מחדל. הוסיפו `"use client"` רק כשצריך Hooks או Events.
+
+---
+
+## 🗺️ מפת דרכים (Roadmap - v1 MVP)
+
+- [ ] **Discovery:** חיפוש, פילטור ודפי קטגוריות.
+- [ ] **Booking Flow:** מערכת בקשות הזמנה (Request -> Approve/Reject).
+- [ ] **Host Dashboard:** ניהול לוקיישנים, זמינות (Blocks) וגלריית מדיה.
+- [ ] **Notifications:** שליחת מיילים אוטומטיים על סטטוס הזמנה דרך Resend.
+- [ ] **Admin:** ניהול קטגוריות ומודרציה של לוקיישנים.
+
+---
+
+## 📄 רישיון
+כל הזכויות שמורות ל-**Rolling Locations**.
