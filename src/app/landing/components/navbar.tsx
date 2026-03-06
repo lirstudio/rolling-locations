@@ -24,7 +24,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { Logo } from '@/components/logo'
 import { MegaMenu } from '@/components/landing/mega-menu'
 import { ModeToggle } from '@/components/mode-toggle'
 import { useTheme } from '@/hooks/use-theme'
@@ -82,7 +81,6 @@ export function LandingNavbar() {
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link href="https://shadcnstore.com" className="flex items-center space-x-2 cursor-pointer" target='_blank' rel="noopener noreferrer">
-            <Logo size={32} />
             <span className="font-bold">
               ShadcnStore
             </span>
@@ -158,9 +156,6 @@ export function LandingNavbar() {
               {/* Header */}
               <SheetHeader className="space-y-0 p-4 pb-2 border-b">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Logo size={16} />
-                  </div>
                   <SheetTitle className="text-lg font-semibold">ShadcnStore</SheetTitle>
                   <div className="ml-auto flex items-center gap-2">
                     <Button

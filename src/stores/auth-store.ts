@@ -1,36 +1,24 @@
 import { create } from "zustand";
 import type { User, UserRole } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { roleRedirectPath } from "@/lib/auth";
 import type { Session, User as SupabaseUser } from "@supabase/supabase-js";
-
-const PENDING_SIGNUP_ROLE_KEY = "rollin-pending-signup-role";
 
 function supabaseUserToAppUser(sb: SupabaseUser): User {
   const meta = sb.user_metadata ?? {};
-  const role = (meta.role as UserRole) ?? "creator";
+  const role = (meta.role as UserRole) ?? "guest";
   const name = meta.name ?? meta.full_name ?? sb.email?.split("@")[0] ?? "User";
   return {
     id: sb.id,
     name: typeof name === "string" ? name : "User",
     email: sb.email ?? "",
     phone: meta.phone,
-    role: ["guest", "creator", "host", "admin"].includes(role) ? role : "creator",
+    role: ["guest", "creator", "host", "admin"].includes(role) ? role : "guest",
     createdAt: sb.created_at ?? new Date().toISOString(),
   };
 }
 
-export function roleRedirectPath(role: UserRole): string {
-  switch (role) {
-    case "admin":
-      return "/dashboard";
-    case "host":
-      return "/host/overview";
-    case "creator":
-      return "/creator/overview";
-    default:
-      return "/sign-in";
-  }
-}
+export { roleRedirectPath };
 
 interface AuthState {
   user: User | null;
@@ -44,13 +32,11 @@ interface AuthState {
   sendMagicLink: (email: string, redirectTo?: string) => Promise<void>;
   sendOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, token: string) => Promise<void>;
-  signInWithGoogle: (redirectTo?: string, pendingRole?: "creator" | "host") => Promise<void>;
+  signInWithGoogle: (redirectTo?: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserMetadata: (data: { role?: string; name?: string; phone?: string }) => Promise<void>;
   updateUser: (patch: Partial<User>) => void;
   clearError: () => void;
-  setPendingSignUpRole: (role: "creator" | "host") => void;
-  consumePendingSignUpRole: () => "creator" | "host" | null;
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
@@ -111,21 +97,24 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     set({ isLoading: true, error: null });
     const supabase = createClient();
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       email: email.trim().toLowerCase(),
       token: token.trim(),
       type: "email",
     });
 
     set({ isLoading: false });
-    if (error) set({ error: error.message });
+    if (error) {
+      set({ error: error.message });
+      return;
+    }
+    if (data.session) {
+      get().setSession(data.session);
+    }
   },
 
-  signInWithGoogle: async (redirectTo?: string, pendingRole?: "creator" | "host") => {
+  signInWithGoogle: async (redirectTo?: string) => {
     set({ isLoading: true, error: null });
-    if (pendingRole && typeof window !== "undefined") {
-      sessionStorage.setItem(PENDING_SIGNUP_ROLE_KEY, pendingRole);
-    }
     const supabase = createClient();
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const redirect = redirectTo ?? `${origin}/auth/callback`;
@@ -162,43 +151,30 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     if (!user) return;
     set({ user: { ...user, ...patch } });
   },
-
-  setPendingSignUpRole: (role: "creator" | "host") => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(PENDING_SIGNUP_ROLE_KEY, role);
-    }
-  },
-
-  consumePendingSignUpRole: (): "creator" | "host" | null => {
-    if (typeof window === "undefined") return null;
-    const role = sessionStorage.getItem(PENDING_SIGNUP_ROLE_KEY);
-    sessionStorage.removeItem(PENDING_SIGNUP_ROLE_KEY);
-    if (role === "creator" || role === "host") return role;
-    return null;
-  },
 }));
 
-// Sync auth state from Supabase (run in client)
 export function subscribeAuth() {
-  const supabase = createClient();
-  const { setSession, consumePendingSignUpRole, updateUserMetadata } = useAuthStore.getState();
-
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session);
+  let supabase: ReturnType<typeof createClient>;
+  try {
+    supabase = createClient();
+  } catch {
     useAuthStore.setState({ isInitialized: true });
-  });
+    return;
+  }
 
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  const { setSession } = useAuthStore.getState();
+
+  supabase.auth
+    .getSession()
+    .then(({ data: { session } }) => {
+      setSession(session);
+    })
+    .catch(() => {})
+    .finally(() => {
+      useAuthStore.setState({ isInitialized: true });
+    });
+
+  supabase.auth.onAuthStateChange((_event, session) => {
     setSession(session ?? null);
-
-    if (event === "SIGNED_IN" && session?.user) {
-      const pendingRole = consumePendingSignUpRole();
-      if (pendingRole) {
-        const meta = session.user.user_metadata ?? {};
-        if (!meta.role) {
-          await updateUserMetadata({ role: pendingRole });
-        }
-      }
-    }
   });
 }

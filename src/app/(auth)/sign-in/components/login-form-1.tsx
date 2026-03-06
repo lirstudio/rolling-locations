@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +54,6 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
     defaultValues: { email: "", token: "" },
   });
 
-  // Redirect when session becomes available (e.g. after magic link callback)
   if (isAuthenticated && user) {
     router.push(roleRedirectPath(user.role));
     return null;
@@ -95,8 +93,8 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
     <div className={className} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("welcomeBack")}</CardTitle>
-          <CardDescription>{t("signInDescription")}</CardDescription>
+          <CardTitle className="text-xl">{t("welcomeTitle")}</CardTitle>
+          <CardDescription>{t("authDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {step === "sent" && (
@@ -109,18 +107,15 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
               >
                 {t("backToSignIn")}
               </Button>
-              <div className="text-center text-sm">
-                {t("dontHaveAccount")}{" "}
-                <Link href="/sign-up" className="underline underline-offset-4">
-                  {t("signUp")}
-                </Link>
-              </div>
             </div>
           )}
 
           {step === "otp" && (
             <Form {...otpForm}>
               <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="grid gap-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  {t("otpSentTo", { email: otpEmail })}
+                </p>
                 <FormField
                   control={otpForm.control}
                   name="email"
@@ -144,6 +139,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                           maxLength={6}
                           className="text-center font-mono text-lg tracking-widest"
                           dir="ltr"
+                          autoFocus
                           {...field}
                         />
                       </FormControl>
@@ -161,7 +157,10 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                   type="button"
                   variant="ghost"
                   className="w-full cursor-pointer"
-                  onClick={() => setStep("email")}
+                  onClick={() => {
+                    clearError();
+                    setStep("email");
+                  }}
                 >
                   {t("backToSignIn")}
                 </Button>
@@ -175,7 +174,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    emailForm.handleSubmit((data) => onEmailSubmit(data, "link"))(e);
+                    emailForm.handleSubmit((data) => onEmailSubmit(data, "code"))(e);
                   }}
                   className="grid gap-4"
                 >
@@ -190,6 +189,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                             type="email"
                             placeholder="name@example.com"
                             autoComplete="email"
+                            autoFocus
                             {...field}
                           />
                         </FormControl>
@@ -201,7 +201,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                     <p className="text-sm text-destructive text-center">{error}</p>
                   )}
                   <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
-                    {isLoading ? "..." : t("sendMagicLink")}
+                    {isLoading ? "..." : t("continueWithEmail")}
                   </Button>
                 </form>
               </Form>
@@ -223,13 +223,13 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                   disabled={isLoading}
                   onClick={() =>
                     emailForm.handleSubmit(
-                      (data) => onEmailSubmit(data, "code"),
+                      (data) => onEmailSubmit(data, "link"),
                       () => {}
                     )()
                   }
                 >
                   <Mail className="me-2 h-4 w-4" />
-                  {t("sendCode")}
+                  {t("sendMagicLink")}
                 </Button>
                 <Button
                   variant="outline"
@@ -248,12 +248,12 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                 </Button>
               </div>
 
-              <div className="text-center text-sm">
-                {t("dontHaveAccount")}{" "}
-                <Link href="/sign-up" className="underline underline-offset-4">
-                  {t("signUp")}
-                </Link>
-              </div>
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                {t("termsFooter", {
+                  terms: t("termsOfService"),
+                  privacy: t("privacyPolicy"),
+                })}
+              </p>
             </>
           )}
         </CardContent>

@@ -14,7 +14,6 @@ import {
   Settings,
 } from "lucide-react"
 import Link from "next/link"
-import { Logo } from "@/components/logo"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -108,8 +107,14 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   role?: Exclude<UserRole, "guest">
 }
 
+// MVP_BYPASS: Show all role menus for all users (temporary)
+const allRoleGroups: { role: string; heading: string; groups: NavGroup[] }[] = [
+  { role: "admin", heading: "🔑 אדמין", groups: navByRole.admin },
+  { role: "host", heading: "🏠 מארח", groups: navByRole.host },
+  { role: "creator", heading: "🎬 יוצר תוכן", groups: navByRole.creator },
+]
+
 export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
-  const navGroups = navByRole[role]
   const authUser = useAuthStore((s) => s.user)
 
   const user = {
@@ -125,12 +130,9 @@ export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Logo size={24} className="text-current" />
-                </div>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-medium">Rollin Locations</span>
-                  <span className="truncate text-xs text-muted-foreground capitalize">{role}</span>
+                  <span className="truncate text-xs text-muted-foreground">MVP</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -138,8 +140,12 @@ export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {navGroups.map((group) => (
-          <NavMain key={group.label} label={group.label} items={group.items} />
+        {allRoleGroups.map(({ role: r, heading, groups }) => (
+          <React.Fragment key={r}>
+            {groups.map((group) => (
+              <NavMain key={`${r}-${group.label}`} label={group.label} items={group.items} />
+            ))}
+          </React.Fragment>
         ))}
       </SidebarContent>
       <SidebarFooter>

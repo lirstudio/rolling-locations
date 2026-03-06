@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Logo } from "@/components/logo";
 
 interface AuthCardProps {
   children: React.ReactNode;
@@ -18,9 +17,6 @@ export function AuthCard({ children }: AuthCardProps) {
           href="/"
           className="flex items-center gap-2 self-center font-medium"
         >
-          <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-md">
-            <Logo size={24} />
-          </div>
           {t("appName")}
         </Link>
         {children}

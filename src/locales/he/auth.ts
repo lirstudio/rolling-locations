@@ -16,12 +16,15 @@ const auth = {
   welcomeBack: "ברוך שובך",
   createAccount: "יצירת חשבון",
 
+  welcomeTitle: "ברוך הבא ל-Rollin",
+  authDescription: "הזן את האימייל שלך כדי להתחבר או ליצור חשבון",
+
   signInDescription: "הזן את האימייל שלך ונשלח אליך קישור או קוד כניסה",
   signUpDescription: "הזן את הפרטים שלך כדי ליצור חשבון חדש",
   forgotPasswordTitle: "שכחת את הסיסמה?",
   forgotPasswordDescription: "הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס",
   sendResetLink: "שלח קישור לאיפוס",
-  backToSignIn: "חזרה לכניסה",
+  backToSignIn: "חזרה",
   rememberPassword: "נזכרת בסיסמה?",
 
   roleSelection: "אני רוצה להירשם כ...",
@@ -43,10 +46,15 @@ const auth = {
   sendCode: "שלח קוד לאימייל",
   magicLinkSent: "נשלח אליך קישור כניסה למייל",
   checkYourEmail: "בדוק את תיבת המייל — קישור או קוד בן 6 ספרות",
+  otpSentTo: "קוד נשלח אל {email}",
   enterCode: "הזן את הקוד",
   verify: "אימות",
   codePlaceholder: "000000",
   continueWithEmail: "המשך עם אימייל",
+
+  onboardingTitle: "השלמת פרופיל",
+  onboardingDescription: "ספר לנו קצת על עצמך כדי להתחיל",
+  completeProfile: "סיום והמשך",
 } as const;
 
 export default auth;

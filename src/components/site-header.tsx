@@ -30,6 +30,9 @@ const BREADCRUMB_LABELS: Record<string, string> = {
   creator: "יוצר",
   bookings: "הזמנות",
   invoices: "חשבוניות",
+  users: "משתמשים",
+  categories: "קטגוריות",
+  commission: "עמלות",
 }
 
 function useBreadcrumbs() {

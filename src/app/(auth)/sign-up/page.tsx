@@ -1,10 +1,5 @@
-import { SignupForm1 } from "./components/signup-form-1";
-import { AuthCard } from "@/components/auth/auth-card";
+import { redirect } from "next/navigation";
 
 export default function SignUpPage() {
-  return (
-    <AuthCard>
-      <SignupForm1 />
-    </AuthCard>
-  );
+  redirect("/sign-in");
 }
