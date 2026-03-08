@@ -30,6 +30,8 @@ import {
 import { useHostStore } from "@/stores/host-store";
 import type { LocationStatus } from "@/types";
 
+const HOST_ID = "user-host-1";
+
 const statusVariant: Record<LocationStatus, "default" | "secondary" | "outline"> = {
   published: "default",
   draft: "secondary",
@@ -38,7 +40,11 @@ const statusVariant: Record<LocationStatus, "default" | "secondary" | "outline">
 
 export default function HostLocationsPage() {
   const t = useTranslations("host");
-  const hostLocations = useHostStore((s) => s.getHostLocations());
+  const locations = useHostStore((s) => s.locations);
+  const hostLocations = React.useMemo(
+    () => locations.filter((l) => l.hostId === HOST_ID),
+    [locations]
+  );
   const setLocationStatus = useHostStore((s) => s.setLocationStatus);
   const deleteLocation = useHostStore((s) => s.deleteLocation);
 

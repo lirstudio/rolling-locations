@@ -20,10 +20,16 @@ import {
 } from "@/components/ui/select";
 import { useHostStore } from "@/stores/host-store";
 
+const HOST_ID = "user-host-1";
+
 export default function HostAvailabilityPage() {
   const t = useTranslations("host");
   const router = useRouter();
-  const hostLocations = useHostStore((s) => s.getHostLocations());
+  const locations = useHostStore((s) => s.locations);
+  const hostLocations = React.useMemo(
+    () => locations.filter((l) => l.hostId === HOST_ID),
+    [locations]
+  );
 
   function handleSelect(locationId: string) {
     router.push(`/host/locations/${locationId}/availability`);

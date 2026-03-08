@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu, User, LogOut, CircleUser, Settings, LayoutDashboard } from "lucide-react";
+import { Menu, User, LogOut, CircleUser, Settings, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -64,17 +64,23 @@ function NavAvatar() {
   const dashboardHref = roleRedirectPath(user.role);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full" aria-label={user.name}>
+    <div className="flex items-center gap-0.5">
+      <Button variant="ghost" size="icon" className="rounded-full" aria-label={tNav("dashboard")} asChild>
+        <Link href={dashboardHref}>
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarFallback className="rounded-full text-xs">
               {initials}
             </AvatarFallback>
           </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
+        </Link>
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="rounded-full size-8" aria-label={tNav("accountMenu")}>
+            <ChevronDown className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
         className="min-w-56 rounded-lg"
         side={dropdownSide}
         align="end"
@@ -121,6 +127,7 @@ function NavAvatar() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 }
 

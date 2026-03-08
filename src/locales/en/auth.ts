@@ -17,9 +17,9 @@ const auth = {
   createAccount: "Create account",
 
   welcomeTitle: "Welcome to Rollin",
-  authDescription: "Enter your email to sign in or create an account",
+  authDescription: "Enter your email and we'll send you a 6-digit verification code",
 
-  signInDescription: "Enter your email and we'll send you a sign-in link or code",
+  signInDescription: "Enter your email and we'll send you a verification code",
   signUpDescription: "Enter your details to create a new account",
   forgotPasswordTitle: "Forgot your password?",
   forgotPasswordDescription: "Enter your email address and we'll send you a reset link",
@@ -45,7 +45,7 @@ const auth = {
   sendMagicLink: "Send sign-in link",
   sendCode: "Send code to email",
   magicLinkSent: "Sign-in link sent to your email",
-  checkYourEmail: "Check your inbox — link or 6-digit code",
+  checkYourEmail: "Check your inbox — 6-digit code",
   otpSentTo: "Code sent to {email}",
   enterCode: "Enter code",
   verify: "Verify",
@@ -55,6 +55,8 @@ const auth = {
   onboardingTitle: "Complete Your Profile",
   onboardingDescription: "Tell us a bit about yourself to get started",
   completeProfile: "Complete & Continue",
+
+  setAsAdmin: "Set as admin",
 } as const;
 
 export default auth;

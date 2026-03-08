@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +29,6 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
   const t = useTranslations("auth");
   const router = useRouter();
   const {
-    sendMagicLink,
     sendOtp,
     verifyOtp,
     signInWithGoogle,
@@ -54,34 +52,34 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
     defaultValues: { email: "", token: "" },
   });
 
+  const didRedirect = useRef(false);
+  useEffect(() => {
+    if (!isAuthenticated || !user || didRedirect.current) return;
+    didRedirect.current = true;
+    router.replace(roleRedirectPath(user.role));
+  }, [isAuthenticated, user, router]);
+
   if (isAuthenticated && user) {
-    router.push(roleRedirectPath(user.role));
-    return null;
+    return (
+      <div className="flex min-h-[200px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
+      </div>
+    );
   }
 
-  async function onEmailSubmit(data: SignInFormValues, mode: "link" | "code") {
+  async function onEmailSubmit(data: SignInFormValues) {
     clearError();
-    if (mode === "link") {
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
-      await sendMagicLink(data.email, `${origin}/auth/callback`);
-      if (!useAuthStore.getState().error) setStep("sent");
-    } else {
-      await sendOtp(data.email);
-      if (!useAuthStore.getState().error) {
-        setOtpEmail(data.email);
-        otpForm.setValue("email", data.email);
-        setStep("otp");
-      }
+    await sendOtp(data.email);
+    if (!useAuthStore.getState().error) {
+      setOtpEmail(data.email);
+      otpForm.setValue("email", data.email);
+      setStep("otp");
     }
   }
 
   async function onOtpSubmit(data: VerifyOtpFormValues) {
     clearError();
     await verifyOtp(data.email, data.token);
-    const state = useAuthStore.getState();
-    if (state.isAuthenticated && state.user) {
-      router.push(roleRedirectPath(state.user.role));
-    }
   }
 
   async function onGoogle() {
@@ -97,19 +95,6 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
           <CardDescription>{t("authDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {step === "sent" && (
-            <div className="grid gap-4 text-center">
-              <p className="text-sm text-muted-foreground">{t("checkYourEmail")}</p>
-              <Button
-                variant="outline"
-                className="w-full cursor-pointer"
-                onClick={() => setStep("email")}
-              >
-                {t("backToSignIn")}
-              </Button>
-            </div>
-          )}
-
           {step === "otp" && (
             <Form {...otpForm}>
               <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="grid gap-4">
@@ -172,10 +157,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
             <>
               <Form {...emailForm}>
                 <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    emailForm.handleSubmit((data) => onEmailSubmit(data, "code"))(e);
-                  }}
+                  onSubmit={emailForm.handleSubmit(onEmailSubmit)}
                   className="grid gap-4"
                 >
                   <FormField
@@ -201,7 +183,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                     <p className="text-sm text-destructive text-center">{error}</p>
                   )}
                   <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
-                    {isLoading ? "..." : t("continueWithEmail")}
+                    {isLoading ? "..." : t("sendCode")}
                   </Button>
                 </form>
               </Form>
@@ -216,21 +198,6 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
               </div>
 
               <div className="grid gap-2">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="w-full cursor-pointer"
-                  disabled={isLoading}
-                  onClick={() =>
-                    emailForm.handleSubmit(
-                      (data) => onEmailSubmit(data, "link"),
-                      () => {}
-                    )()
-                  }
-                >
-                  <Mail className="me-2 h-4 w-4" />
-                  {t("sendMagicLink")}
-                </Button>
                 <Button
                   variant="outline"
                   type="button"

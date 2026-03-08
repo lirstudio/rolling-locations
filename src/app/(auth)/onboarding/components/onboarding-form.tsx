@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -49,10 +49,11 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<"di
     }
   }, [isInitialized, isAuthenticated, router]);
 
+  const didRedirectToDashboard = useRef(false);
   useEffect(() => {
-    if (isInitialized && isAuthenticated && user && isOnboardingComplete(user.role)) {
-      router.replace(roleRedirectPath(user.role));
-    }
+    if (!isInitialized || !isAuthenticated || !user || !isOnboardingComplete(user.role) || didRedirectToDashboard.current) return;
+    didRedirectToDashboard.current = true;
+    router.replace(roleRedirectPath(user.role));
   }, [isInitialized, isAuthenticated, user, router]);
 
   if (!isInitialized || !isAuthenticated || !user) {
@@ -73,10 +74,10 @@ export function OnboardingForm({ className, ...props }: React.ComponentProps<"di
       name: data.name,
       phone: data.phone || undefined,
     });
-
     const state = useAuthStore.getState();
     if (state.user) {
-      router.push(roleRedirectPath(state.user.role));
+      didRedirectToDashboard.current = true;
+      router.replace(roleRedirectPath(state.user.role));
     }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore, roleRedirectPath } from "@/stores/auth-store";
 import { HeroSection } from "./components/hero-section";
@@ -12,13 +12,15 @@ import { CTABanner } from "./components/cta-banner";
 
 export default function MarketingHomePage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const didRedirect = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      router.replace(roleRedirectPath(user.role));
-    }
-  }, [isAuthenticated, user, router]);
+    if (!isAuthenticated || !user || didRedirect.current) return;
+    didRedirect.current = true;
+    router.replace(roleRedirectPath(user.role));
+  }, [isAuthenticated, user?.id, user?.role, router]);
 
   if (isAuthenticated && user) {
     return (

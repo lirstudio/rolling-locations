@@ -22,6 +22,8 @@ import { useHostStore } from "@/stores/host-store";
 import { mockUsers } from "@/mocks/users";
 import type { BookingStatus } from "@/types";
 
+const HOST_ID = "user-host-1";
+
 const statusVariant: Record<BookingStatus, "default" | "secondary" | "destructive" | "outline"> = {
   requested: "default",
   approved: "secondary",
@@ -47,8 +49,16 @@ function formatTime(iso: string) {
 
 export default function HostRequestsPage() {
   const t = useTranslations("host");
-  const hostRequests = useHostStore((s) => s.getRequestsForHost());
   const locations = useHostStore((s) => s.locations);
+  const bookingRequests = useHostStore((s) => s.bookingRequests);
+  const hostLocations = React.useMemo(
+    () => locations.filter((l) => l.hostId === HOST_ID),
+    [locations]
+  );
+  const hostRequests = React.useMemo(() => {
+    const locationIds = hostLocations.map((l) => l.id);
+    return bookingRequests.filter((r) => locationIds.includes(r.locationId));
+  }, [bookingRequests, hostLocations]);
 
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
 

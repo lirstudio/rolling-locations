@@ -66,8 +66,17 @@ const MONTH_NAMES_HE = [
 export default function AvailabilityPage() {
   const t = useTranslations("host");
   const params = useParams<{ id: string }>();
-  const location = useHostStore((s) => s.getLocationById(params.id));
-  const blocks = useHostStore((s) => s.getBlocksForLocation(params.id));
+  const locationId = params?.id ?? "";
+  const locations = useHostStore((s) => s.locations);
+  const availabilityBlocks = useHostStore((s) => s.availabilityBlocks);
+  const location = React.useMemo(
+    () => locations.find((l) => l.id === locationId),
+    [locations, locationId]
+  );
+  const blocks = React.useMemo(
+    () => availabilityBlocks.filter((b) => b.locationId === locationId),
+    [availabilityBlocks, locationId]
+  );
   const addBlock = useHostStore((s) => s.addBlock);
   const removeBlock = useHostStore((s) => s.removeBlock);
   const bookingRequests = useHostStore((s) => s.bookingRequests);

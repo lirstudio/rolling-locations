@@ -7,6 +7,7 @@ import {
   LogOut,
   CircleUser,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -26,6 +27,22 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
+
+const allowSelfAdminEmails =
+  typeof process.env.NEXT_PUBLIC_ALLOW_SELF_ADMIN_EMAILS === "string"
+    ? new Set(
+        process.env.NEXT_PUBLIC_ALLOW_SELF_ADMIN_EMAILS.split(",").map((e) =>
+          e.trim().toLowerCase()
+        )
+      )
+    : null;
+
+function canShowSetAsAdmin(email: string, role: string): boolean {
+  if (role === "admin") return false;
+  if (process.env.NODE_ENV === "development") return true;
+  if (allowSelfAdminEmails?.has(email.trim().toLowerCase())) return true;
+  return false;
+}
 
 export function NavUser({
   user,
@@ -48,6 +65,11 @@ export function NavUser({
   const t = useTranslations("auth");
   const tSettings = useTranslations("settings");
   const signOut = useAuthStore((s) => s.signOut);
+  const authUser = useAuthStore((s) => s.user);
+  const updateUserMetadata = useAuthStore((s) => s.updateUserMetadata);
+  const showSetAsAdmin =
+    authUser &&
+    canShowSetAsAdmin(authUser.email, authUser.role);
 
   const initials = user.name
     .split(" ")
@@ -59,6 +81,11 @@ export function NavUser({
   async function handleSignOut() {
     await signOut();
     router.push("/sign-in");
+  }
+
+  async function handleSetAsAdmin() {
+    await updateUserMetadata({ role: "admin" });
+    router.push("/dashboard");
   }
 
   return (
@@ -119,6 +146,15 @@ export function NavUser({
                   {tSettings("user.title")}
                 </Link>
               </DropdownMenuItem>
+              {showSetAsAdmin && (
+                <DropdownMenuItem
+                  onClick={handleSetAsAdmin}
+                  className="cursor-pointer"
+                >
+                  <ShieldCheck />
+                  {t("setAsAdmin")}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -6,6 +6,7 @@ const marketing = {
     signUp: "Sign up",
     signIn: "Sign in",
     dashboard: "Dashboard",
+    accountMenu: "Account menu",
     langHe: "עברית",
     langEn: "English",
   },

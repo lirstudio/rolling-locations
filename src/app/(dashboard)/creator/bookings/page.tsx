@@ -21,6 +21,8 @@ import {
 import { useCreatorStore } from "@/stores/creator-store";
 import type { BookingStatus } from "@/types";
 
+const CREATOR_ID = "user-creator-1";
+
 const statusVariant: Record<BookingStatus, "default" | "secondary" | "destructive" | "outline"> = {
   requested: "default",
   approved: "secondary",
@@ -45,8 +47,12 @@ function formatTime(iso: string) {
 
 export default function CreatorBookingsPage() {
   const t = useTranslations("creator");
-  const creatorBookings = useCreatorStore((s) => s.getCreatorBookings());
+  const bookingRequests = useCreatorStore((s) => s.bookingRequests);
   const locations = useCreatorStore((s) => s.locations);
+  const creatorBookings = React.useMemo(
+    () => bookingRequests.filter((r) => r.creatorId === CREATOR_ID),
+    [bookingRequests]
+  );
 
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
 

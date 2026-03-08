@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Clock, CheckCircle, DollarSign } from "lucide-react";
 import Link from "next/link";
@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCreatorStore } from "@/stores/creator-store";
 import type { BookingStatus } from "@/types";
+
+const CREATOR_ID = "user-creator-1";
 
 function formatCurrency(amount: number) {
   return `₪${amount.toLocaleString("he-IL")}`;
@@ -36,7 +38,12 @@ const statusVariant: Record<BookingStatus, "default" | "secondary" | "destructiv
 
 export default function CreatorOverviewPage() {
   const t = useTranslations("creator");
-  const creatorBookings = useCreatorStore((s) => s.getCreatorBookings());
+  const bookingRequests = useCreatorStore((s) => s.bookingRequests);
+  const locations = useCreatorStore((s) => s.locations);
+  const creatorBookings = useMemo(
+    () => bookingRequests.filter((r) => r.creatorId === CREATOR_ID),
+    [bookingRequests]
+  );
 
   // #region agent log
   useEffect(() => {
@@ -54,7 +61,6 @@ export default function CreatorOverviewPage() {
     }).catch(() => {});
   }, [creatorBookings.length]);
   // #endregion
-  const locations = useCreatorStore((s) => s.locations);
 
   const activeBookings = creatorBookings.filter(
     (r) => r.status === "approved"

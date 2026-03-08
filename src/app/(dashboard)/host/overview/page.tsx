@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { MapPin, Inbox, CheckCircle, DollarSign } from "lucide-react";
 import Link from "next/link";
@@ -14,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useHostStore } from "@/stores/host-store";
 import { mockUsers } from "@/mocks/users";
+
+const HOST_ID = "user-host-1";
 
 function formatCurrency(amount: number) {
   return `₪${amount.toLocaleString("he-IL")}`;
@@ -35,9 +38,16 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
 
 export default function HostOverviewPage() {
   const t = useTranslations("host");
-  const hostLocations = useHostStore((s) => s.getHostLocations());
-  const hostRequests = useHostStore((s) => s.getRequestsForHost());
   const locations = useHostStore((s) => s.locations);
+  const bookingRequests = useHostStore((s) => s.bookingRequests);
+  const hostLocations = useMemo(
+    () => locations.filter((l) => l.hostId === HOST_ID),
+    [locations]
+  );
+  const hostRequests = useMemo(() => {
+    const locationIds = hostLocations.map((l) => l.id);
+    return bookingRequests.filter((r) => locationIds.includes(r.locationId));
+  }, [bookingRequests, hostLocations]);
 
   const activeListings = hostLocations.filter(
     (l) => l.status === "published"
