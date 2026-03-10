@@ -3,6 +3,9 @@
     "supabase": {
       "url": "https://mcp.supabase.com/mcp?project_ref=wrmwgcbswvyblidythko",
       "headers": {}
+    },
+    "vercel": {
+      "url": "https://mcp.vercel.com"
     }
   }
 }

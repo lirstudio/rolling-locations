@@ -48,18 +48,48 @@ pnpm install
 ```
 
 ### 2. הגדרת משתני סביבה
-יש ליצור קובץ `.env.local` ולהוסיף את המפתחות הבאים:
+יש ליצור קובץ `.env.local` (**לא לעשות commit** — הקובץ ממוען ב-.gitignore) ולהוסיף את המפתחות הבאים:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_key
+SEND_EMAIL_HOOK_SECRET=v1,whsec_<base64_secret>
 ```
+אופציונלי: `AUTH_FROM_EMAIL`, `BOOKINGS_FROM_EMAIL`, `ADMIN_HOST_FALLBACK_EMAIL`, `SUPABASE_SERVICE_ROLE_KEY`, `VERCEL_TOKEN` — לפי הצורך (ראו הודעות שגיאה בקוד).
 
 ### 3. הרצת שרת הפיתוח
 ```bash
 npm run dev
 ```
 האפליקציה תהיה זמינה בכתובת `http://localhost:3000`.
+
+---
+
+## 📧 מיילי אימות (OTP / Magic link) — לכל המשתמשים
+
+האפליקציה משתמשת ב-**Send Email Hook** של Supabase: כל מיילי האימות (קוד 6 ספרות, magic link, recovery, הזמנות וכו') נשלחים דרך **Resend** מ-route ייעודי, ולכן מגיעים **לכל כתובת** (לא רק לצוות).
+
+**הגדרה (פעם אחת):**
+
+1. **להפוך את ה-API לנגיש מהאינטרנט**  
+   ב-production: האתר כבר נגיש. ב-dev: להשתמש ב-ngrok (או דומה) כדי לחשוף `https://your-ngrok-url/api/auth/send-email`.
+
+2. **ב-Supabase Dashboard:** [Authentication → Hooks](https://supabase.com/dashboard/project/_/auth/hooks) → **Send Email** → Create.
+   - **URL:** `https://<הדומיין-שלך>/api/auth/send-email`
+   - **Generate Secret** — להעתיק את הסוד (פורמט `v1,whsec_...`).
+   - לשמור את הסוד ב-`.env.local` כ-`SEND_EMAIL_HOOK_SECRET=v1,whsec_<הערך>`.
+
+3. **משתני סביבה חובה:** `RESEND_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SEND_EMAIL_HOOK_SECRET`. אופציונלי: `AUTH_FROM_EMAIL` אם רוצים שולח שונה מנoreply@locations.rollin.video.
+
+אחרי ההגדרה, Supabase מנתב את **כל** שליחות מייל האימות ל-hook הזה והאפליקציה שולחת אותן דרך Resend — לכל סוגי המיילים ולכל המשתמשים.
+
+**הוספת הסוד ב-Vercel (כדי שמיילים יעבדו בפרודקשן):**
+
+1. ב-Vercel: הפרויקט → **Settings** → **Environment Variables**.
+2. **Add** → בשדה **Key** הזן: `SEND_EMAIL_HOOK_SECRET`.
+3. בשדה **Value** הדבק את הערך מ-`.env.local` (כל מה שמופיע אחרי `SEND_EMAIL_HOOK_SECRET=`).
+4. סמן **Production**, **Preview**, **Development** → **Save**.
+5. (אופציונלי) Redeploy כדי שהמשתנה ייטען.
 
 ---
 
