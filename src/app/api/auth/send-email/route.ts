@@ -108,11 +108,13 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    console.error("[auth/send-email] Resend error:", error.message, "to:", to.replace(/(.{2}).*(@.*)/, "$1…$2"));
     return NextResponse.json(
       { error: { http_code: 503, message: error.message } },
       { status: 503, headers: { "Content-Type": "application/json" } }
     );
   }
 
+  console.info("[auth/send-email] Sent OK to:", to.replace(/(.{2}).*(@.*)/, "$1…$2"));
   return NextResponse.json({}, { status: 200, headers: { "Content-Type": "application/json" } });
 }

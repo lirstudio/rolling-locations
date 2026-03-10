@@ -83,13 +83,20 @@ npm run dev
 
 אחרי ההגדרה, Supabase מנתב את **כל** שליחות מייל האימות ל-hook הזה והאפליקציה שולחת אותן דרך Resend — לכל סוגי המיילים ולכל המשתמשים.
 
-**הוספת הסוד ב-Vercel (כדי שמיילים יעבדו בפרודקשן):**
+**חשוב — כדי שמיילים יגיעו לכל משתמש (לא רק למנהל):**  
+ב-Resend, **לפני אימות דומיין** אפשר לשלוח רק לכתובת בעל החשבון. כדי לשלוח לכל כתובת:
+- היכנס ל-[Resend → Domains](https://resend.com/domains), הוסף את הדומיין שממנו אתה שולח (למשל `locations.rollin.video`).
+- הוסף את רשומות ה-DNS (SPF, DKIM) לפי ההנחיות ב-Resend.
+- אחרי אימות, שליחה תתאפשר לכל נמען.
+
+**הוספת משתני הסביבה ב-Vercel (כדי שמיילים יעבדו בפרודקשן):**
 
 1. ב-Vercel: הפרויקט → **Settings** → **Environment Variables**.
-2. **Add** → בשדה **Key** הזן: `SEND_EMAIL_HOOK_SECRET`.
-3. בשדה **Value** הדבק את הערך מ-`.env.local` (כל מה שמופיע אחרי `SEND_EMAIL_HOOK_SECRET=`).
-4. סמן **Production**, **Preview**, **Development** → **Save**.
-5. (אופציונלי) Redeploy כדי שהמשתנה ייטען.
+2. הוסף **שני** משתנים (כל אחד בנפרד):
+   - **Key:** `SEND_EMAIL_HOOK_SECRET` | **Value:** הערך מ-`.env.local` (כל מה שמופיע אחרי `SEND_EMAIL_HOOK_SECRET=`).
+   - **Key:** `RESEND_API_KEY` | **Value:** מפתח ה-API מ-Resend (אותו ערך כמו ב-`.env.local`).
+3. לכל משתנה: סמן **Production**, **Preview**, **Development** → **Save**.
+4. (מומלץ) **Redeploy** כדי שהמשתנים ייטענו.
 
 ---
 

@@ -10,8 +10,8 @@ import { CreatorBookingEmail } from "@/emails/creator-booking-confirmation";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = "Rollin Locations <bookings@locations.rollin.video>";
-const ADMIN_FALLBACK_HOST_EMAIL = process.env.ADMIN_HOST_FALLBACK_EMAIL ?? "liran@lirstudio.co.il";
+const FROM_EMAIL = process.env.BOOKINGS_FROM_EMAIL ?? "Rollin Locations <bookings@locations.rollin.video>";
+const ADMIN_FALLBACK_HOST_EMAIL = process.env.ADMIN_HOST_FALLBACK_EMAIL;
 
 export interface CreateBookingInput {
   locationId: string;
@@ -148,47 +148,49 @@ export async function createBookingRequest(
   const displayStart = format(new Date(input.startDate), "EEEE, d MMMM yyyy", { locale: he });
   const displayEnd = format(new Date(input.endDate), "EEEE, d MMMM yyyy", { locale: he });
 
-  // 2. Send both emails in parallel – don't block on failure
-  const [hostResult, creatorResult] = await Promise.allSettled([
-    resend.emails.send({
-      from: FROM_EMAIL,
-      to: hostEmailTarget,
-      subject: `בקשת הזמנה חדשה — ${input.locationTitle}`,
-      react: React.createElement(HostBookingEmail, {
-        locationTitle: input.locationTitle,
-        locationAddress: input.locationAddress,
-        creatorName: input.creatorName,
-        creatorEmail: input.creatorEmail,
-        creatorPhone: input.creatorPhone,
-        startDate: displayStart,
-        endDate: displayEnd,
-        durationDays: input.durationDays,
-        dailyRate: input.dailyRate,
-        subtotal: input.subtotal,
-        total: input.total,
-        notes: input.notes,
-        bookingId,
-      }),
+  // 2. Send both emails in parallel – don't block on failure (host email only if target from input or env)
+  const hostPromise = hostEmailTarget
+    ? resend.emails.send({
+        from: FROM_EMAIL,
+        to: hostEmailTarget,
+        subject: `בקשת הזמנה חדשה — ${input.locationTitle}`,
+        react: React.createElement(HostBookingEmail, {
+          locationTitle: input.locationTitle,
+          locationAddress: input.locationAddress,
+          creatorName: input.creatorName,
+          creatorEmail: input.creatorEmail,
+          creatorPhone: input.creatorPhone,
+          startDate: displayStart,
+          endDate: displayEnd,
+          durationDays: input.durationDays,
+          dailyRate: input.dailyRate,
+          subtotal: input.subtotal,
+          total: input.total,
+          notes: input.notes,
+          bookingId,
+        }),
+      })
+    : Promise.resolve({ data: null, error: null });
+  const creatorPromise = resend.emails.send({
+    from: FROM_EMAIL,
+    to: input.creatorEmail,
+    subject: `אישור בקשת הזמנה — ${input.locationTitle}`,
+    react: React.createElement(CreatorBookingEmail, {
+      creatorName: input.creatorName,
+      locationTitle: input.locationTitle,
+      locationAddress: input.locationAddress,
+      startDate: displayStart,
+      endDate: displayEnd,
+      durationDays: input.durationDays,
+      dailyRate: input.dailyRate,
+      subtotal: input.subtotal,
+      total: input.total,
+      notes: input.notes,
+      bookingId,
     }),
-    resend.emails.send({
-      from: FROM_EMAIL,
-      to: input.creatorEmail,
-      subject: `אישור בקשת הזמנה — ${input.locationTitle}`,
-      react: React.createElement(CreatorBookingEmail, {
-        creatorName: input.creatorName,
-        locationTitle: input.locationTitle,
-        locationAddress: input.locationAddress,
-        startDate: displayStart,
-        endDate: displayEnd,
-        durationDays: input.durationDays,
-        dailyRate: input.dailyRate,
-        subtotal: input.subtotal,
-        total: input.total,
-        notes: input.notes,
-        bookingId,
-      }),
-    }),
-  ]);
+  });
+
+  const [hostResult, creatorResult] = await Promise.allSettled([hostPromise, creatorPromise]);
 
   if (hostResult.status === "rejected") {
     console.error("[createBookingRequest] Host email REJECTED:", hostResult.reason);
