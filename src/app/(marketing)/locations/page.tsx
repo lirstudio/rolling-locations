@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { X } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { LocationCard } from "@/components/locations/location-card";
 import {
   Select,
   SelectContent,
@@ -16,60 +18,91 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LocationCard } from "@/components/marketing/location-card";
-import {
-  MOCK_LOCATIONS,
-  MOCK_CATEGORIES,
-} from "@/data/mock-locations";
+import { usePublishedLocations } from "@/hooks/use-published-locations";
+import { mockCategories } from "@/mocks/categories";
+import type { Location } from "@/types";
 
 const PAGE_SIZE = 6;
 const PRICE_MIN = 0;
-const PRICE_MAX = 300;
-const PRICE_STEP = 10;
+const PRICE_MAX = 5000;
+const PRICE_STEP = 100;
 
 type LocationTypeFilter = "all" | "indoor" | "outdoor";
 
-function matchLocationType(categorySlug: string, type: LocationTypeFilter): boolean {
+const OUTDOOR_CATEGORY_IDS = new Set(
+  mockCategories.filter((c) => c.slug === "outdoor-photography").map((c) => c.id)
+);
+
+function matchLocationType(loc: Location, type: LocationTypeFilter): boolean {
   if (type === "all") return true;
-  if (type === "outdoor") return categorySlug === "outdoor";
-  return categorySlug !== "outdoor";
+  const isOutdoor = loc.categoryIds.some((id) => OUTDOOR_CATEGORY_IDS.has(id));
+  return type === "outdoor" ? isOutdoor : !isOutdoor;
 }
+
 
 export default function LocationsIndexPage() {
   const t = useTranslations("marketing.locationsIndex");
-  const tLoc = useTranslations("locations");
+  const locale = useLocale();
+  const dir = locale === "he" ? "rtl" : "ltr";
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category") ?? "";
+  const cityParam = searchParams.get("city") ?? "";
+  const queryParam = searchParams.get("q") ?? "";
 
-  const [categories, setCategories] = useState<string[]>(
-    categoryParam ? [categoryParam] : []
+  const { locations: publishedLocations } = usePublishedLocations();
+
+  const topLevelCategories = useMemo(
+    () => mockCategories.filter((c) => c.visible && !c.parentId),
+    []
   );
+
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(() => {
+    if (!categoryParam) return [];
+    const cat = mockCategories.find((c) => c.slug === categoryParam);
+    return cat ? [cat.id] : [];
+  });
   const [locationType, setLocationType] = useState<LocationTypeFilter>("all");
-  const [city, setCity] = useState("");
-  const [priceMax, setPriceMax] = useState(PRICE_MAX);
+  const [city, setCity] = useState(cityParam);
+  const [query, setQuery] = useState(queryParam);
+  const [priceRange, setPriceRange] = useState<[number, number]>([PRICE_MIN, PRICE_MAX]);
   const [page, setPage] = useState(1);
 
-  const toggleCategory = (slug: string) => {
-    setCategories((prev) =>
-      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
+  const toggleCategory = (catId: string) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]
     );
     setPage(1);
   };
 
+  const isPriceFiltered = priceRange[0] > PRICE_MIN || priceRange[1] < PRICE_MAX;
+
   const filtered = useMemo(() => {
-    let list = [...MOCK_LOCATIONS];
-    if (categories.length > 0) {
-      list = list.filter((l) => categories.includes(l.categorySlug));
-    }
-    list = list.filter((l) => matchLocationType(l.categorySlug, locationType));
-    if (city) {
-      list = list.filter((l) =>
-        tLoc(l.cityKey).toLowerCase().includes(city.toLowerCase())
+    let list = publishedLocations;
+    if (query.trim()) {
+      const needle = query.trim().toLowerCase();
+      list = list.filter(
+        (l) =>
+          l.title.toLowerCase().includes(needle) ||
+          l.description.toLowerCase().includes(needle) ||
+          l.address.city.toLowerCase().includes(needle)
       );
     }
-    list = list.filter((l) => l.priceHourly <= priceMax);
+    if (selectedCategoryIds.length > 0) {
+      list = list.filter((l) =>
+        l.categoryIds.some((id) => selectedCategoryIds.includes(id))
+      );
+    }
+    list = list.filter((l) => matchLocationType(l, locationType));
+    if (city) {
+      list = list.filter((l) =>
+        l.address.city.toLowerCase().includes(city.toLowerCase())
+      );
+    }
+    list = list.filter(
+      (l) => l.pricing.dailyRate >= priceRange[0] && l.pricing.dailyRate <= priceRange[1]
+    );
     return list;
-  }, [categories, locationType, city, priceMax, tLoc]);
+  }, [publishedLocations, query, selectedCategoryIds, locationType, city, priceRange]);
 
   const paginated = useMemo(
     () => filtered.slice(0, page * PAGE_SIZE),
@@ -77,16 +110,18 @@ export default function LocationsIndexPage() {
   );
   const hasMore = paginated.length < filtered.length;
   const activeFilters =
-    (categories.length > 0 ? 1 : 0) +
+    (query ? 1 : 0) +
+    (selectedCategoryIds.length > 0 ? 1 : 0) +
     (locationType !== "all" ? 1 : 0) +
     (city ? 1 : 0) +
-    (priceMax < PRICE_MAX ? 1 : 0);
+    (isPriceFiltered ? 1 : 0);
 
   const clearFilters = () => {
-    setCategories([]);
+    setQuery("");
+    setSelectedCategoryIds([]);
     setLocationType("all");
     setCity("");
-    setPriceMax(PRICE_MAX);
+    setPriceRange([PRICE_MIN, PRICE_MAX]);
     setPage(1);
   };
 
@@ -108,23 +143,54 @@ export default function LocationsIndexPage() {
 
       <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
         <aside className="space-y-6 rounded-xl border border-border bg-muted/30 p-4">
+          {/* Free-text search */}
+          <div className="space-y-2">
+            <Label className="text-foreground">{t("search")}</Label>
+            <div className="relative">
+              <Search className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t("searchPlaceholder")}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+                className="h-9 ps-9"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => { setQuery(""); setPage(1); }}
+                  className="absolute top-1/2 end-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={t("clearFilters")}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category */}
           <div className="space-y-3">
             <Label className="text-foreground">{t("category")}</Label>
             <div className="flex flex-col gap-2">
-              {MOCK_CATEGORIES.map((c) => (
+              {topLevelCategories.map((c) => (
                 <label
                   key={c.id}
                   className="flex cursor-pointer items-center gap-2 text-sm"
                 >
                   <Checkbox
-                    checked={categories.includes(c.slug)}
-                    onCheckedChange={() => toggleCategory(c.slug)}
+                    checked={selectedCategoryIds.includes(c.id)}
+                    onCheckedChange={() => toggleCategory(c.id)}
                   />
-                  {tLoc(`categories.${c.slug}`)}
+                  {c.name}
                 </label>
               ))}
             </div>
           </div>
+
+          {/* Location type */}
           <div className="space-y-2">
             <Label className="text-foreground">{t("type")}</Label>
             <Select
@@ -144,36 +210,61 @@ export default function LocationsIndexPage() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* City */}
           <div className="space-y-2">
             <Label className="text-foreground">{t("city")}</Label>
-            <Input
-              type="text"
-              placeholder="—"
-              value={city}
-              onChange={(e) => {
-                setCity(e.target.value);
-                setPage(1);
-              }}
-              className="h-9"
-            />
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="—"
+                value={city}
+                onChange={(e) => {
+                  setCity(e.target.value);
+                  setPage(1);
+                }}
+                className="h-9 pe-8"
+              />
+              {city && (
+                <button
+                  type="button"
+                  onClick={() => { setCity(""); setPage(1); }}
+                  className="absolute top-1/2 end-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={t("clearFilters")}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-foreground">
-              {t("priceRange")} ≤ ₪{priceMax}/hr
-            </Label>
-            <input
-              type="range"
+
+          {/* Price range */}
+          <div className="space-y-3">
+            <Label className="text-foreground">{t("priceRange")}</Label>
+            <p className="text-sm font-medium text-foreground tabular-nums">
+              ₪{priceRange[0].toLocaleString()}
+              {" – "}
+              {priceRange[1] >= PRICE_MAX
+                ? `₪${PRICE_MAX.toLocaleString()}+`
+                : `₪${priceRange[1].toLocaleString()}`}
+              <span className="text-muted-foreground font-normal">
+                {" "}/{t("pricePerDayUnit")}
+              </span>
+            </p>
+            <Slider
+              dir={dir}
               min={PRICE_MIN}
               max={PRICE_MAX}
               step={PRICE_STEP}
-              value={priceMax}
-              onChange={(e) => {
-                setPriceMax(Number(e.target.value));
+              value={priceRange}
+              onValueChange={(v) => {
+                setPriceRange(v as [number, number]);
                 setPage(1);
               }}
-              className="w-full accent-primary"
+              className="mt-1"
             />
           </div>
+
           <Button variant="outline" size="sm" className="w-full" onClick={clearFilters}>
             {t("clearFilters")}
           </Button>
@@ -195,7 +286,7 @@ export default function LocationsIndexPage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5">
                 {paginated.map((loc) => (
                   <LocationCard key={loc.id} location={loc} />
                 ))}

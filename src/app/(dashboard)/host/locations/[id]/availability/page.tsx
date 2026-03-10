@@ -129,6 +129,7 @@ export default function AvailabilityPage() {
       end: new Date(newEnd).toISOString(),
       isBlocked: true,
       note: newNote || undefined,
+      source: "manual",
     });
     setNewStart("");
     setNewEnd("");

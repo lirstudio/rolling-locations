@@ -78,7 +78,7 @@ const admin = {
     creator: "Creator",
     date: "Date",
     duration: "Duration",
-    hours: "hours",
+    days: "days",
     price: "Price",
     status: {
       label: "Status",

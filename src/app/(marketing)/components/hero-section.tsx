@@ -1,17 +1,45 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, MapPin, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, Search, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { mockCategories } from "@/mocks/categories";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1800&q=80";
 
+const EMPTY_CATEGORY = "__all__";
+
 export function HeroSection() {
   const t = useTranslations("marketing.hero");
+  const router = useRouter();
+
+  const [query, setQuery] = useState("");
+  const [city, setCity] = useState("");
+  const [categorySlug, setCategorySlug] = useState(EMPTY_CATEGORY);
+
+  const topLevelCategories = mockCategories.filter((c) => c.visible && !c.parentId);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (city.trim()) params.set("city", city.trim());
+    if (categorySlug && categorySlug !== EMPTY_CATEGORY) params.set("category", categorySlug);
+    const qs = params.toString();
+    router.push(`/locations${qs ? `?${qs}` : ""}`);
+  }
 
   return (
     <section className="relative">
@@ -25,7 +53,6 @@ export function HeroSection() {
           className="object-cover"
           sizes="100vw"
         />
-        {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Centered text content */}
@@ -41,9 +68,30 @@ export function HeroSection() {
 
       {/* Search bar — overlapping the hero bottom edge */}
       <div className="relative z-20 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14">
-        <div className="rounded-xl border border-border bg-card p-4 shadow-lg sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
-            {/* Location field */}
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-xl border border-border bg-card p-4 shadow-lg sm:p-6"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+            {/* General search field */}
+            <div className="flex-[2] min-w-0">
+              <label className="mb-1.5 block text-xs font-semibold text-foreground">
+                {t("searchQuery")}
+              </label>
+              <div className="relative">
+                <Search className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("searchQueryPlaceholder")}
+                  className="bg-background ps-10 pe-4"
+                  aria-label={t("searchQuery")}
+                />
+              </div>
+            </div>
+
+            {/* City / region field */}
             <div className="flex-1 min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-foreground">
                 {t("searchCity")}
@@ -52,39 +100,47 @@ export function HeroSection() {
                 <MapPin className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   placeholder={t("searchCity")}
                   className="bg-background ps-10 pe-4"
-                  readOnly
                   aria-label={t("searchCity")}
                 />
               </div>
             </div>
-            {/* Category field */}
+
+            {/* Category select */}
             <div className="flex-1 min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-foreground">
                 {t("searchCategory")}
               </label>
               <div className="relative">
-                <Tag className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder={t("searchCategory")}
-                  className="bg-background ps-10 pe-4"
-                  readOnly
-                  aria-label={t("searchCategory")}
-                />
+                <Tag className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
+                <Select value={categorySlug} onValueChange={setCategorySlug}>
+                  <SelectTrigger className="bg-background ps-10" aria-label={t("searchCategory")}>
+                    <SelectValue placeholder={t("allCategories")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_CATEGORY}>{t("allCategories")}</SelectItem>
+                    {topLevelCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.slug}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+
             {/* CTA */}
-            <Button size="lg" asChild className="shrink-0 w-full sm:w-auto">
-              <Link href="/locations">
-                {t("cta")}
-                <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
-              </Link>
+            <Button type="submit" size="lg" className="shrink-0 w-full sm:w-auto">
+              {t("cta")}
+              <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
             </Button>
           </div>
-        </div>
+        </form>
       </div>
+
       {/* Spacer so next section doesn't overlap */}
       <div className="h-8 sm:h-10" />
     </section>

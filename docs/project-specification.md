@@ -1,7 +1,7 @@
 ## Project details
 
 - **Working name:** Rollin Locations (sub-brand of Rolling)
-- **One-liner:** Find and book unique shoot locations by the hour.
+- **One-liner:** Find and book unique shoot locations by the day.
 - **Default language:** Hebrew (RTL)
 - **Localization:** support multiple locales (i18n)
 - **Audience:** content creators and production teams
@@ -13,7 +13,7 @@
 ### מודל עסקי (מפורט)
 
 - **Hosts (מארחים):** נרשמים למערכת ומפרסמים משרד אחד או יותר.
-- **Creators (שוכרים):** מבקשים הזמנה למשרד לפי תאריך/שעות (ו/או יומי).
+- **Creators (שוכרים):** מבקשים הזמנה למשרד לפי תאריכים (יום אחד או יותר).
 - **המערכת (Admin):** מגדירה לכל Host את מודל העמלות/תמחור המנוי.
 
 #### עמלה (Commission)

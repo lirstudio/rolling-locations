@@ -78,7 +78,7 @@ const admin = {
     creator: "יוצר",
     date: "תאריך",
     duration: "משך",
-    hours: "שעות",
+    days: "ימים",
     price: "מחיר",
     status: {
       label: "סטטוס",

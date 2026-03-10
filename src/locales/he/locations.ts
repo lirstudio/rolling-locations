@@ -1,10 +1,15 @@
 /** Locale strings for mock location/category content (marketing discovery). */
 const locations = {
+  emptyCategory: "אין לוקיישנים בקטגוריה זו כרגע.",
   categories: {
     studio: "סטודיו",
+    podcast: "פודקאסט",
+    "outdoor-photography": "צילומי חוץ",
+    "event-hall": "אולם להשכרה",
+    offices: "משרדים להשכרה",
+    "office-floor": "קומה להשכרה",
     office: "משרד",
-    loft: "לופט",
-    outdoor: "חוץ",
+    "meeting-room": "חדר ישיבות",
   },
   cities: {
     telAviv: "תל אביב",

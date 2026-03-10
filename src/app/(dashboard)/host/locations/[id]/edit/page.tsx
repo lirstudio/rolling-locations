@@ -5,12 +5,13 @@ import { useRouter, useParams } from "next/navigation";
 import { LocationForm } from "@/components/locations/location-form";
 import { useHostStore } from "@/stores/host-store";
 import type { LocationFormValues } from "@/schemas/location";
+import type { MediaItem } from "@/types";
 
 export default function EditLocationPage() {
   const t = useTranslations("host");
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const location = useHostStore((s) => s.getLocationById(params.id));
+  const location = useHostStore((s) => s.locations.find((l) => l.id === params.id));
   const updateLocation = useHostStore((s) => s.updateLocation);
 
   if (!location) {
@@ -21,19 +22,27 @@ export default function EditLocationPage() {
     );
   }
 
-  function handleSubmit(values: LocationFormValues) {
-    updateLocation(params.id, {
+  async function handleSubmit(values: LocationFormValues) {
+    const mediaGallery: MediaItem[] = (values.mediaUrls ?? []).map((url, index) => ({
+      id: crypto.randomUUID(),
+      url,
+      type: "image" as const,
+      isFeatured: index === 0,
+    }));
+
+    await updateLocation(params.id, {
       title: values.title,
       description: values.description,
-      type: values.type,
       address: { ...values.address, country: values.address.country ?? "IL" },
+      mediaGallery,
       categoryIds: values.categoryIds,
       pricing: values.pricing,
       rules: values.rules,
       amenities: values.amenities,
+      showcaseVideos: values.showcaseVideoUrls ?? [],
       status: values.status ?? "draft",
     });
-    router.push("/host/locations");
+    router.push(`/host/locations/${params.id}/view`);
   }
 
   return (
@@ -47,12 +56,13 @@ export default function EditLocationPage() {
           defaultValues={{
             title: location.title,
             description: location.description,
-            type: location.type,
             address: location.address,
             categoryIds: location.categoryIds,
             pricing: location.pricing,
             rules: location.rules ?? "",
             amenities: location.amenities ?? [],
+            mediaUrls: location.mediaGallery.map((m) => m.url),
+            showcaseVideoUrls: location.showcaseVideos ?? [],
             status: location.status,
           }}
           onSubmit={handleSubmit}

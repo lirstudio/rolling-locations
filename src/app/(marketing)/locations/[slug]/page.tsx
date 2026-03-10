@@ -1,61 +1,87 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MapPin, CheckCircle2 } from "lucide-react";
+import { format } from "date-fns";
+import { he } from "date-fns/locale/he";
+import { MapPin, CheckCircle2, Loader2, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LocationCard } from "@/components/marketing/location-card";
-import {
-  LocationShowcaseVideos,
-  type ShowcaseVideoItem,
-} from "@/components/marketing/location-showcase-videos";
-import { getLocationBySlug, getSimilarLocations } from "@/data/mock-locations";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { fetchLocationBySlug, fetchPublishedLocations } from "@/app/actions/locations";
+import { VideoCarousel } from "@/components/locations/video-carousel";
+import { LocationCard } from "@/components/locations/location-card";
+import type { Location } from "@/types";
+import type { DateRange } from "react-day-picker";
 
-const PLACEHOLDER_IMAGES: Record<string, string> = {
-  studio: "https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800&q=80",
-  office: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-  loft: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
-  outdoor: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80",
-};
+function normalizeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
 
 export default function LocationDetailsPage() {
   const params = useParams();
-  const slug = typeof params.slug === "string" ? params.slug : "";
+  const slugRaw = typeof params.slug === "string" ? params.slug : "";
+  const slug = useMemo(() => normalizeSlug(slugRaw), [slugRaw]);
   const t = useTranslations("marketing.locationDetails");
-  const tLoc = useTranslations("locations");
 
-  const location = useMemo(() => getLocationBySlug(slug), [slug]);
-  const similar = useMemo(
-    () => (location ? getSimilarLocations(location, 6) : []),
-    [location]
-  );
+  const [location, setLocation] = useState<Location | null | undefined>(undefined);
+  const [similar, setSimilar] = useState<Location[]>([]);
 
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("12:00");
-  const [galleryOpen, setGalleryOpen] = useState(false);
+  useEffect(() => {
+    setLocation(undefined);
+    setSimilar([]);
+    fetchLocationBySlug(slug).then((loc) => {
+      setLocation(loc);
+      if (loc) {
+        fetchPublishedLocations().then((all) => {
+          setSimilar(
+            all
+              .filter(
+                (l) =>
+                  l.id !== loc.id &&
+                  (l.categoryIds.some((id) => loc.categoryIds.includes(id)) ||
+                    l.address.city === loc.address.city)
+              )
+              .slice(0, 6)
+          );
+        });
+      }
+    });
+  }, [slug]);
 
-  const hours = useMemo(() => {
-    if (!startTime || !endTime) return 0;
-    const [sh, sm] = startTime.split(":").map(Number);
-    const [eh, em] = endTime.split(":").map(Number);
-    return eh - sh + (em - sm) / 60;
-  }, [startTime, endTime]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarClickCount = useRef(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const estimate = location ? Math.round(location.priceHourly * hours) : 0;
+  useEffect(() => setSelectedImageIndex(0), [slug]);
+
+  const days = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) return 0;
+    const diff = Math.round(
+      (dateRange.to.getTime() - dateRange.from.getTime()) / 86_400_000
+    );
+    return diff >= 0 ? diff + 1 : 0;
+  }, [dateRange]);
+
+  const estimate = location ? location.pricing.dailyRate * days : 0;
+
+  if (location === undefined) {
+    return (
+      <div className="container flex min-h-[50vh] items-center justify-center px-4 py-16">
+        <Loader2 className="size-10 animate-spin text-muted-foreground" aria-hidden />
+      </div>
+    );
+  }
 
   if (!location) {
     return (
@@ -68,104 +94,120 @@ export default function LocationDetailsPage() {
     );
   }
 
-  const imgSrc = PLACEHOLDER_IMAGES[location.imagePlaceholder] ?? PLACEHOLDER_IMAGES.studio;
-  const title = tLoc(location.titleKey);
-  const city = tLoc(location.cityKey);
-  const category = tLoc(`categories.${location.categorySlug}`);
+  const gallery = location.mediaGallery;
+  const mainImageUrl = gallery[selectedImageIndex]?.url ?? gallery[0]?.url;
 
   return (
     <div className="container px-4 pb-24 sm:px-6 lg:px-8">
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <section className="overflow-hidden rounded-xl border border-border bg-muted">
-            <button
-              type="button"
-              className="relative block w-full aspect-[16/10] cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-t-xl overflow-hidden"
-              onClick={() => setGalleryOpen(true)}
-            >
-              <Image
-                src={imgSrc}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-                priority
-              />
-            </button>
-            <div className="flex gap-2 p-2 overflow-x-auto">
-              {[1, 2, 3].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="relative h-16 w-24 shrink-0 rounded overflow-hidden bg-muted focus-visible:ring-2 focus-visible:ring-ring"
-                  onClick={() => setGalleryOpen(true)}
-                >
-                  <Image src={imgSrc} alt="" fill className="object-cover" sizes="96px" />
-                </button>
-              ))}
-            </div>
-          </section>
-          <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>{t("galleryPlaceholder")}</DialogTitle>
-              </DialogHeader>
-              <p className="text-sm text-muted-foreground">{t("galleryPlaceholder")}</p>
-            </DialogContent>
-          </Dialog>
+          {mainImageUrl && (
+            <section className="overflow-hidden rounded-xl border border-border bg-muted">
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src={mainImageUrl}
+                  alt={location.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  priority={selectedImageIndex === 0}
+                  unoptimized={mainImageUrl.includes("supabase.co") && mainImageUrl.includes("/storage/")}
+                />
+              </div>
+              {gallery.length > 1 && (
+                <div className="flex gap-2 p-2 overflow-x-auto">
+                  {gallery.map((m, index) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`relative h-16 w-24 shrink-0 rounded overflow-hidden bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        index === selectedImageIndex
+                          ? "ring-2 ring-primary ring-offset-2"
+                          : ""
+                      }`}
+                    >
+                      <Image
+                        src={m.url}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                        unoptimized={m.url.includes("supabase.co") && m.url.includes("/storage/")}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
 
           <section>
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{title}</h1>
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+              {location.title}
+            </h1>
             <p className="mt-1 flex items-center gap-1 text-muted-foreground">
               <MapPin className="h-4 w-4 shrink-0" />
-              {city}
+              {location.address.street}, {location.address.city}
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-md bg-muted px-2 py-1 text-sm">{category}</span>
-            </div>
-            <p className="mt-4 text-muted-foreground">{tLoc(location.descriptionKey)}</p>
+            <p className="mt-4 text-muted-foreground">{location.description}</p>
           </section>
 
-          <section>
-            <h2 className="text-lg font-semibold text-foreground">{t("amenities")}</h2>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-              {location.amenitiesKeys.map((key) => (
-                <li key={key} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-                  {tLoc(key)}
-                </li>
-              ))}
-            </ul>
-          </section>
+          {location.amenities && location.amenities.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold text-foreground">
+                {t("amenities")}
+              </h2>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {location.amenities.map((a) => (
+                  <li
+                    key={a}
+                    className="flex items-center gap-2 text-sm text-muted-foreground"
+                  >
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                    {a}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-          <section>
-            <h2 className="text-lg font-semibold text-foreground">{t("rules")}</h2>
-            <ul className="mt-3 list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              {location.rulesKeys.map((key) => (
-                <li key={key}>{tLoc(key)}</li>
-              ))}
-            </ul>
-          </section>
+          {location.rules && (
+            <section>
+              <h2 className="text-lg font-semibold text-foreground">{t("rules")}</h2>
+              <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">
+                {location.rules}
+              </p>
+            </section>
+          )}
 
-          {location.showcaseVideos?.length ? (
-            <LocationShowcaseVideos
-              videos={location.showcaseVideos.map(
-                (v): ShowcaseVideoItem => ({
-                  id: v.id,
-                  url: v.url,
-                  thumbnailUrl: v.thumbnailUrl,
-                  caption: v.captionKey ? tLoc(v.captionKey) : undefined,
-                })
-              )}
-            />
-          ) : null}
+          {location.showcaseVideos && location.showcaseVideos.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold text-foreground">
+                {t("videosFromLocation")}
+              </h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {t("videosFromLocationSubline")}
+              </p>
+              <div className="mt-4">
+                <VideoCarousel
+                  urls={location.showcaseVideos}
+                  prevLabel={t("playVideo")}
+                  nextLabel={t("playVideo")}
+                  playLabel={t("playVideo")}
+                />
+              </div>
+            </section>
+          )}
 
           {similar.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-foreground">{t("similarLocations")}</h2>
+              <h2 className="text-lg font-semibold text-foreground">
+                {t("similarLocations")}
+              </h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {similar.map((loc) => (
-                  <LocationCard key={loc.id} location={loc} />
+                  <LocationCard key={loc.id} location={loc} variant="compact" />
                 ))}
               </div>
             </section>
@@ -177,69 +219,130 @@ export default function LocationDetailsPage() {
             <CardHeader>
               <h2 className="text-lg font-semibold">{t("pricing")}</h2>
               <p className="text-sm text-muted-foreground">
-                {t("perHour", { price: location.priceHourly })}
-                {location.priceDaily != null && (
-                  <span className="ms-2"> / {t("perDay", { price: location.priceDaily })}</span>
-                )}
+                ₪{location.pricing.dailyRate} / {t("days").replace("ימים", "יום")}
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>{t("date")}</Label>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Label>{t("startTime")}</Label>
-                  <Input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
+              <Popover
+                open={calendarOpen}
+                onOpenChange={(open) => {
+                  setCalendarOpen(open);
+                  if (open) calendarClickCount.current = 0;
+                }}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-start font-normal h-auto min-h-10 py-2",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="me-2 h-4 w-4 shrink-0" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <span>
+                          {format(dateRange.from, "EEE, d MMM", { locale: he })}
+                          {" — "}
+                          {format(dateRange.to, "EEE, d MMM", { locale: he })}
+                        </span>
+                      ) : (
+                        format(dateRange.from, "EEE, d MMM", { locale: he })
+                      )
+                    ) : (
+                      t("selectDates")
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center" side="bottom">
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={(range) => {
+                      setDateRange(range);
+                      calendarClickCount.current += 1;
+                      if (calendarClickCount.current >= 2) {
+                        setCalendarOpen(false);
+                        calendarClickCount.current = 0;
+                      }
+                    }}
+                    numberOfMonths={2}
+                    disabled={{ before: new Date() }}
+                    locale={he}
+                    dir="rtl"
                   />
+                  {dateRange?.from && (
+                    <div className="border-t border-border p-2 flex justify-end">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setDateRange(undefined);
+                          setCalendarOpen(false);
+                        }}
+                      >
+                        {t("resetDates")}
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+
+              {days > 0 && (
+                <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      ₪{location.pricing.dailyRate} × {days} {t("days")}
+                    </span>
+                    <span className="font-medium text-foreground">
+                      ₪{estimate.toLocaleString("he-IL")}
+                    </span>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>{t("endTime")}</Label>
-                  <Input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                  />
-                </div>
-              </div>
-              {hours > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  {t("estimate")}: <span className="font-medium text-foreground">₪{estimate}</span>
+              )}
+
+              <Button
+                className="w-full"
+                disabled={days <= 0}
+                asChild={days > 0}
+              >
+                {days > 0 ? (
+                  <Link
+                    href={`/locations/${encodeURIComponent(slug)}/booking?from=${format(dateRange!.from!, "yyyy-MM-dd")}&to=${format(dateRange!.to!, "yyyy-MM-dd")}`}
+                  >
+                    {t("requestBooking")}
+                  </Link>
+                ) : (
+                  t("requestBooking")
+                )}
+              </Button>
+              {days <= 0 && (
+                <p className="text-center text-xs text-muted-foreground">
+                  {t("selectDatesToBook")}
                 </p>
               )}
-              <Button className="w-full" asChild>
-                <Link href="/auth/sign-in">{t("requestBooking")}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-6 border border-border">
-            <CardContent className="pt-6">
-              <h3 className="text-sm font-semibold text-foreground">{t("host")}</h3>
-              <div className="mt-3 flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-muted text-muted-foreground text-sm">
-                    {tLoc(location.hostNameKey).slice(0, 1)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="font-medium text-foreground">{tLoc(location.hostNameKey)}</p>
-              </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
       <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-border bg-background p-4 lg:hidden">
-        <Button className="w-full" size="lg" asChild>
-          <Link href="/auth/sign-in">{t("requestBooking")}</Link>
+        <Button
+          className="w-full"
+          size="lg"
+          disabled={days <= 0}
+          asChild={days > 0}
+        >
+          {days > 0 ? (
+            <Link
+              href={`/locations/${encodeURIComponent(slug)}/booking?from=${format(dateRange!.from!, "yyyy-MM-dd")}&to=${format(dateRange!.to!, "yyyy-MM-dd")}`}
+            >
+              {t("requestBooking")}
+            </Link>
+          ) : (
+            t("requestBooking")
+          )}
         </Button>
       </div>
     </div>

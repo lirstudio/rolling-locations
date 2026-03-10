@@ -2,11 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Menu, User, LogOut, CircleUser, Settings, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +27,24 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
 import { roleRedirectPath } from "@/lib/auth";
+
+const SHOOT_OPTIONS = [
+  {
+    labelKey: "shootCommercial" as const,
+    categorySlug: "commercial",
+    image: "https://images.unsplash.com/photo-1574717025058-2f8737d2e2b7?w=600&h=400&fit=crop&q=80",
+  },
+  {
+    labelKey: "shootConference" as const,
+    categorySlug: "conference",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop&q=80",
+  },
+  {
+    labelKey: "shootPodcast" as const,
+    categorySlug: "podcast",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&h=400&fit=crop&q=80",
+  },
+];
 
 function getInitials(name: string): string {
   return name
@@ -135,6 +161,7 @@ export function SiteNav() {
   const t = useTranslations("marketing.nav");
   const locale = useLocale();
   const [open, setOpen] = useState(false);
+  const [shootMenuOpen, setShootMenuOpen] = useState(false);
   const sheetSide = locale === "he" ? "right" : "left";
 
   const navLinks = [
@@ -150,13 +177,47 @@ export function SiteNav() {
           <span className="font-bold text-foreground">Rollin Locations</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
             <Button key={href} variant="ghost" asChild className="ms-1 me-1">
               <Link href={href}>{label}</Link>
             </Button>
           ))}
-        </nav>
+
+          <NavigationMenu dir={locale === "he" ? "rtl" : "ltr"}>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 focus:bg-accent/50 data-[state=open]:bg-accent/50 h-9 px-4 py-2 text-sm font-medium cursor-pointer">
+                  {t("whatToShoot")}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid w-[640px] grid-cols-3 gap-3 p-4">
+                    {SHOOT_OPTIONS.map((opt) => (
+                      <Link
+                        key={opt.categorySlug}
+                        href={`/locations?category=${opt.categorySlug}`}
+                        className="group relative block aspect-[4/3] overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                      >
+                        <Image
+                          src={opt.image}
+                          alt={t(opt.labelKey)}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="200px"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <span className="absolute inset-x-0 bottom-0 p-3 text-center text-base font-semibold text-white">
+                          {t(opt.labelKey)}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
 
         <div className="hidden md:flex items-center gap-2">
           <NavAvatar />
@@ -182,6 +243,41 @@ export function SiteNav() {
                   </Link>
                 </Button>
               ))}
+
+              <button
+                type="button"
+                onClick={() => setShootMenuOpen((v) => !v)}
+                className="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+              >
+                {t("whatToShoot")}
+                <ChevronDown className={`size-4 transition-transform ${shootMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+              {shootMenuOpen && (
+                <div className="grid grid-cols-1 gap-2 px-2 pb-2">
+                  {SHOOT_OPTIONS.map((opt) => (
+                    <Link
+                      key={opt.categorySlug}
+                      href={`/locations?category=${opt.categorySlug}`}
+                      onClick={() => setOpen(false)}
+                      className="group relative block aspect-video overflow-hidden rounded-lg"
+                    >
+                      <Image
+                        src={opt.image}
+                        alt={t(opt.labelKey)}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="280px"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      <span className="absolute inset-x-0 bottom-0 p-2 text-center text-sm font-semibold text-white">
+                        {t(opt.labelKey)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
               <div className="mt-4 border-t border-border pt-4 flex items-center justify-end">
                 <NavAvatar />
               </div>

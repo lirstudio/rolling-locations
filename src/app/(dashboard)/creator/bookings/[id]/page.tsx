@@ -42,19 +42,12 @@ const statusIcon: Record<BookingStatus, React.ElementType> = {
   cancelled: XCircle,
 };
 
-function formatFull(iso: string) {
+function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("he-IL", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
-}
-
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("he-IL", {
-    hour: "2-digit",
-    minute: "2-digit",
   });
 }
 
@@ -167,19 +160,17 @@ export default function CreatorBookingDetailPage() {
                 <p className="text-sm text-muted-foreground">{host?.email}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t("bookings.date")}</p>
-                <p className="font-medium">{formatFull(booking.start)}</p>
+                <p className="text-sm text-muted-foreground">{t("bookings.startDate")}</p>
+                <p className="font-medium">{formatDate(booking.start)}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t("bookings.time")}</p>
-                <p className="font-medium">
-                  {formatTime(booking.start)} – {formatTime(booking.end)}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("bookings.endDate")}</p>
+                <p className="font-medium">{formatDate(booking.end)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{t("bookings.duration")}</p>
                 <p className="font-medium">
-                  {booking.durationHours} {t("bookings.hours")}
+                  {booking.durationDays} {t("bookings.days")}
                 </p>
               </div>
               <div>

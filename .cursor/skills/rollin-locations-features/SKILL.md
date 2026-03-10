@@ -20,9 +20,9 @@ Full spec: [docs/project-specification.md](../../docs/project-specification.md)
 
 - **Users** – id, name, email, phone, role
 - **Categories** – id, name, slug, cover/icon, order, visible
-- **Locations** – id, title, description, type, address+geo, media_gallery, host_id, categories, pricing (hourly + optional daily), rules, amenities, status (draft/published/paused)
+- **Locations** – id, title, description, type, address+geo, media_gallery, host_id, categories, pricing (daily rate only), rules, amenities, status (draft/published/paused)
 - **Availability** – location_id, start, end, is_blocked, note
-- **Booking Requests** – id, location_id, creator_id, start, end, duration, price_estimate, status (requested→approved/rejected→cancelled), notes
+- **Booking Requests** – id, location_id, creator_id, start (date), end (date), duration_days, price_estimate, status (requested→approved/rejected→cancelled), notes
 
 ## v1 UI screens checklist
 

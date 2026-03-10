@@ -1,10 +1,15 @@
 /** Locale strings for mock location/category content (marketing discovery). */
 const locations = {
+  emptyCategory: "No locations in this category yet.",
   categories: {
     studio: "Studio",
+    podcast: "Podcast",
+    "outdoor-photography": "Outdoor Photography",
+    "event-hall": "Event Hall",
+    offices: "Offices for Rent",
+    "office-floor": "Floor for Rent",
     office: "Office",
-    loft: "Loft",
-    outdoor: "Outdoor",
+    "meeting-room": "Meeting Room",
   },
   cities: {
     telAviv: "Tel Aviv",

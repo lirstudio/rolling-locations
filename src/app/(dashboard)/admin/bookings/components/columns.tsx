@@ -92,10 +92,10 @@ export function getBookingColumns(
       ),
     },
     {
-      accessorKey: "durationHours",
+      accessorKey: "durationDays",
       header: "משך",
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.durationHours} שעות</span>
+        <span className="text-sm">{row.original.durationDays} ימים</span>
       ),
     },
     {

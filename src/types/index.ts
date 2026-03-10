@@ -33,27 +33,18 @@ export interface Category {
   iconUrl?: string;
   order: number;
   visible: boolean;
+  parentId?: string;
 }
 
 // ─── Locations ────────────────────────────────────────────────────────────────
 
-export type LocationType =
-  | "studio"
-  | "rooftop"
-  | "apartment"
-  | "office"
-  | "outdoor"
-  | "industrial"
-  | "other";
-
 export interface LocationPricing {
-  hourlyRate: number;
-  dailyRate?: number;
-  minimumHours?: number;
+  dailyRate: number;
 }
 
 export interface LocationAddress {
   street: string;
+  neighborhood?: string;
   city: string;
   country: string;
   lat?: number;
@@ -69,9 +60,9 @@ export interface MediaItem {
 
 export interface Location {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  type: LocationType;
   address: LocationAddress;
   mediaGallery: MediaItem[];
   hostId: string;
@@ -79,11 +70,14 @@ export interface Location {
   pricing: LocationPricing;
   rules?: string;
   amenities?: string[];
+  showcaseVideos?: string[];
   status: LocationStatus;
   createdAt: string;
 }
 
 // ─── Availability ─────────────────────────────────────────────────────────────
+
+export type AvailabilitySource = "manual" | "google_calendar";
 
 export interface AvailabilityBlock {
   id: string;
@@ -92,6 +86,28 @@ export interface AvailabilityBlock {
   end: string;
   isBlocked: boolean;
   note?: string;
+  source: AvailabilitySource;
+  externalEventId?: string;
+  createdAt?: string;
+}
+
+export interface OperatingHoursEntry {
+  id?: string;
+  locationId: string;
+  dayOfWeek: number; // 0=Sun … 6=Sat
+  isOpen: boolean;
+  openTime?: string; // "HH:mm"
+  closeTime?: string; // "HH:mm"
+}
+
+export interface GoogleCalendarConnection {
+  id: string;
+  hostId: string;
+  locationId: string;
+  googleAccountEmail: string;
+  calendarId: string;
+  lastSyncAt?: string;
+  syncEnabled: boolean;
 }
 
 // ─── Booking Requests ─────────────────────────────────────────────────────────
@@ -102,7 +118,7 @@ export interface BookingRequest {
   creatorId: string;
   start: string;
   end: string;
-  durationHours: number;
+  durationDays: number;
   priceEstimate: number;
   status: BookingStatus;
   notes?: string;
@@ -116,11 +132,9 @@ export interface BookingRequest {
 export interface LocationCardVM {
   id: string;
   title: string;
-  type: LocationType;
   city: string;
   coverUrl: string;
-  hourlyRate: number;
-  dailyRate?: number;
+  dailyRate: number;
   status: LocationStatus;
 }
 

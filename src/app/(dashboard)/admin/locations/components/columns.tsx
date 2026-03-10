@@ -55,7 +55,7 @@ export function getLocationColumns(
       cell: ({ row }) => (
         <div>
           <p className="font-medium">{row.original.title}</p>
-          <p className="text-xs text-muted-foreground">{row.original.type}</p>
+          <p className="text-xs text-muted-foreground">{row.original.address.city}</p>
         </div>
       ),
     },
