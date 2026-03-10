@@ -70,11 +70,9 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
   async function onEmailSubmit(data: SignInFormValues) {
     clearError();
     await sendOtp(data.email);
-    if (!useAuthStore.getState().error) {
-      setOtpEmail(data.email);
-      otpForm.setValue("email", data.email);
-      setStep("otp");
-    }
+    setOtpEmail(data.email);
+    otpForm.setValue("email", data.email);
+    setStep("otp");
   }
 
   async function onOtpSubmit(data: VerifyOtpFormValues) {
