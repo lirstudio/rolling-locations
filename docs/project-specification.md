@@ -1,6 +1,6 @@
 ## Project details
 
-- **Working name:** Rollin Locations (sub-brand of Rolling)
+- **Working name:** Rollin Locations (sub-brand of Rollin)
 - **One-liner:** Find and book unique shoot locations by the day.
 - **Default language:** Hebrew (RTL)
 - **Localization:** support multiple locales (i18n)

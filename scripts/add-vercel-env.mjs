@@ -2,14 +2,14 @@
 /**
  * Add SEND_EMAIL_HOOK_SECRET to Vercel project env via API.
  * Requires: VERCEL_TOKEN (from https://vercel.com/account/tokens), .env.local with SEND_EMAIL_HOOK_SECRET.
- * Optional: VERCEL_PROJECT_NAME (default: rolling-locations), VERCEL_TEAM_ID (for team projects).
+ * Optional: VERCEL_PROJECT_NAME (default: rollin-locations), VERCEL_TEAM_ID (for team projects).
  * Run: node --env-file=.env.local scripts/add-vercel-env.mjs
  *      or: VERCEL_TOKEN=xxx node --env-file=.env.local scripts/add-vercel-env.mjs
  */
 
 const token = process.env.VERCEL_TOKEN;
 const secret = process.env.SEND_EMAIL_HOOK_SECRET;
-const project = process.env.VERCEL_PROJECT_NAME || "rolling-locations";
+const project = process.env.VERCEL_PROJECT_NAME || "rollin-locations";
 const teamId = process.env.VERCEL_TEAM_ID;
 
 if (!token) {

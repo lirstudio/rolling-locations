@@ -121,4 +121,4 @@ npm run dev
 ---
 
 ## 📄 רישיון
-כל הזכויות שמורות ל-**Rolling Locations**.
+כל הזכויות שמורות ל-**Rollin Locations**.
