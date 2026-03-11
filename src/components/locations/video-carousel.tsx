@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-// ── Video URL helpers ──────────────────────────────────────────────────────────
+// ── URL helpers ────────────────────────────────────────────────────────────────
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(
@@ -60,6 +59,7 @@ export function VideoCarousel({ urls, prevLabel, nextLabel, playLabel }: VideoCa
   if (videos.length === 0) return null;
 
   const active = videos[activeIndex];
+  const isMulti = videos.length > 1;
 
   function prev() {
     setActiveIndex((i) => (i === 0 ? videos.length - 1 : i - 1));
@@ -70,98 +70,136 @@ export function VideoCarousel({ urls, prevLabel, nextLabel, playLabel }: VideoCa
   }
 
   return (
-    <div className="space-y-3">
-      {/* Main video frame */}
-      <div className="relative overflow-hidden rounded-xl border border-border bg-black aspect-video">
-        {active.kind === "youtube" || active.kind === "vimeo" ? (
-          <iframe
-            key={activeIndex}
-            src={active.embedUrl}
-            title={playLabel}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 size-full"
-          />
-        ) : (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
-          <video
-            key={activeIndex}
-            src={active.url}
-            controls
-            className="absolute inset-0 size-full object-contain"
-          />
+    <div className="space-y-4 text-center">
+      {/* counter when multiple */}
+      {isMulti && (
+        <p className="text-sm text-muted-foreground tabular-nums">
+          {activeIndex + 1} / {videos.length}
+        </p>
+      )}
+
+      {/* player + arrows */}
+      <div className="relative flex items-center justify-center gap-3">
+        {/* prev arrow */}
+        {isMulti && (
+          <button
+            type="button"
+            onClick={prev}
+            aria-label={prevLabel}
+            className="hidden sm:flex shrink-0 h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronRight className="size-5 rtl:hidden" />
+            <ChevronLeft className="size-5 hidden rtl:block" />
+          </button>
+        )}
+
+        {/* video embed */}
+        <div className="relative flex-1 overflow-hidden rounded-xl border border-border bg-black aspect-video shadow-sm">
+          {active.kind === "youtube" || active.kind === "vimeo" ? (
+            <iframe
+              key={activeIndex}
+              src={active.embedUrl}
+              title={`${playLabel} ${activeIndex + 1}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 size-full"
+            />
+          ) : (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <video
+              key={activeIndex}
+              src={active.url}
+              controls
+              className="absolute inset-0 size-full object-contain"
+            />
+          )}
+        </div>
+
+        {/* next arrow */}
+        {isMulti && (
+          <button
+            type="button"
+            onClick={next}
+            aria-label={nextLabel}
+            className="hidden sm:flex shrink-0 h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronLeft className="size-5 rtl:hidden" />
+            <ChevronRight className="size-5 hidden rtl:block" />
+          </button>
         )}
       </div>
 
-      {/* Navigation: thumbnails row + prev/next */}
-      {videos.length > 1 && (
-        <div className="flex items-center gap-2">
-          <Button
+      {/* mobile arrows */}
+      {isMulti && (
+        <div className="flex justify-center gap-3 sm:hidden">
+          <button
             type="button"
-            variant="outline"
-            size="icon"
-            className="shrink-0 size-8"
             onClick={prev}
             aria-label={prevLabel}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronRight className="size-4" />
-          </Button>
-
-          <div className="flex flex-1 gap-2 overflow-x-auto py-0.5">
-            {videos.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActiveIndex(i)}
-                className={`relative shrink-0 h-14 w-22 rounded-lg overflow-hidden border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  i === activeIndex
-                    ? "border-primary"
-                    : "border-border opacity-60 hover:opacity-90"
-                }`}
-                aria-label={`${playLabel} ${i + 1}`}
-              >
-                {v.kind === "youtube" ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={v.thumbnailUrl}
-                    alt=""
-                    className="size-full object-cover bg-black"
-                  />
-                ) : (
-                  <div className="size-full bg-muted flex items-center justify-center">
-                    <Play className="size-4 text-muted-foreground" />
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <Button
+            <ChevronRight className="size-5 rtl:hidden" />
+            <ChevronLeft className="size-5 hidden rtl:block" />
+          </button>
+          <button
             type="button"
-            variant="outline"
-            size="icon"
-            className="shrink-0 size-8"
             onClick={next}
             aria-label={nextLabel}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronLeft className="size-4" />
-          </Button>
+            <ChevronLeft className="size-5 rtl:hidden" />
+            <ChevronRight className="size-5 hidden rtl:block" />
+          </button>
         </div>
       )}
 
-      {/* Dot indicators */}
-      {videos.length > 1 && (
-        <div className="flex justify-center gap-1.5">
+      {/* dots */}
+      {isMulti && (
+        <div className="flex justify-center gap-2">
           {videos.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setActiveIndex(i)}
-              className={`size-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                i === activeIndex ? "bg-primary" : "bg-muted-foreground/30"
-              }`}
               aria-label={`${playLabel} ${i + 1}`}
+              className={`rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                i === activeIndex
+                  ? "w-5 h-2 bg-primary"
+                  : "w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+              }`}
             />
+          ))}
+        </div>
+      )}
+
+      {/* thumbnail strip — only when 3+ videos */}
+      {videos.length >= 3 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 justify-center">
+          {videos.map((v, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              aria-label={`${playLabel} ${i + 1}`}
+              className={`relative shrink-0 h-16 w-28 rounded-lg overflow-hidden border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                i === activeIndex
+                  ? "border-primary opacity-100 shadow-sm"
+                  : "border-transparent opacity-50 hover:opacity-80"
+              }`}
+            >
+              {v.kind === "youtube" ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={v.thumbnailUrl}
+                  alt=""
+                  className="size-full object-cover bg-black"
+                />
+              ) : (
+                <div className="size-full bg-muted flex items-center justify-center">
+                  <Play className="size-4 text-muted-foreground" />
+                </div>
+              )}
+            </button>
           ))}
         </div>
       )}
