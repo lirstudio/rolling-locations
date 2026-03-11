@@ -80,6 +80,7 @@ const marketing = {
     privacy: "פרטיות",
     allRights: "כל הזכויות שמורות",
     tagline: "מצאו ובצעו הזמנה יומית של לוקיישנים ייחודיים לצילום.",
+    version: "גרסה",
   },
   locationCard: {
     available: "זמין",

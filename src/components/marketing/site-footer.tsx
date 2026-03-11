@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { APP_VERSION } from "@/generated/version";
 
 export function SiteFooter() {
   const t = useTranslations("marketing.footer");
@@ -59,7 +60,10 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Rollin Locations. {t("allRights")}</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Rollin Locations. {t("allRights")}</p>
+            <p className="text-xs text-muted-foreground">{t("version")} {APP_VERSION}</p>
+          </div>
           <div className="flex flex-wrap gap-4">
             {legalLinks.map(({ href, label }) => (
               <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">

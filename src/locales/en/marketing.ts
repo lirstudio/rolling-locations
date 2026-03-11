@@ -80,6 +80,7 @@ const marketing = {
     privacy: "Privacy",
     allRights: "All rights reserved",
     tagline: "Find and book unique shoot locations by the day.",
+    version: "Version",
   },
   locationCard: {
     available: "Available",
