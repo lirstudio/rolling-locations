@@ -205,3 +205,33 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Hero background video: covers the hero section like object-cover */
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/*
+ * YT IFrame Player API replaces the target <div> directly with an <iframe>.
+ * Apply the cover calculation here so the 16:9 iframe always fills the
+ * container regardless of the container's aspect ratio.
+ *
+ * width: 100vw  + height: 56.25vw → exactly 16:9 at full viewport width
+ * min-width: 177.78vh              → 16:9 inverse; fills tall containers
+ * min-height: 100%                 → never shorter than the hero section
+ * translate(-50%,-50%)             → center within the container
+ */
+.hero-video-bg iframe {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 100vw !important;
+  height: 56.25vw !important;
+  min-height: 100% !important;
+  min-width: 177.78vh !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+  border: 0 !important;
+}
+

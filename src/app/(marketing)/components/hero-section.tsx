@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -15,21 +15,46 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockCategories } from "@/mocks/categories";
+import { HeroVideoBackground } from "@/components/hero-video-background";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1800&q=80";
 
 const EMPTY_CATEGORY = "__all__";
 
-export function HeroSection() {
+function getYouTubeVideoId(url: string): string | null {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  );
+  return match?.[1] ?? null;
+}
+
+interface HeroSectionProps {
+  /** From server so iframe gets src on first paint and autoplay works */
+  initialHeroVideoUrl?: string | null;
+}
+
+export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
   const t = useTranslations("marketing.hero");
   const router = useRouter();
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string | null>(initialHeroVideoUrl);
 
   const [query, setQuery] = useState("");
   const [city, setCity] = useState("");
   const [categorySlug, setCategorySlug] = useState(EMPTY_CATEGORY);
 
   const topLevelCategories = mockCategories.filter((c) => c.visible && !c.parentId);
+
+  useEffect(() => {
+    if (initialHeroVideoUrl) return;
+    fetch("/api/site-settings/hero-video")
+      .then((r) => r.json())
+      .then((data: { url?: string | null }) => {
+        const url = data?.url?.trim();
+        if (url) setHeroVideoUrl(url);
+      })
+      .catch(() => {});
+  }, [initialHeroVideoUrl]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,22 +66,34 @@ export function HeroSection() {
     router.push(`/locations${qs ? `?${qs}` : ""}`);
   }
 
+  const youtubeId = heroVideoUrl ? getYouTubeVideoId(heroVideoUrl) : null;
+  const showVideo = youtubeId !== null;
+
   return (
     <section className="relative">
-      {/* Full-width hero image background */}
+      {/* Full-width hero background: video (from admin) or image fallback */}
       <div className="relative min-h-[420px] sm:min-h-[500px] lg:min-h-[560px]">
-        <Image
-          src={HERO_IMAGE}
-          alt=""
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/40" />
+        {showVideo ? (
+          <>
+            <HeroVideoBackground videoId={youtubeId!} />
+            <div className="absolute inset-0 bg-black/40" aria-hidden style={{ zIndex: 1 }} />
+          </>
+        ) : (
+          <>
+            <Image
+              src={HERO_IMAGE}
+              alt=""
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-black/40" />
+          </>
+        )}
 
         {/* Centered text content */}
-        <div className="relative z-10 flex h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center pb-16">
+        <div className="relative flex h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center pb-16" style={{ zIndex: 2 }}>
           <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-md">
             {t("title")}
           </h1>

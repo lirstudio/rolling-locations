@@ -93,6 +93,8 @@ const admin = {
   settings: {
     title: "Admin Settings",
     general: "General",
+    heroVideoUrl: "Hero video URL (homepage)",
+    heroVideoUrlDesc: "YouTube link shown as hero background. Empty = image.",
     platformName: "Platform Name",
     platformNameDesc: "The display name of the marketplace",
     defaultLanguage: "Default Language",

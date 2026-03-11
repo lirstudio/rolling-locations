@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Lock } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -18,11 +19,41 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 
 export default function AdminSettingsPage() {
+  const t = useTranslations("admin.settings")
   const [platformName, setPlatformName] = useState("Rollin Locations")
   const [defaultLang, setDefaultLang] = useState("he")
+  const [heroVideoUrl, setHeroVideoUrl] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  function handleSave() {
-    toast.success("ההגדרות נשמרו (mock)")
+  useEffect(() => {
+    fetch("/api/admin/site-settings")
+      .then((r) => (r.ok ? r.json() : { heroVideoUrl: null }))
+      .then((data: { heroVideoUrl?: string | null }) => {
+        setHeroVideoUrl(data?.heroVideoUrl ?? "")
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function handleSave() {
+    setSaving(true)
+    try {
+      const res = await fetch("/api/admin/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ heroVideoUrl: heroVideoUrl.trim() || null }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.error ?? "Failed to save")
+      }
+      toast.success("ההגדרות נשמרו")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "שגיאה בשמירה")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -68,6 +99,20 @@ export default function AdminSettingsPage() {
                 השפה הראשית של הפלטפורמה
               </p>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="hero-video-url">{t("heroVideoUrl")}</Label>
+              <Input
+                id="hero-video-url"
+                type="url"
+                value={heroVideoUrl}
+                onChange={(e) => setHeroVideoUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                disabled={loading}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("heroVideoUrlDesc")}
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -108,8 +153,12 @@ export default function AdminSettingsPage() {
         </Card>
 
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="cursor-pointer">
-            שמור הגדרות
+          <Button
+            onClick={handleSave}
+            disabled={saving || loading}
+            className="cursor-pointer"
+          >
+            {saving ? "..." : t("saveSettings")}
           </Button>
         </div>
       </div>

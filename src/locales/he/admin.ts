@@ -93,6 +93,8 @@ const admin = {
   settings: {
     title: "הגדרות ניהול",
     general: "כללי",
+    heroVideoUrl: "קישור סרטון הירו (עמוד הבית)",
+    heroVideoUrlDesc: "קישור YouTube שיוצג ברקע ההירו. ריק = תמונה.",
     platformName: "שם הפלטפורמה",
     platformNameDesc: "שם התצוגה של השוק",
     defaultLanguage: "שפת ברירת מחדל",
