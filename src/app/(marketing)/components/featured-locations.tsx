@@ -1,30 +1,23 @@
 "use client";
 
-import { useRef, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePublishedLocations } from "@/hooks/use-published-locations";
 import { mockCategories } from "@/mocks/categories";
 import { LocationCard } from "@/components/locations/location-card";
 
-const CARD_WIDTH = 300;
-const GAP = 20;
-
 export function FeaturedLocations() {
   const t = useTranslations("marketing.featuredLocations");
   const tCat = useTranslations("marketing.categories");
   const tLoc = useTranslations("locations");
-  const tCommon = useTranslations("common");
-
   const [activeCategory, setActiveCategoryRaw] = useState<string | null>(null);
   const { locations, loading } = usePublishedLocations();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const setActiveCategory = (id: string | null) => {
     setActiveCategoryRaw(id);
-    scrollRef.current?.scrollTo({ left: 0, behavior: "instant" });
   };
 
   const topCategories = useMemo(
@@ -36,17 +29,6 @@ export function FeaturedLocations() {
     if (!activeCategory) return locations;
     return locations.filter((loc) => loc.categoryIds.includes(activeCategory));
   }, [locations, activeCategory]);
-
-  const scroll = (direction: "prev" | "next") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const step = CARD_WIDTH + GAP;
-    const isRtl =
-      typeof document !== "undefined" && document.documentElement.dir === "rtl";
-    const delta =
-      direction === "next" ? (isRtl ? -step : step) : isRtl ? step : -step;
-    el.scrollBy({ left: delta, behavior: "smooth" });
-  };
 
   if (!loading && locations.length === 0) return null;
 
@@ -99,14 +81,22 @@ export function FeaturedLocations() {
           </div>
         </div>
 
-        {/* Location cards */}
+        {/* Location cards — same component as discover page (/locations) */}
         {loading ? (
-          <div className="mt-10 flex gap-5">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="mt-10 grid gap-5">
+            {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="shrink-0 w-[min(260px,80vw)] sm:w-[280px] lg:w-[calc(25%-15px)] aspect-[3/4] rounded-xl bg-muted animate-pulse"
-              />
+                className="flex overflow-hidden rounded-xl border border-border bg-card"
+              >
+                <div className="w-72 shrink-0 aspect-[4/3] sm:min-h-[220px] bg-muted animate-pulse" />
+                <div className="flex-1 p-5 space-y-3">
+                  <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                </div>
+              </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -124,51 +114,16 @@ export function FeaturedLocations() {
             </Button>
           </div>
         ) : (
-          <div
-            ref={scrollRef}
-            className="mt-10 flex gap-5 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 snap-x"
-            style={{ scrollSnapType: "x mandatory" }}
-          >
+          <div className="mt-10 grid gap-5">
             {filtered.map((loc) => (
-              <div
-                key={loc.id}
-                className="shrink-0 snap-start w-[min(260px,80vw)] sm:w-[280px] lg:w-[calc(25%-15px)]"
-                style={{ scrollSnapAlign: "start" }}
-              >
-                <LocationCard location={loc} variant="compact" />
-              </div>
+              <LocationCard key={loc.id} location={loc} />
             ))}
           </div>
         )}
 
-        {/* Navigation + subtitle */}
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="rounded-full shrink-0 h-10 w-10 border-foreground/20"
-              onClick={() => scroll("prev")}
-              aria-label={tCommon("previous")}
-            >
-              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="rounded-full shrink-0 h-10 w-10 border-foreground/20"
-              onClick={() => scroll("next")}
-              aria-label={tCommon("next")}
-            >
-              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground max-w-md text-start sm:text-end leading-relaxed">
-            {t("subtitle")}
-          </p>
-        </div>
+        <p className="mt-8 text-sm text-muted-foreground max-w-md text-start sm:text-end leading-relaxed">
+          {t("subtitle")}
+        </p>
       </div>
     </section>
   );

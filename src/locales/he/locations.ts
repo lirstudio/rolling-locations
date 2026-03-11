@@ -10,6 +10,8 @@ const locations = {
     "office-floor": "קומה להשכרה",
     office: "משרד",
     "meeting-room": "חדר ישיבות",
+    commercial: "פרסומת",
+    conference: "כנס",
   },
   cities: {
     telAviv: "תל אביב",

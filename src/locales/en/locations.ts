@@ -10,6 +10,8 @@ const locations = {
     "office-floor": "Floor for Rent",
     office: "Office",
     "meeting-room": "Meeting Room",
+    commercial: "Commercial",
+    conference: "Conference",
   },
   cities: {
     telAviv: "Tel Aviv",
