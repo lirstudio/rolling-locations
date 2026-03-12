@@ -11,6 +11,11 @@ import heMessages from "@/locales/he";
 export const metadata: Metadata = {
   title: "Rollin Locations",
   description: "מצאו ובצעו הזמנה של לוקיישנים ייחודיים לצילום.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
