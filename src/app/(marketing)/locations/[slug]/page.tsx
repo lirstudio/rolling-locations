@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { he } from "date-fns/locale/he";
 import { MapPin, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { fetchLocationBySlug, fetchPublishedLocations } from "@/app/actions/loca
 import { VideoCarousel } from "@/components/locations/video-carousel";
 import { LocationCard } from "@/components/locations/location-card";
 import { LocationGallery } from "@/components/locations/location-gallery";
+import { useUnavailableDates } from "@/hooks/use-unavailable-dates";
 import type { Location } from "@/types";
 import type { DateRange } from "react-day-picker";
 
@@ -59,9 +60,26 @@ export default function LocationDetailsPage() {
     });
   }, [slug]);
 
+  const { unavailableDates } = useUnavailableDates(location?.id);
+
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarClickCount = useRef(0);
+
+  const disabledDays = useMemo(() => {
+    const matchers: Array<Date | { before: Date }> = [
+      { before: new Date() },
+    ];
+    for (const d of unavailableDates) {
+      matchers.push(d);
+    }
+    return matchers;
+  }, [unavailableDates]);
+
+  const isDateUnavailable = useMemo(() => {
+    return (date: Date) =>
+      unavailableDates.some((d) => isSameDay(d, date));
+  }, [unavailableDates]);
 
   const days = useMemo(() => {
     if (!dateRange?.from || !dateRange?.to) return 0;
@@ -224,6 +242,8 @@ export default function LocationDetailsPage() {
                       mode="range"
                       selected={dateRange}
                       onSelect={(range) => {
+                        if (range?.from && isDateUnavailable(range.from)) return;
+                        if (range?.to && isDateUnavailable(range.to)) return;
                         setDateRange(range);
                         calendarClickCount.current += 1;
                         if (calendarClickCount.current >= 2) {
@@ -232,7 +252,7 @@ export default function LocationDetailsPage() {
                         }
                       }}
                       numberOfMonths={2}
-                      disabled={{ before: new Date() }}
+                      disabled={disabledDays}
                       locale={he}
                       dir="rtl"
                     />

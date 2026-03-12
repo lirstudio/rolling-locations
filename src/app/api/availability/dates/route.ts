@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUnavailableDates } from "@/lib/check-availability";
+import { syncIfStale } from "@/app/actions/google-calendar";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -13,6 +14,8 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
+
+  await syncIfStale(locationId);
 
   const dates = await getUnavailableDates(locationId, start, end);
   return NextResponse.json({ dates });

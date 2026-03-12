@@ -67,6 +67,17 @@ export default function BookingSummaryPage() {
     "checking" | "available" | "unavailable"
   >("checking");
   const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<
+    Array<{ start: string; end: string; durationDays: number }>
+  >([]);
+
+  const days = useMemo(() => {
+    if (!dateFrom || !dateTo) return 0;
+    const diff = Math.round(
+      (dateTo.getTime() - dateFrom.getTime()) / 86_400_000
+    );
+    return diff >= 0 ? diff + 1 : 0;
+  }, [dateFrom, dateTo]);
 
   useEffect(() => {
     setLocation(undefined);
@@ -74,8 +85,9 @@ export default function BookingSummaryPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!location || !dateFrom || !dateTo) return;
+    if (!location || !dateFrom || !dateTo || days <= 0) return;
     setAvailabilityStatus("checking");
+    setSuggestions([]);
     const startStr = format(dateFrom, "yyyy-MM-dd");
     const endStr = format(dateTo, "yyyy-MM-dd");
     fetch(
@@ -89,20 +101,20 @@ export default function BookingSummaryPage() {
         } else {
           setAvailabilityStatus("unavailable");
           setUnavailableReason(data.reason ?? null);
+          fetch(
+            `/api/availability/suggest?locationId=${location.id}&start=${startStr}&end=${endStr}&days=${days}`
+          )
+            .then((r) => r.json())
+            .then((suggestData) => {
+              setSuggestions(suggestData.suggestions ?? []);
+            })
+            .catch(() => {});
         }
       })
       .catch(() => {
         setAvailabilityStatus("available");
       });
-  }, [location, dateFrom, dateTo]);
-
-  const days = useMemo(() => {
-    if (!dateFrom || !dateTo) return 0;
-    const diff = Math.round(
-      (dateTo.getTime() - dateFrom.getTime()) / 86_400_000
-    );
-    return diff >= 0 ? diff + 1 : 0;
-  }, [dateFrom, dateTo]);
+  }, [location, dateFrom, dateTo, days]);
 
   const subtotal = location ? location.pricing.dailyRate * days : 0;
   const serviceFee = Math.round(subtotal * 0.05);
@@ -349,18 +361,57 @@ export default function BookingSummaryPage() {
             </CardContent>
           </Card>
 
-          {/* Availability warning */}
+          {/* Availability warning + alternative date suggestions */}
           {availabilityStatus === "unavailable" && (
-            <div className="flex items-start gap-3 rounded-lg border border-orange-300 bg-orange-50 p-4">
-              <AlertCircle className="h-5 w-5 shrink-0 text-orange-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-orange-700">
-                  {t("unavailableTitle")}
-                </p>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  {t("unavailableMessage")}
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 rounded-lg border border-orange-300 bg-orange-50 p-4">
+                <AlertCircle className="h-5 w-5 shrink-0 text-orange-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-orange-700">
+                    {t("unavailableTitle")}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {t("unavailableMessage")}
+                  </p>
+                </div>
               </div>
+
+              {suggestions.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <h3 className="flex items-center gap-2 text-base font-semibold text-foreground">
+                      <CalendarDays className="h-5 w-5 text-primary" />
+                      {t("suggestedDatesTitle")}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {t("suggestedDatesDesc")}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {suggestions.map((s) => (
+                      <Link
+                        key={s.start}
+                        href={`/locations/${encodeURIComponent(slug)}/booking?from=${s.start}&to=${s.end}`}
+                        className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="space-y-0.5">
+                          <p className="text-sm font-medium text-foreground">
+                            {format(new Date(s.start), "d MMM", { locale: he })}
+                            {" – "}
+                            {format(new Date(s.end), "d MMM yyyy", { locale: he })}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {s.durationDays} {t("days")}
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          {t("selectAlternative")}
+                        </Button>
+                      </Link>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
 

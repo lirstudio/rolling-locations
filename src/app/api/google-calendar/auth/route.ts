@@ -1,17 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import {
   getGoogleOAuthClient,
   GOOGLE_SCOPES,
 } from "@/lib/google-calendar";
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const locationId = searchParams.get("locationId");
+export async function GET() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!locationId) {
+  if (!user) {
     return NextResponse.json(
-      { error: "locationId is required" },
-      { status: 400 }
+      { error: "Not authenticated" },
+      { status: 401 }
     );
   }
 
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
     access_type: "offline",
     scope: GOOGLE_SCOPES,
     prompt: "consent",
-    state: locationId,
+    state: user.id,
   });
 
   return NextResponse.redirect(authUrl);

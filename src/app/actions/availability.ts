@@ -1,18 +1,9 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { AvailabilityBlock, OperatingHoursEntry } from "@/types";
+import type { AvailabilityBlock } from "@/types";
 
-// ── DB row shapes ────────────────────────────────────────────────────────────
-
-type OperatingHoursRow = {
-  id: string;
-  location_id: string;
-  day_of_week: number;
-  is_open: boolean;
-  open_time: string | null;
-  close_time: string | null;
-};
+// ── DB row shape ────────────────────────────────────────────────────────────
 
 type AvailabilityBlockRow = {
   id: string;
@@ -26,18 +17,7 @@ type AvailabilityBlockRow = {
   created_at: string;
 };
 
-// ── Mappers ──────────────────────────────────────────────────────────────────
-
-function hoursRowToEntry(row: OperatingHoursRow): OperatingHoursEntry {
-  return {
-    id: row.id,
-    locationId: row.location_id,
-    dayOfWeek: row.day_of_week,
-    isOpen: row.is_open,
-    openTime: row.open_time ?? undefined,
-    closeTime: row.close_time ?? undefined,
-  };
-}
+// ── Mapper ──────────────────────────────────────────────────────────────────
 
 function blockRowToBlock(row: AvailabilityBlockRow): AvailabilityBlock {
   return {
@@ -53,59 +33,7 @@ function blockRowToBlock(row: AvailabilityBlockRow): AvailabilityBlock {
   };
 }
 
-// ── Operating Hours ──────────────────────────────────────────────────────────
-
-export async function fetchOperatingHours(
-  locationId: string
-): Promise<OperatingHoursEntry[]> {
-  const db = createAdminClient();
-  const { data, error } = await db
-    .from("location_operating_hours")
-    .select("*")
-    .eq("location_id", locationId)
-    .order("day_of_week");
-
-  if (error || !data) return [];
-  return (data as OperatingHoursRow[]).map(hoursRowToEntry);
-}
-
-export async function saveOperatingHours(
-  locationId: string,
-  entries: OperatingHoursEntry[]
-): Promise<{ error?: string }> {
-  const db = createAdminClient();
-
-  const { error: deleteError } = await db
-    .from("location_operating_hours")
-    .delete()
-    .eq("location_id", locationId);
-
-  if (deleteError) {
-    return { error: deleteError.message };
-  }
-
-  if (entries.length === 0) return {};
-
-  const rows = entries.map((e) => ({
-    location_id: locationId,
-    day_of_week: e.dayOfWeek,
-    is_open: e.isOpen,
-    open_time: e.isOpen ? (e.openTime ?? null) : null,
-    close_time: e.isOpen ? (e.closeTime ?? null) : null,
-  }));
-
-  const { error: insertError } = await db
-    .from("location_operating_hours")
-    .insert(rows);
-
-  if (insertError) {
-    return { error: insertError.message };
-  }
-
-  return {};
-}
-
-// ── Availability Blocks ──────────────────────────────────────────────────────
+// ── Availability Blocks (Google Calendar sourced) ───────────────────────────
 
 export async function fetchAvailabilityBlocks(
   locationId: string
@@ -115,39 +43,9 @@ export async function fetchAvailabilityBlocks(
     .from("availability_blocks")
     .select("*")
     .eq("location_id", locationId)
+    .eq("source", "google_calendar")
     .order("start_at");
 
   if (error || !data) return [];
   return (data as AvailabilityBlockRow[]).map(blockRowToBlock);
-}
-
-export async function addAvailabilityBlock(
-  block: Omit<AvailabilityBlock, "id" | "createdAt">
-): Promise<{ error?: string }> {
-  const db = createAdminClient();
-  const { error } = await db.from("availability_blocks").insert({
-    location_id: block.locationId,
-    start_at: block.start,
-    end_at: block.end,
-    is_blocked: block.isBlocked,
-    note: block.note ?? null,
-    source: block.source,
-    external_event_id: block.externalEventId ?? null,
-  });
-
-  if (error) return { error: error.message };
-  return {};
-}
-
-export async function removeAvailabilityBlock(
-  blockId: string
-): Promise<{ error?: string }> {
-  const db = createAdminClient();
-  const { error } = await db
-    .from("availability_blocks")
-    .delete()
-    .eq("id", blockId);
-
-  if (error) return { error: error.message };
-  return {};
 }

@@ -104,6 +104,32 @@ export async function updateBookingStatusInDb(
     console.error("[updateBookingStatusInDb] error:", error.message);
     return { error: error.message };
   }
+
+  if (status === "approved") {
+    try {
+      const booking = await fetchBookingRequestById(id);
+      if (booking) {
+        const { createBookingEvent } = await import("./google-calendar");
+        await createBookingEvent({
+          locationId: booking.location_id,
+          summary: `📸 Rollin — ${booking.location_title}`,
+          description: [
+            `Booking by ${booking.creator_name}`,
+            booking.creator_email,
+            booking.creator_phone ? `Phone: ${booking.creator_phone}` : "",
+            booking.notes ? `Notes: ${booking.notes}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          startDate: booking.start_date,
+          endDate: booking.end_date,
+        });
+      }
+    } catch (err) {
+      console.error("[updateBookingStatusInDb] write-back to GCal failed:", err);
+    }
+  }
+
   return {};
 }
 

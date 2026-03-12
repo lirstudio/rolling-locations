@@ -1,8 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type UnavailableReason =
-  | "outside_operating_hours"
-  | "manual_block"
   | "google_calendar_block"
   | "existing_booking";
 
@@ -14,77 +12,37 @@ export interface AvailabilityCheckResult {
 
 /**
  * Checks whether a location is available for the given date range.
- * Evaluates all 4 layers:
- *  1. Operating hours (recurring weekly)
- *  2. Manual availability blocks
- *  3. Google Calendar synced blocks
- *  4. Approved bookings
+ * Two layers:
+ *  1. Google Calendar synced blocks
+ *  2. Approved bookings
  */
 export async function checkAvailability(
   locationId: string,
-  requestedStart: string, // ISO date or datetime
+  requestedStart: string,
   requestedEnd: string
 ): Promise<AvailabilityCheckResult> {
   const db = createAdminClient();
-  const start = new Date(requestedStart);
-  const end = new Date(requestedEnd);
 
-  // ── 1. Operating hours ─────────────────────────────────────────────────────
-
-  const { data: hoursRows } = await db
-    .from("location_operating_hours")
-    .select("day_of_week, is_open, open_time, close_time")
-    .eq("location_id", locationId);
-
-  if (hoursRows && hoursRows.length > 0) {
-    const hoursMap = new Map(
-      hoursRows.map((r) => [r.day_of_week, r])
-    );
-
-    // Check each day in the range
-    const cursor = new Date(start);
-    cursor.setHours(0, 0, 0, 0);
-    const endDay = new Date(end);
-    endDay.setHours(0, 0, 0, 0);
-
-    while (cursor <= endDay) {
-      const dow = cursor.getDay();
-      const entry = hoursMap.get(dow);
-      if (entry && !entry.is_open) {
-        return {
-          available: false,
-          reason: "outside_operating_hours",
-          detail: `Closed on day ${dow}`,
-        };
-      }
-      cursor.setDate(cursor.getDate() + 1);
-    }
-  }
-
-  // ── 2 + 3. Availability blocks (manual + google) ──────────────────────────
+  // ── 1. Google Calendar blocks ───────────────────────────────────────────────
 
   const { data: blocks } = await db
     .from("availability_blocks")
     .select("source, start_at, end_at, note")
     .eq("location_id", locationId)
     .eq("is_blocked", true)
+    .eq("source", "google_calendar")
     .lte("start_at", requestedEnd)
     .gte("end_at", requestedStart);
 
   if (blocks && blocks.length > 0) {
-    const first = blocks[0];
-    const reason: UnavailableReason =
-      first.source === "google_calendar"
-        ? "google_calendar_block"
-        : "manual_block";
     return {
       available: false,
-      reason,
-      detail: first.note ?? undefined,
+      reason: "google_calendar_block",
+      detail: blocks[0].note ?? undefined,
     };
   }
 
-  // ── 4. Approved bookings ───────────────────────────────────────────────────
+  // ── 2. Approved bookings ────────────────────────────────────────────────────
 
   const startDate = requestedStart.slice(0, 10);
   const endDate = requestedEnd.slice(0, 10);
@@ -110,7 +68,7 @@ export async function checkAvailability(
 
 /**
  * Returns all unavailable dates for a location within a date range.
- * Useful for calendar UI — marks which dates are blocked.
+ * Used by the guest calendar UI to disable blocked dates.
  */
 export async function getUnavailableDates(
   locationId: string,
@@ -120,26 +78,17 @@ export async function getUnavailableDates(
   const db = createAdminClient();
   const results: { date: string; reason: UnavailableReason }[] = [];
 
-  // Operating hours → closed days
-  const { data: hoursRows } = await db
-    .from("location_operating_hours")
-    .select("day_of_week, is_open")
-    .eq("location_id", locationId);
-
-  const closedDays = new Set(
-    (hoursRows ?? []).filter((r) => !r.is_open).map((r) => r.day_of_week)
-  );
-
-  // Blocks
+  // Google Calendar blocks
   const { data: blocks } = await db
     .from("availability_blocks")
     .select("start_at, end_at, source")
     .eq("location_id", locationId)
     .eq("is_blocked", true)
+    .eq("source", "google_calendar")
     .lte("start_at", rangeEnd)
     .gte("end_at", rangeStart);
 
-  const blockDateSet = new Map<string, UnavailableReason>();
+  const blockDateSet = new Set<string>();
   for (const b of blocks ?? []) {
     const bStart = new Date(b.start_at);
     const bEnd = new Date(b.end_at);
@@ -147,12 +96,7 @@ export async function getUnavailableDates(
     cursor.setHours(0, 0, 0, 0);
     while (cursor <= bEnd) {
       const key = cursor.toISOString().slice(0, 10);
-      blockDateSet.set(
-        key,
-        b.source === "google_calendar"
-          ? "google_calendar_block"
-          : "manual_block"
-      );
+      blockDateSet.add(key);
       cursor.setDate(cursor.getDate() + 1);
     }
   }
@@ -185,12 +129,9 @@ export async function getUnavailableDates(
 
   while (cursor <= end) {
     const dateStr = cursor.toISOString().slice(0, 10);
-    const dow = cursor.getDay();
 
-    if (closedDays.has(dow)) {
-      results.push({ date: dateStr, reason: "outside_operating_hours" });
-    } else if (blockDateSet.has(dateStr)) {
-      results.push({ date: dateStr, reason: blockDateSet.get(dateStr)! });
+    if (blockDateSet.has(dateStr)) {
+      results.push({ date: dateStr, reason: "google_calendar_block" });
     } else if (bookingDateSet.has(dateStr)) {
       results.push({ date: dateStr, reason: "existing_booking" });
     }

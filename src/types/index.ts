@@ -77,7 +77,7 @@ export interface Location {
 
 // ─── Availability ─────────────────────────────────────────────────────────────
 
-export type AvailabilitySource = "manual" | "google_calendar";
+export type AvailabilitySource = "google_calendar";
 
 export interface AvailabilityBlock {
   id: string;
@@ -91,23 +91,14 @@ export interface AvailabilityBlock {
   createdAt?: string;
 }
 
-export interface OperatingHoursEntry {
-  id?: string;
-  locationId: string;
-  dayOfWeek: number; // 0=Sun … 6=Sat
-  isOpen: boolean;
-  openTime?: string; // "HH:mm"
-  closeTime?: string; // "HH:mm"
-}
-
 export interface GoogleCalendarConnection {
   id: string;
   hostId: string;
-  locationId: string;
   googleAccountEmail: string;
   calendarId: string;
   lastSyncAt?: string;
   syncEnabled: boolean;
+  syncToken?: string;
 }
 
 // ─── Booking Requests ─────────────────────────────────────────────────────────

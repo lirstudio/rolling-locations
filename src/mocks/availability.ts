@@ -8,7 +8,7 @@ export const mockAvailability: AvailabilityBlock[] = [
     end: "2026-03-16T23:59:59Z",
     isBlocked: true,
     note: "תחזוקה",
-    source: "manual",
+    source: "google_calendar",
   },
   {
     id: "avail-2",
@@ -17,7 +17,7 @@ export const mockAvailability: AvailabilityBlock[] = [
     end: "2026-03-21T23:59:59Z",
     isBlocked: true,
     note: "הזמנה פרטית",
-    source: "manual",
+    source: "google_calendar",
   },
   {
     id: "avail-3",
@@ -25,6 +25,6 @@ export const mockAvailability: AvailabilityBlock[] = [
     start: "2026-03-18T00:00:00Z",
     end: "2026-03-18T23:59:59Z",
     isBlocked: true,
-    source: "manual",
+    source: "google_calendar",
   },
 ];

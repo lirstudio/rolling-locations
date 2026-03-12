@@ -1,22 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { saveGoogleConnection, syncGoogleCalendar } from "@/app/actions/google-calendar";
-
-const HOST_ID = "user-host-1"; // v1: hardcoded until real auth
+import { createClient } from "@/lib/supabase/server";
+import {
+  saveGoogleConnection,
+  syncGoogleCalendarForHost,
+} from "@/app/actions/google-calendar";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const locationId = searchParams.get("state");
+  const hostId = searchParams.get("state");
 
-  if (!code || !locationId) {
+  if (!code || !hostId) {
     return NextResponse.redirect(
       new URL("/host/availability?error=missing_params", request.url)
     );
   }
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.id !== hostId) {
+    return NextResponse.redirect(
+      new URL("/auth/sign-in?next=/host/availability", request.url)
+    );
+  }
+
   const { error } = await saveGoogleConnection({
-    hostId: HOST_ID,
-    locationId,
+    hostId,
     code,
   });
 
@@ -27,8 +39,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Trigger initial sync
-  await syncGoogleCalendar(locationId);
+  await syncGoogleCalendarForHost(hostId);
 
   return NextResponse.redirect(
     new URL("/host/availability?google=connected", request.url)

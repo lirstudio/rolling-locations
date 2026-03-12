@@ -24,16 +24,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { GoogleCalendarConnection } from "@/types";
 import {
-  fetchGoogleConnection,
+  fetchGoogleConnectionByHost,
   disconnectGoogleCalendar,
-  syncGoogleCalendar,
+  syncGoogleCalendarForHost,
 } from "@/app/actions/google-calendar";
 
 interface GoogleCalendarTabProps {
-  locationId: string;
+  hostId: string;
 }
 
-export function GoogleCalendarTab({ locationId }: GoogleCalendarTabProps) {
+export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
   const t = useTranslations("host.availability");
   const [connection, setConnection] =
     React.useState<GoogleCalendarConnection | null>(null);
@@ -43,22 +43,22 @@ export function GoogleCalendarTab({ locationId }: GoogleCalendarTabProps) {
 
   const loadConnection = React.useCallback(async () => {
     setIsLoading(true);
-    const conn = await fetchGoogleConnection(locationId);
+    const conn = await fetchGoogleConnectionByHost(hostId);
     setConnection(conn);
     setIsLoading(false);
-  }, [locationId]);
+  }, [hostId]);
 
   React.useEffect(() => {
     loadConnection();
   }, [loadConnection]);
 
   function handleConnect() {
-    window.location.href = `/api/google-calendar/auth?locationId=${locationId}`;
+    window.location.href = `/api/google-calendar/auth`;
   }
 
   async function handleSync() {
     setIsSyncing(true);
-    const { error, synced } = await syncGoogleCalendar(locationId);
+    const { error, synced } = await syncGoogleCalendarForHost(hostId);
     setIsSyncing(false);
     if (error) {
       toast.error(error);
@@ -70,7 +70,7 @@ export function GoogleCalendarTab({ locationId }: GoogleCalendarTabProps) {
 
   async function handleDisconnect() {
     setIsDisconnecting(true);
-    const { error } = await disconnectGoogleCalendar(locationId);
+    const { error } = await disconnectGoogleCalendar(hostId);
     setIsDisconnecting(false);
     if (error) {
       toast.error(error);
@@ -102,7 +102,7 @@ export function GoogleCalendarTab({ locationId }: GoogleCalendarTabProps) {
             {t("googleConnect")}
           </Button>
           <p className="text-xs text-muted-foreground max-w-sm text-center">
-            {t("googlePermissionNote")}
+            {t("googlePermissionNoteReadWrite")}
           </p>
         </CardContent>
       </Card>

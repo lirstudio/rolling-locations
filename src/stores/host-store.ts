@@ -108,6 +108,22 @@ export const useHostStore = create<HostStore>()(
       },
 
       setLocationStatus: async (id, status) => {
+        if (status === "published") {
+          const loc = get().locations.find((l) => l.id === id);
+          if (loc) {
+            const { hasGoogleCalendarConnection } = await import(
+              "@/app/actions/google-calendar"
+            );
+            const connected = await hasGoogleCalendarConnection(loc.hostId);
+            if (!connected) {
+              toast.error(
+                "יש לחבר יומן גוגל לפני פרסום. עברו לניהול זמינות."
+              );
+              return;
+            }
+          }
+        }
+
         const previous = get().locations.find((l) => l.id === id);
         set((s) => ({
           locations: s.locations.map((l) =>
