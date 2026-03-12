@@ -58,9 +58,7 @@ export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
     loadConnection();
   }, [loadConnection]);
 
-  function handleConnect() {
-    window.location.href = `/api/google-calendar/auth`;
-  }
+  const connectHref = `/api/google-calendar/auth`;
 
   async function handleSync() {
     setIsSyncing(true);
@@ -115,9 +113,11 @@ export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
           <CardDescription>{t("googleConnectDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-3">
-          <Button onClick={handleConnect}>
-            <ExternalLink className="me-2 size-4" />
-            {t("googleConnect")}
+          <Button asChild>
+            <a href={connectHref}>
+              <ExternalLink className="me-2 size-4" />
+              {t("googleConnect")}
+            </a>
           </Button>
           <p className="text-xs text-muted-foreground max-w-sm text-center">
             {t("googlePermissionNoteReadWrite")}
