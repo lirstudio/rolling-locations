@@ -1,17 +1,31 @@
 import { google } from "googleapis";
 
-export function getGoogleOAuthClient() {
+/**
+ * Returns an OAuth2 client. When redirectUri is provided (e.g. from request origin),
+ * use it so the same app works on localhost and production without changing env.
+ */
+export function getGoogleOAuthClient(redirectUri?: string) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const resolvedRedirectUri =
+    redirectUri ?? process.env.GOOGLE_REDIRECT_URI;
 
-  if (!clientId || !clientSecret || !redirectUri) {
+  if (!clientId || !clientSecret) {
     throw new Error(
-      "Missing Google OAuth env: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI"
+      "Missing Google OAuth env: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET"
+    );
+  }
+  if (!resolvedRedirectUri) {
+    throw new Error(
+      "Missing redirect URI: pass redirectUri or set GOOGLE_REDIRECT_URI"
     );
   }
 
-  return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  return new google.auth.OAuth2(
+    clientId,
+    clientSecret,
+    resolvedRedirectUri
+  );
 }
 
 export const GOOGLE_SCOPES = [

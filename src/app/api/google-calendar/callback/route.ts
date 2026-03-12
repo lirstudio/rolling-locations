@@ -29,9 +29,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const redirectUri = `${new URL(request.url).origin}/api/google-calendar/callback`;
     const { error } = await saveGoogleConnection({
       hostId,
       code,
+      redirectUri,
     });
 
     if (error) {

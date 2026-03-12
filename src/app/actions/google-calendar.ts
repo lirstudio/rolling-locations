@@ -142,8 +142,9 @@ export async function disconnectGoogleCalendar(
 export async function saveGoogleConnection(params: {
   hostId: string;
   code: string;
+  redirectUri: string;
 }): Promise<{ error?: string }> {
-  const oauth2 = getGoogleOAuthClient();
+  const oauth2 = getGoogleOAuthClient(params.redirectUri);
 
   const { tokens } = await oauth2.getToken(params.code);
   if (!tokens.access_token || !tokens.refresh_token) {

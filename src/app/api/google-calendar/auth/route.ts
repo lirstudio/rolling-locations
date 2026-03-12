@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const oauth2 = getGoogleOAuthClient();
+    const origin = new URL(request.url).origin;
+    const redirectUri = `${origin}/api/google-calendar/callback`;
+    const oauth2 = getGoogleOAuthClient(redirectUri);
     const authUrl = oauth2.generateAuthUrl({
       access_type: "offline",
       scope: GOOGLE_SCOPES,
