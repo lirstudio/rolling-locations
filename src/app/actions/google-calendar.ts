@@ -103,9 +103,14 @@ async function loadConnectionRow(
 export async function fetchGoogleConnectionByHost(
   hostId: string
 ): Promise<GoogleCalendarConnection | null> {
-  const row = await loadConnectionRow(hostId);
-  if (!row) return null;
-  return rowToConnection(row);
+  try {
+    const row = await loadConnectionRow(hostId);
+    if (!row) return null;
+    return rowToConnection(row);
+  } catch (err) {
+    console.error("[fetchGoogleConnectionByHost] error:", err);
+    return null;
+  }
 }
 
 export async function disconnectGoogleCalendar(

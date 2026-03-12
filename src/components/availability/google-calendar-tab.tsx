@@ -43,9 +43,15 @@ export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
 
   const loadConnection = React.useCallback(async () => {
     setIsLoading(true);
-    const conn = await fetchGoogleConnectionByHost(hostId);
-    setConnection(conn);
-    setIsLoading(false);
+    try {
+      const conn = await fetchGoogleConnectionByHost(hostId);
+      setConnection(conn);
+    } catch (err) {
+      console.error("[GoogleCalendarTab] failed to load connection:", err);
+      setConnection(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, [hostId]);
 
   React.useEffect(() => {
@@ -58,25 +64,37 @@ export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
 
   async function handleSync() {
     setIsSyncing(true);
-    const { error, synced } = await syncGoogleCalendarForHost(hostId);
-    setIsSyncing(false);
-    if (error) {
-      toast.error(error);
-    } else {
-      toast.success(t("syncSuccess", { count: synced ?? 0 }));
-      await loadConnection();
+    try {
+      const { error, synced } = await syncGoogleCalendarForHost(hostId);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success(t("syncSuccess", { count: synced ?? 0 }));
+        await loadConnection();
+      }
+    } catch (err) {
+      console.error("[GoogleCalendarTab] sync failed:", err);
+      toast.error("שגיאה בסנכרון");
+    } finally {
+      setIsSyncing(false);
     }
   }
 
   async function handleDisconnect() {
     setIsDisconnecting(true);
-    const { error } = await disconnectGoogleCalendar(hostId);
-    setIsDisconnecting(false);
-    if (error) {
-      toast.error(error);
-    } else {
-      toast.success(t("disconnectSuccess"));
-      setConnection(null);
+    try {
+      const { error } = await disconnectGoogleCalendar(hostId);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success(t("disconnectSuccess"));
+        setConnection(null);
+      }
+    } catch (err) {
+      console.error("[GoogleCalendarTab] disconnect failed:", err);
+      toast.error("שגיאה בניתוק");
+    } finally {
+      setIsDisconnecting(false);
     }
   }
 
