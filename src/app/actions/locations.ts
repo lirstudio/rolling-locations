@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import type { Location } from "@/types";
 
 // ── DB row shapes ─────────────────────────────────────────────────────────────
@@ -169,7 +170,7 @@ export async function fetchAllLocations(): Promise<Location[]> {
 }
 
 export async function fetchPublishedLocations(): Promise<Location[]> {
-  const db = createAdminClient();
+  const db = await createClient();
   const { data, error } = await db
     .from("locations")
     .select("*, location_media(*)")
@@ -181,7 +182,7 @@ export async function fetchPublishedLocations(): Promise<Location[]> {
 }
 
 export async function fetchLocationBySlug(slug: string): Promise<Location | null> {
-  const db = createAdminClient();
+  const db = await createClient();
   const { data, error } = await db
     .from("locations")
     .select("*, location_media(*)")
