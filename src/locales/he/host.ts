@@ -123,6 +123,9 @@ const host = {
     noLocation: "אין לוקיישנים",
     noLocationDesc: "צור לוקיישן כדי לנהל זמינות",
     googleRequired: "יש לחבר יומן גוגל ללוקיישן לפני פרסום",
+    googleErrorConfig: "שגיאת הגדרה. וודא שמשתני הסביבה מוגדרים: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, ENCRYPTION_KEY.",
+    googleErrorOAuthFailed: "התחברות ליומן גוגל נכשלה. נסו שוב.",
+    googleConnectedSuccess: "יומן גוגל מחובר בהצלחה.",
   },
   requests: {
     title: "בקשות הזמנה",

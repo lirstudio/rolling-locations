@@ -123,6 +123,9 @@ const host = {
     noLocation: "No locations",
     noLocationDesc: "Create a location to manage availability",
     googleRequired: "Connect Google Calendar to your location before publishing",
+    googleErrorConfig: "Configuration error. Ensure server env vars are set: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, ENCRYPTION_KEY.",
+    googleErrorOAuthFailed: "Google Calendar connection failed. Try again.",
+    googleConnectedSuccess: "Google Calendar connected successfully.",
   },
   requests: {
     title: "Booking Requests",

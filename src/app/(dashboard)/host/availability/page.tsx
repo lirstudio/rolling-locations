@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -18,9 +20,28 @@ import { GoogleCalendarTab } from "@/components/availability/google-calendar-tab
 
 export default function HostAvailabilityPage() {
   const t = useTranslations("host");
+  const searchParams = useSearchParams();
   const hydrated = useStoreHydrated();
   const user = useAuthStore((s) => s.user);
   const locations = useHostStore((s) => s.locations);
+
+  React.useEffect(() => {
+    const error = searchParams.get("error");
+    const google = searchParams.get("google");
+    if (error === "config") {
+      toast.error(t("availability.googleErrorConfig"));
+    } else if (error === "oauth_failed" || error === "oauth_start_failed" || error === "missing_params") {
+      toast.error(t("availability.googleErrorOAuthFailed"));
+    } else if (google === "connected") {
+      toast.success(t("availability.googleConnectedSuccess"));
+    }
+    if (error || google) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      url.searchParams.delete("google");
+      window.history.replaceState({}, "", url.pathname + url.search || url.pathname);
+    }
+  }, [searchParams, t]);
 
   const hostLocations = React.useMemo(
     () =>

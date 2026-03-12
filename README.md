@@ -55,6 +55,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_key
 SEND_EMAIL_HOOK_SECRET=v1,whsec_<base64_secret>
 ```
+
+**חיבור יומן גוגל (זמינות מארחים):** נדרש עבור "חבר יומן גוגל" בעמוד ניהול זמינות.
+```env
+GOOGLE_CLIENT_ID=...          # מ-Google Cloud Console → OAuth client (Web)
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=https://<הדומיין-שלך>/api/google-calendar/callback
+ENCRYPTION_KEY=...            # 64 תווים hex (למשל: openssl rand -hex 32)
+```
+`GOOGLE_REDIRECT_URI` חייב להיות זהה ל-URI שהוגדר ב-Google Cloud ב-Authorized redirect URIs.
+
 אופציונלי: `AUTH_FROM_EMAIL`, `BOOKINGS_FROM_EMAIL`, `ADMIN_HOST_FALLBACK_EMAIL`, `SUPABASE_SERVICE_ROLE_KEY`, `VERCEL_TOKEN` — לפי הצורך (ראו הודעות שגיאה בקוד).
 
 ### 3. הרצת שרת הפיתוח
