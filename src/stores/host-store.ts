@@ -14,6 +14,7 @@ import {
   saveLocation,
   deleteLocationAction,
   fetchAllLocations,
+  backfillLocationHostId,
 } from "@/app/actions/locations";
 import { generateSlug } from "@/utils/slug";
 
@@ -34,7 +35,7 @@ interface HostStore {
   setLocationStatus: (id: string, status: LocationStatus) => Promise<void>;
 
   // Sync / migration
-  syncFromDb: () => Promise<void>;
+  syncFromDb: (hostId?: string) => Promise<void>;
 
   // Availability
   addBlock: (block: AvailabilityBlock) => void;
@@ -147,17 +148,26 @@ export const useHostStore = create<HostStore>()(
         }
       },
 
-      syncFromDb: async () => {
+      syncFromDb: async (hostId?: string) => {
         if (get().isSyncing) return;
         set({ isSyncing: true });
 
         try {
+          // Backfill host_id for locations that were saved before auth was wired up
+          if (hostId) {
+            await backfillLocationHostId(hostId);
+          }
+
           const dbLocations = await fetchAllLocations();
           const localLocs = get().locations;
 
           if (dbLocations.length > 0) {
             // DB is the single source of truth — always prefer DB data.
-            const merged: Location[] = [...dbLocations];
+            const merged: Location[] = dbLocations.map((loc) => ({
+              ...loc,
+              // Preserve local hostId if DB row still has null (shouldn't happen after backfill)
+              hostId: loc.hostId === "user-host-1" && hostId ? hostId : loc.hostId,
+            }));
 
             // Migrate any local-only locations (not yet in DB) from legacy localStorage
             const dbIds = new Set(dbLocations.map((l) => l.id));
@@ -168,7 +178,12 @@ export const useHostStore = create<HostStore>()(
               const newSlug = isUuid
                 ? loc.slug
                 : `${generateSlug(loc.title)}-${newId.slice(0, 8)}`;
-              const migratedLoc: Location = { ...loc, id: newId, slug: newSlug };
+              const migratedLoc: Location = {
+                ...loc,
+                id: newId,
+                slug: newSlug,
+                hostId: hostId ?? loc.hostId,
+              };
               const { error } = await saveLocation(migratedLoc);
               if (error) console.error("[host-store] migration save error:", error);
               merged.push(migratedLoc);
@@ -188,7 +203,12 @@ export const useHostStore = create<HostStore>()(
               const newSlug = isUuid
                 ? loc.slug
                 : `${generateSlug(loc.title)}-${newId.slice(0, 8)}`;
-              const migratedLoc: Location = { ...loc, id: newId, slug: newSlug };
+              const migratedLoc: Location = {
+                ...loc,
+                id: newId,
+                slug: newSlug,
+                hostId: hostId ?? loc.hostId,
+              };
               const { error } = await saveLocation(migratedLoc);
               if (error)
                 console.error("[host-store] migration save error:", error);

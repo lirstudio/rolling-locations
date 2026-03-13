@@ -66,20 +66,39 @@ export default function LocationDetailsPage() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarClickCount = useRef(0);
 
+  const isDateUnavailable = useMemo(
+    () => (date: Date) => unavailableDates.some((d) => isSameDay(d, date)),
+    [unavailableDates]
+  );
+
+  // When user has picked `from` but not `to` yet (react-day-picker sets to=from
+  // on first click), cap selectable end date at the day before the first blocked
+  // date after `from`.
+  const maxEndDate = useMemo(() => {
+    if (!dateRange?.from) return null;
+    // Active when to is unset OR when to equals from (react-day-picker first-click state)
+    const isPickingEnd = !dateRange.to || isSameDay(dateRange.from, dateRange.to);
+    if (!isPickingEnd) return null;
+    const from = dateRange.from;
+    const next = unavailableDates
+      .filter((d) => d > from)
+      .sort((a, b) => a.getTime() - b.getTime())[0];
+    if (!next) return null;
+    const cap = new Date(next);
+    cap.setDate(cap.getDate() - 1);
+    return cap;
+  }, [dateRange?.from, dateRange?.to, unavailableDates]);
+
   const disabledDays = useMemo(() => {
-    const matchers: Array<Date | { before: Date }> = [
+    const matchers: Array<Date | { before: Date } | { after: Date }> = [
       { before: new Date() },
+      ...unavailableDates,
     ];
-    for (const d of unavailableDates) {
-      matchers.push(d);
+    if (maxEndDate) {
+      matchers.push({ after: maxEndDate });
     }
     return matchers;
-  }, [unavailableDates]);
-
-  const isDateUnavailable = useMemo(() => {
-    return (date: Date) =>
-      unavailableDates.some((d) => isSameDay(d, date));
-  }, [unavailableDates]);
+  }, [unavailableDates, maxEndDate]);
 
   const days = useMemo(() => {
     if (!dateRange?.from || !dateRange?.to) return 0;
@@ -90,6 +109,13 @@ export default function LocationDetailsPage() {
   }, [dateRange]);
 
   const estimate = location ? location.pricing.dailyRate * days : 0;
+
+  const hasBlockedInRange = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) return false;
+    return unavailableDates.some(
+      (d) => d >= dateRange.from! && d <= dateRange.to!
+    );
+  }, [dateRange, unavailableDates]);
 
   if (location === undefined) {
     return (
@@ -244,6 +270,16 @@ export default function LocationDetailsPage() {
                       onSelect={(range) => {
                         if (range?.from && isDateUnavailable(range.from)) return;
                         if (range?.to && isDateUnavailable(range.to)) return;
+                        // Reject any range that spans over a blocked date
+                        if (range?.from && range?.to) {
+                          const hasBlocked = unavailableDates.some(
+                            (d) => d > range.from! && d < range.to!
+                          );
+                          if (hasBlocked) {
+                            setDateRange({ from: range.from, to: undefined });
+                            return;
+                          }
+                        }
                         setDateRange(range);
                         calendarClickCount.current += 1;
                         if (calendarClickCount.current >= 2) {
@@ -299,10 +335,10 @@ export default function LocationDetailsPage() {
                 <Button
                   className="w-full"
                   size="lg"
-                  disabled={days <= 0}
-                  asChild={days > 0}
+                  disabled={days <= 0 || hasBlockedInRange}
+                  asChild={days > 0 && !hasBlockedInRange}
                 >
-                  {days > 0 ? (
+                  {days > 0 && !hasBlockedInRange ? (
                     <Link
                       href={`/locations/${encodeURIComponent(slug)}/booking?from=${format(dateRange!.from!, "yyyy-MM-dd")}&to=${format(dateRange!.to!, "yyyy-MM-dd")}`}
                     >
@@ -361,10 +397,10 @@ export default function LocationDetailsPage() {
           </div>
           <Button
             size="lg"
-            disabled={days <= 0}
-            asChild={days > 0}
+            disabled={days <= 0 || hasBlockedInRange}
+            asChild={days > 0 && !hasBlockedInRange}
           >
-            {days > 0 ? (
+            {days > 0 && !hasBlockedInRange ? (
               <Link
                 href={`/locations/${encodeURIComponent(slug)}/booking?from=${format(dateRange!.from!, "yyyy-MM-dd")}&to=${format(dateRange!.to!, "yyyy-MM-dd")}`}
               >

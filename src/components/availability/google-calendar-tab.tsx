@@ -20,7 +20,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { GoogleCalendarConnection } from "@/types";
 import {
@@ -113,12 +114,16 @@ export function GoogleCalendarTab({ hostId }: GoogleCalendarTabProps) {
           <CardDescription>{t("googleConnectDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-3">
-          <Button asChild>
-            <a href={connectHref}>
-              <ExternalLink className="me-2 size-4" />
-              {t("googleConnect")}
-            </a>
-          </Button>
+          <a
+            href={connectHref}
+            className={cn(
+              buttonVariants({ variant: "default", size: "default" }),
+              "inline-flex items-center justify-center gap-2"
+            )}
+          >
+            <ExternalLink className="me-2 size-4" />
+            {t("googleConnect")}
+          </a>
           <p className="text-xs text-muted-foreground max-w-sm text-center">
             {t("googlePermissionNoteReadWrite")}
           </p>

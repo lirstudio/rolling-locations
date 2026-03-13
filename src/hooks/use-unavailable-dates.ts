@@ -15,7 +15,7 @@ export function useUnavailableDates(locationId: string | undefined) {
     setIsLoading(true);
     const now = new Date();
     const end = new Date(now);
-    end.setDate(end.getDate() + 90);
+    end.setDate(end.getDate() + 120);
 
     try {
       const startStr = now.toISOString().slice(0, 10);

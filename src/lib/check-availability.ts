@@ -93,11 +93,10 @@ export async function getUnavailableDates(
     const bStart = new Date(b.start_at);
     const bEnd = new Date(b.end_at);
     const cursor = new Date(bStart);
-    cursor.setHours(0, 0, 0, 0);
+    cursor.setUTCHours(0, 0, 0, 0);
     while (cursor <= bEnd) {
-      const key = cursor.toISOString().slice(0, 10);
-      blockDateSet.add(key);
-      cursor.setDate(cursor.getDate() + 1);
+      blockDateSet.add(cursor.toISOString().slice(0, 10));
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
   }
 
@@ -115,17 +114,18 @@ export async function getUnavailableDates(
     const bStart = new Date(b.start_date);
     const bEnd = new Date(b.end_date);
     const cursor = new Date(bStart);
+    cursor.setUTCHours(0, 0, 0, 0);
     while (cursor <= bEnd) {
       bookingDateSet.add(cursor.toISOString().slice(0, 10));
-      cursor.setDate(cursor.getDate() + 1);
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
   }
 
   // Walk the full range
   const cursor = new Date(rangeStart);
-  cursor.setHours(0, 0, 0, 0);
+  cursor.setUTCHours(0, 0, 0, 0);
   const end = new Date(rangeEnd);
-  end.setHours(0, 0, 0, 0);
+  end.setUTCHours(0, 0, 0, 0);
 
   while (cursor <= end) {
     const dateStr = cursor.toISOString().slice(0, 10);
@@ -136,7 +136,7 @@ export async function getUnavailableDates(
       results.push({ date: dateStr, reason: "existing_booking" });
     }
 
-    cursor.setDate(cursor.getDate() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
   return results;

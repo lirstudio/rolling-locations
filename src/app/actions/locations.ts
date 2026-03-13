@@ -56,7 +56,7 @@ function toDbRow(loc: Location): Omit<LocationRow, "created_at" | "location_medi
     amenities: loc.amenities ?? [],
     category_ids: loc.categoryIds,
     status: loc.status,
-    host_id: null, // v1: real auth not yet implemented
+    host_id: loc.hostId ?? null,
     showcase_videos: loc.showcaseVideos ?? [],
   };
 }
@@ -156,6 +156,23 @@ export async function deleteLocationAction(locationId: string): Promise<{ error?
   const { error } = await db.from("locations").delete().eq("id", locationId);
   if (error) return { error: error.message };
   return {};
+}
+
+/**
+ * Backfills host_id = hostId for all locations that currently have host_id = null.
+ * Call once per host after they authenticate.
+ */
+export async function backfillLocationHostId(
+  hostId: string
+): Promise<{ updated: number; error?: string }> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("locations")
+    .update({ host_id: hostId })
+    .is("host_id", null)
+    .select("id");
+  if (error) return { updated: 0, error: error.message };
+  return { updated: data?.length ?? 0 };
 }
 
 export async function fetchAllLocations(): Promise<Location[]> {

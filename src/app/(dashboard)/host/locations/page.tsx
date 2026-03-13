@@ -28,14 +28,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useHostStore } from "@/stores/host-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { useStoreHydrated } from "@/hooks/use-store-hydrated";
 import type { LocationStatus } from "@/types";
 
 function isSupabaseStorageUrl(url: string): boolean {
   return url.includes("supabase.co") && url.includes("/storage/");
 }
-
-const HOST_ID = "user-host-1";
 
 const statusVariant: Record<LocationStatus, "default" | "secondary" | "outline"> = {
   published: "default",
@@ -46,20 +45,24 @@ const statusVariant: Record<LocationStatus, "default" | "secondary" | "outline">
 export default function HostLocationsPage() {
   const t = useTranslations("host");
   const hydrated = useStoreHydrated();
+  const user = useAuthStore((s) => s.user);
   const syncFromDb = useHostStore((s) => s.syncFromDb);
   const locations = useHostStore((s) => s.locations);
   const hostLocations = React.useMemo(
-    () => locations.filter((l) => l.hostId === HOST_ID),
-    [locations]
+    () =>
+      user
+        ? locations.filter((l) => l.hostId === user.id)
+        : locations,
+    [locations, user]
   );
   const setLocationStatus = useHostStore((s) => s.setLocationStatus);
   const deleteLocation = useHostStore((s) => s.deleteLocation);
 
-  // On first mount after hydration: sync from DB (and migrate legacy localStorage data)
+  // On first mount after hydration: sync from DB and backfill host_id
   React.useEffect(() => {
-    if (hydrated) syncFromDb();
+    if (hydrated && user) syncFromDb(user.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated]);
+  }, [hydrated, user?.id]);
 
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");

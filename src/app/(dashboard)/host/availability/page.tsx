@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { CalendarDays, MapPin } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -81,15 +81,8 @@ export default function HostAvailabilityPage() {
       {/* Google Calendar connection — always visible */}
       <GoogleCalendarTab hostId={user.id} />
 
-      {/* Location-specific availability below */}
-      {hostLocations.length === 0 ? (
-        <div className="mx-auto flex max-w-md flex-col items-center gap-4 py-8 text-center">
-          <MapPin className="size-10 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {t("availability.noLocationDesc")}
-          </p>
-        </div>
-      ) : (
+      {/* Per-location calendar view when host has locations */}
+      {hostLocations.length > 0 && (
         <>
           <div className="flex items-center justify-end">
             <Select
