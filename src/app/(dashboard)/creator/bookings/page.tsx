@@ -100,9 +100,9 @@ export default function CreatorBookingsPage() {
             return (
               <Link key={booking.id} href={`/creator/bookings/${booking.id}`}>
                 <Card className="transition-colors hover:bg-muted/50">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="size-12 overflow-hidden rounded-lg bg-muted">
+                  <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 flex-1 items-center gap-4">
+                      <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
                         {location?.mediaGallery[0] && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -112,8 +112,8 @@ export default function CreatorBookingsPage() {
                           />
                         )}
                       </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium">
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="truncate font-medium">
                           {location?.title ?? "—"}
                         </span>
                         <span className="text-sm text-muted-foreground">
@@ -122,7 +122,7 @@ export default function CreatorBookingsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex shrink-0 items-center gap-3 sm:justify-end">
                       <span className="text-sm font-semibold">
                         ₪{booking.priceEstimate.toLocaleString("he-IL")}
                       </span>

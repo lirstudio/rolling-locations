@@ -105,18 +105,18 @@ export function LandingFooter() {
         </div>
 
         {/* Main Footer Content */}
-        <div className="grid gap-8 grid-cols-4 lg:grid-cols-6">
+        <div className="grid gap-8 grid-cols-2 sm:grid-cols-4 lg:grid-cols-6">
           {/* Brand Column */}
-          <div className="col-span-4 lg:col-span-2 max-w-2xl">
-            <div className="flex items-center space-x-2 mb-4 max-lg:justify-center">
-              <a href="https://shadcnstore.com" target='_blank' className="flex items-center space-x-2 cursor-pointer">
+          <div className="col-span-2 sm:col-span-4 lg:col-span-2 max-w-2xl">
+            <div className="flex items-center gap-2 mb-4 max-lg:justify-center">
+              <a href="https://shadcnstore.com" target='_blank' className="flex items-center gap-2 cursor-pointer">
                 <span className="font-bold text-xl">ShadcnStore</span>
               </a>
             </div>
             <p className="text-muted-foreground mb-6 max-lg:text-center max-lg:flex max-lg:justify-center">
               Accelerating web development with curated blocks, templates, landing pages, and admin dashboards designed for modern developers.
             </p>
-            <div className="flex space-x-4 max-lg:justify-center">
+            <div className="flex gap-4 max-lg:justify-center">
               {socialLinks.map((social) => (
                 <Button key={social.name} variant="ghost" size="icon" asChild>
                   <a
@@ -133,7 +133,7 @@ export function LandingFooter() {
           </div>
 
           {/* Links Columns */}
-          <div className='max-md:col-span-2 lg:col-span-1'>
+          <div className='lg:col-span-1'>
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
@@ -149,7 +149,7 @@ export function LandingFooter() {
             </ul>
           </div>
 
-          <div className='max-md:col-span-2 lg:col-span-1'>
+          <div className='lg:col-span-1'>
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
@@ -165,7 +165,7 @@ export function LandingFooter() {
             </ul>
           </div>
 
-          <div className='max-md:col-span-2 lg:col-span-1'>
+          <div className='lg:col-span-1'>
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
@@ -181,7 +181,7 @@ export function LandingFooter() {
             </ul>
           </div>
 
-          <div className='max-md:col-span-2 lg:col-span-1'>
+          <div className='lg:col-span-1'>
             <h4 className="font-semibold mb-4">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
@@ -203,18 +203,20 @@ export function LandingFooter() {
         {/* Bottom Footer */}
         <div className="flex flex-col lg:flex-row justify-between items-center gap-2">
           <div className="flex flex-col sm:flex-row items-center gap-2 text-muted-foreground text-sm">
-            <div className="flex items-center gap-1">
+            <a
+              href="https://lirstudio.co.il/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               <span>Made with</span>
-              <Heart className="h-4 w-4 text-red-500 fill-current" />
-              <span>by</span>
-              <a href="https://shadcnstore.com" target='_blank' className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer">
-                ShadcnStore
-              </a>
-            </div>
+              <Heart className="h-4 w-4 fill-current shrink-0" />
+              <span>by: Lir branding studio</span>
+            </a>
             <span className="hidden sm:inline">•</span>
             <span>© {new Date().getFullYear()} for the developer community</span>
           </div>
-          <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-4 md:mt-0">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-4 md:mt-0">
             <a href="#privacy" className="hover:text-foreground transition-colors">
               Privacy Policy
             </a>

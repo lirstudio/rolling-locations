@@ -21,7 +21,7 @@ export default function FAQPage() {
   ] as const;
 
   return (
-    <div className="container px-4 py-12 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>

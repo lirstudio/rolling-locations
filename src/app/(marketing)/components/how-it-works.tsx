@@ -15,7 +15,7 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="border-b border-border bg-muted/50 py-14 sm:py-20 scroll-mt-16">
-      <div className="container px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto">
           <Link
             href="#how-it-works"

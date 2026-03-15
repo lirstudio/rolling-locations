@@ -104,14 +104,15 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
       </div>
 
       {/* Search bar — overlapping the hero bottom edge */}
-      <div className="relative z-20 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14">
+      <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14 min-w-0">
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-border bg-card p-4 shadow-lg sm:p-6"
+          className="min-w-0 rounded-xl border border-border bg-card p-4 shadow-lg sm:p-5 md:p-6"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+          {/* Grid: equal gap-4; proportional widths 2:1:1:1 on md+ */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr_1fr] md:items-end">
             {/* General search field */}
-            <div className="flex-[2] min-w-0">
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-foreground">
                 {t("searchQuery")}
               </label>
@@ -122,14 +123,14 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t("searchQueryPlaceholder")}
-                  className="bg-background ps-10 pe-4"
+                  className="bg-background ps-10 pe-4 w-full"
                   aria-label={t("searchQuery")}
                 />
               </div>
             </div>
 
             {/* City / region field */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-foreground">
                 {t("searchCity")}
               </label>
@@ -140,21 +141,21 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder={t("searchCity")}
-                  className="bg-background ps-10 pe-4"
+                  className="bg-background ps-10 pe-4 w-full"
                   aria-label={t("searchCity")}
                 />
               </div>
             </div>
 
             {/* Category select */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-foreground">
                 {t("searchCategory")}
               </label>
               <div className="relative">
                 <Tag className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
                 <Select value={categorySlug} onValueChange={setCategorySlug}>
-                  <SelectTrigger className="bg-background ps-10" aria-label={t("searchCategory")}>
+                  <SelectTrigger className="bg-background ps-10 w-full min-w-0" aria-label={t("searchCategory")}>
                     <SelectValue placeholder={t("allCategories")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -169,11 +170,13 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
               </div>
             </div>
 
-            {/* CTA */}
-            <Button type="submit" size="lg" className="shrink-0 w-full sm:w-auto">
-              {t("cta")}
-              <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
-            </Button>
+            {/* CTA — same grid cell, full height alignment */}
+            <div className="flex flex-col justify-end">
+              <Button type="submit" size="lg" className="h-10 w-full">
+                {t("cta")}
+                <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180 shrink-0" />
+              </Button>
+            </div>
           </div>
         </form>
       </div>

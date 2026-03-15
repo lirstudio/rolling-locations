@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Heart } from "lucide-react";
 import { APP_VERSION } from "@/generated/version";
 
 export function SiteFooter() {
@@ -26,7 +27,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-muted/50">
-      <div className="container px-4 py-12 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2">
@@ -59,18 +60,27 @@ export function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Rollin Locations. {t("allRights")}</p>
-            <p className="text-xs text-muted-foreground">{t("version")} {APP_VERSION}</p>
-          </div>
-          <div className="flex flex-wrap gap-4">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border pt-8 text-xs text-muted-foreground items-center text-center">
+          <a
+            href="https://lirstudio.co.il/"
+            target="_blank"
+            rel="noopener noreferrer"
+            dir="ltr"
+            className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+          >
+            <span>Made with</span>
+            <Heart className="h-3.5 w-3.5 fill-current shrink-0" />
+            <span>by: Lir branding studio</span>
+          </a>
+          <p>© {new Date().getFullYear()} Rollin Locations. {t("allRights")}</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             {legalLinks.map(({ href, label }) => (
-              <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <Link key={href} href={href} className="hover:text-foreground transition-colors">
                 {label}
               </Link>
             ))}
           </div>
+          <p>{t("version")} {APP_VERSION}</p>
         </div>
       </div>
     </footer>

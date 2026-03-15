@@ -95,6 +95,7 @@ const marketing = {
     title: "Discover Locations",
     intro: "Filter by category, area and price. Pick a location and request a booking.",
     activeFilters: "Active filters",
+    showFilters: "Filters",
     clearFilters: "Clear filters",
     category: "Category",
     city: "City / area",

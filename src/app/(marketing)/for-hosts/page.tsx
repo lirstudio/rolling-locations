@@ -76,7 +76,7 @@ export default function ForHostsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.12)_0%,_transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.15)_0%,_transparent_60%)]" />
 
-        <div className="relative z-10 container px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur-sm border border-white/10">
               {t("hero.badge")}
@@ -106,7 +106,7 @@ export default function ForHostsPage() {
 
       {/* ── Stats bar ── */}
       <section className="relative z-20 border-b border-border bg-card">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse divide-border">
             {stats.map((stat, i) => (
               <div key={i} className="flex flex-col items-center py-8 sm:py-10">
@@ -124,7 +124,7 @@ export default function ForHostsPage() {
 
       {/* ── Benefits ── */}
       <section className="bg-background py-16 sm:py-24">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
               {t("benefits.title")}
@@ -154,7 +154,7 @@ export default function ForHostsPage() {
 
       {/* ── Process / How it works ── */}
       <section className="bg-muted/50 py-16 sm:py-24 border-y border-border">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
               {t("process.title")}
@@ -195,7 +195,7 @@ export default function ForHostsPage() {
 
       {/* ── What to prepare ── */}
       <section className="bg-background py-16 sm:py-24">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
               {t("whatToPrepare.title")}
@@ -222,7 +222,7 @@ export default function ForHostsPage() {
 
       {/* ── Who is it for ── */}
       <section className="bg-muted/50 py-16 sm:py-24 border-y border-border">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
               {t("whoIsItFor.title")}
@@ -248,7 +248,7 @@ export default function ForHostsPage() {
 
       {/* ── Eligibility + links ── */}
       <section className="bg-background py-12 sm:py-16">
-        <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-sm text-muted-foreground">{t("eligibility")}</p>
 
@@ -266,7 +266,7 @@ export default function ForHostsPage() {
 
       {/* ── Bottom CTA banner ── */}
       <section className="bg-primary py-16 sm:py-20 text-primary-foreground">
-        <div className="container px-4 sm:px-6 lg:px-8 text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
             {t("ctaBottom")}
           </h2>

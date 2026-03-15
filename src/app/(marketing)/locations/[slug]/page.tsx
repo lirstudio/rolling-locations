@@ -18,6 +18,7 @@ import { VideoCarousel } from "@/components/locations/video-carousel";
 import { LocationCard } from "@/components/locations/location-card";
 import { LocationGallery } from "@/components/locations/location-gallery";
 import { useUnavailableDates } from "@/hooks/use-unavailable-dates";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Location } from "@/types";
 import type { DateRange } from "react-day-picker";
 
@@ -61,6 +62,7 @@ export default function LocationDetailsPage() {
   }, [slug]);
 
   const { unavailableDates } = useUnavailableDates(location?.id);
+  const isMobile = useIsMobile();
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -119,7 +121,7 @@ export default function LocationDetailsPage() {
 
   if (location === undefined) {
     return (
-      <div className="container flex min-h-[50vh] items-center justify-center px-4 py-16">
+      <div className="container mx-auto flex min-h-[50vh] items-center justify-center px-4 py-16">
         <Loader2 className="size-10 animate-spin text-muted-foreground" aria-hidden />
       </div>
     );
@@ -127,7 +129,7 @@ export default function LocationDetailsPage() {
 
   if (!location) {
     return (
-      <div className="container px-4 py-16 text-center">
+      <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-muted-foreground">{t("notFound")}</p>
         <Button asChild className="mt-4">
           <Link href="/locations">{t("backToLocations")}</Link>
@@ -139,7 +141,7 @@ export default function LocationDetailsPage() {
   const gallery = location.mediaGallery;
 
   return (
-    <div className="container px-4 pb-24 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 pb-24 sm:px-6 lg:px-8">
       {/* Gallery — full width above the grid */}
       <LocationGallery gallery={gallery} title={location.title} />
 
@@ -197,7 +199,7 @@ export default function LocationDetailsPage() {
               </h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {similar.map((loc) => (
-                  <LocationCard key={loc.id} location={loc} variant="compact" />
+                  <LocationCard key={loc.id} location={loc} />
                 ))}
               </div>
             </section>
@@ -263,7 +265,7 @@ export default function LocationDetailsPage() {
                       </div>
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center" side="bottom">
+                  <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0 overflow-x-hidden" align="center" side="bottom">
                     <Calendar
                       mode="range"
                       selected={dateRange}
@@ -287,7 +289,7 @@ export default function LocationDetailsPage() {
                           calendarClickCount.current = 0;
                         }
                       }}
-                      numberOfMonths={2}
+                      numberOfMonths={isMobile ? 1 : 2}
                       disabled={disabledDays}
                       locale={he}
                       dir="rtl"

@@ -4,42 +4,66 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MapPin, CheckCircle2, ArrowUpRight, ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MapPin,
+  MoreHorizontal,
+  ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { mockCategories } from "@/mocks/categories";
-import type { Location } from "@/types";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { Location, LocationStatus } from "@/types";
 
 function isSupabaseStorageUrl(url: string): boolean {
   return url.includes("supabase.co") && url.includes("/storage/");
 }
 
-const MAX_AMENITIES_SHOWN = 3;
-
 function getImageItems(mediaGallery: { type: string; url: string }[]) {
   return mediaGallery.filter((m) => m.type === "image");
 }
 
-interface LocationCardProps {
+const statusVariant: Record<
+  LocationStatus,
+  "default" | "secondary" | "outline"
+> = {
+  published: "default",
+  draft: "secondary",
+  paused: "outline",
+};
+
+export interface LocationCardProps {
   location: Location;
-  variant?: "compact" | "detailed";
+  /** Default: /locations/[slug]. Host can pass /host/locations/[id]/view */
+  href?: string;
+  /** Show status badge (e.g. Published/Draft) — for host dashboard */
+  showStatus?: boolean;
+  /** Dropdown menu content — for host dashboard (view, edit, delete, etc.) */
+  menuContent?: React.ReactNode;
 }
 
-export function LocationCard({ location, variant = "detailed" }: LocationCardProps) {
-  if (variant === "compact") {
-    return <CompactCard location={location} />;
-  }
-
-  return <DetailedCard location={location} />;
-}
-
-/* ─── Compact (carousel / homepage) ────────────────────────────────────────── */
-
-function CompactCard({ location }: { location: Location }) {
+/**
+ * Single location card used everywhere: marketing (discover, featured, related) and host dashboard.
+ * Vertical card: image, bottom dark bar (title, city, price), optional status badge and menu.
+ */
+export function LocationCard({
+  location,
+  href,
+  showStatus = false,
+  menuContent,
+}: LocationCardProps) {
   const t = useTranslations("marketing.locationCard");
+  const tHost = useTranslations("host");
   const images = getImageItems(location.mediaGallery);
   const [index, setIndex] = useState(0);
   const currentUrl = images[index]?.url;
   const hasMultiple = images.length > 1;
+  const linkHref = href ?? `/locations/${location.slug}`;
 
   const go = (delta: number) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -47,18 +71,15 @@ function CompactCard({ location }: { location: Location }) {
     setIndex((i) => (i + delta + images.length) % images.length);
   };
 
-  return (
-    <Link
-      href={`/locations/${location.slug}`}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-xl"
-    >
+  const cardContent = (
+    <>
       {currentUrl ? (
         <Image
           src={currentUrl}
           alt={location.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 80vw, (max-width: 1200px) 50vw, 25vw"
+          sizes="(max-width: 768px) 80vw, (max-width: 1200px) 50vw, 33vw"
           unoptimized={isSupabaseStorageUrl(currentUrl)}
         />
       ) : (
@@ -88,14 +109,6 @@ function CompactCard({ location }: { location: Location }) {
         </>
       )}
 
-      <Badge className="absolute top-3 end-3 bg-primary text-primary-foreground text-xs font-medium px-2.5 py-1 shadow-sm">
-        {t("fromPerDay", { price: location.pricing.dailyRate })}
-      </Badge>
-
-      <Badge className="absolute top-3 start-3 bg-white/90 text-foreground text-xs font-medium px-2.5 py-1 shadow-sm backdrop-blur-sm">
-        {t("available")}
-      </Badge>
-
       {images.length > 1 && (
         <div className="absolute bottom-14 start-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
           <ImageIcon className="h-3 w-3" />
@@ -103,178 +116,61 @@ function CompactCard({ location }: { location: Location }) {
         </div>
       )}
 
-      <div className="absolute inset-x-0 bottom-0 p-4">
-        <div className="rounded-xl bg-white/20 backdrop-blur-md border border-white/30 p-3.5 shadow-lg">
-          <div className="flex items-end justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-white truncate leading-snug">
-                {location.title}
-              </h3>
-              <p className="flex items-center gap-1 text-[12px] text-white/80 mt-0.5">
-                <MapPin className="h-3 w-3 shrink-0" />
-                {location.address.city}
-              </p>
-            </div>
-            <div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-white/30 backdrop-blur-sm text-white transition-colors group-hover:bg-white group-hover:text-foreground">
-              <ArrowUpRight className="h-4 w-4" />
-            </div>
-          </div>
+      {showStatus && (
+        <Badge
+          variant={statusVariant[location.status]}
+          className="absolute top-3 start-3 z-10 text-xs font-medium px-2.5 py-1 shadow-sm"
+        >
+          {tHost(`locations.${location.status}` as "locations.draft")}
+        </Badge>
+      )}
+
+      {menuContent != null && (
+        <div
+          className="absolute top-3 end-3 z-10"
+          onClick={(e) => e.preventDefault()}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="size-8 rounded-full bg-white/80 backdrop-blur-sm text-foreground hover:bg-white"
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {menuContent}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+
+      {/* Bottom bar: title (line 1), pin + city + price (line 2) — same as Discover */}
+      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+        <div className="rounded-t-xl bg-black/60 backdrop-blur-md border border-white/10 border-b-0 px-3.5 py-3 shadow-lg">
+          <h3 className="text-sm font-semibold text-white truncate leading-snug">
+            {location.title}
+          </h3>
+          <p className="flex items-center justify-end gap-2 text-[12px] text-white/80 mt-1">
+            <MapPin className="h-3 w-3 shrink-0" />
+            <span>{location.address.city}</span>
+            <span className="font-semibold text-white">
+              ₪{location.pricing.dailyRate.toLocaleString("he-IL")}
+            </span>
+          </p>
         </div>
       </div>
-    </Link>
+    </>
   );
-}
-
-/* ─── Detailed (listing page) ──────────────────────────────────────────────── */
-
-function DetailedCard({ location }: { location: Location }) {
-  const t = useTranslations("marketing.locationCard");
-  const images = getImageItems(location.mediaGallery);
-  const [index, setIndex] = useState(0);
-  const currentUrl = images[index]?.url;
-  const hasMultiple = images.length > 1;
-
-  const go = (delta: number) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIndex((i) => (i + delta + images.length) % images.length);
-  };
-
-  const categories = mockCategories.filter((c) =>
-    location.categoryIds.includes(c.id)
-  );
-
-  const amenities = location.amenities ?? [];
-  const shownAmenities = amenities.slice(0, MAX_AMENITIES_SHOWN);
-  const extraAmenities = amenities.length - MAX_AMENITIES_SHOWN;
-
-  const descriptionPreview =
-    location.description.length > 100
-      ? location.description.slice(0, 100) + "…"
-      : location.description;
 
   return (
     <Link
-      href={`/locations/${location.slug}`}
-      className="group flex flex-col sm:flex-row overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-lg"
+      href={linkHref}
+      className="group relative block aspect-[3/4] overflow-hidden rounded-xl"
     >
-      {/* Image side — carousel */}
-      <div className="relative w-full sm:w-72 lg:w-80 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[220px]">
-        {currentUrl ? (
-          <Image
-            src={currentUrl}
-            alt={location.title}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, 320px"
-            unoptimized={isSupabaseStorageUrl(currentUrl)}
-          />
-        ) : (
-          <div className="size-full bg-muted" />
-        )}
-
-        {hasMultiple && (
-          <>
-            <button
-              type="button"
-              onClick={go(-1)}
-              className="absolute top-1/2 start-2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label={t("previousImage")}
-            >
-              <ChevronRight className="h-5 w-5 rtl:rotate-180" />
-            </button>
-            <button
-              type="button"
-              onClick={go(1)}
-              className="absolute top-1/2 end-2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label={t("nextImage")}
-            >
-              <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
-            </button>
-          </>
-        )}
-
-        {images.length > 1 && (
-          <div className="absolute bottom-2 start-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-            <ImageIcon className="h-3 w-3" />
-            {index + 1} / {images.length}
-          </div>
-        )}
-
-        <Badge className="absolute top-2 start-2 bg-white/90 text-foreground text-[11px] font-medium px-2 py-0.5 shadow-sm backdrop-blur-sm">
-          {t("available")}
-        </Badge>
-      </div>
-
-      {/* Content side */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        {/* Header: title + price */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold text-foreground leading-snug group-hover:text-primary transition-colors">
-              {location.title}
-            </h3>
-            <p className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5 shrink-0" />
-              {location.address.street}, {location.address.city}
-            </p>
-          </div>
-          <div className="shrink-0 text-end">
-            <p className="text-lg font-bold text-primary leading-tight">
-              ₪{location.pricing.dailyRate.toLocaleString("he-IL")}
-            </p>
-            <p className="text-xs text-muted-foreground">{t("perDay")}</p>
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed line-clamp-2">
-          {descriptionPreview}
-        </p>
-
-        {/* Categories */}
-        {categories.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {categories.map((c) => (
-              <Badge
-                key={c.id}
-                variant="secondary"
-                className="text-[11px] font-normal px-2 py-0.5"
-              >
-                {c.name}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Amenities */}
-        {amenities.length > 0 && (
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            {shownAmenities.map((a) => (
-              <span
-                key={a}
-                className="flex items-center gap-1 text-xs text-muted-foreground"
-              >
-                <CheckCircle2 className="h-3 w-3 shrink-0 text-primary/70" />
-                {a}
-              </span>
-            ))}
-            {extraAmenities > 0 && (
-              <span className="text-xs text-muted-foreground">
-                +{extraAmenities} {t("more")}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-auto pt-3 flex items-center justify-between">
-          <span className="text-xs font-medium text-primary group-hover:underline inline-flex items-center gap-1">
-            {t("viewDetails")}
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </span>
-        </div>
-      </div>
+      {cardContent}
     </Link>
   );
 }

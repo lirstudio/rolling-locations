@@ -3,23 +3,16 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import Image from "next/image";
-import { Plus, Search, MoreHorizontal, MapPin } from "lucide-react";
+import { Plus, Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -27,20 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationCard } from "@/components/locations/location-card";
 import { useHostStore } from "@/stores/host-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useStoreHydrated } from "@/hooks/use-store-hydrated";
-import type { LocationStatus } from "@/types";
-
-function isSupabaseStorageUrl(url: string): boolean {
-  return url.includes("supabase.co") && url.includes("/storage/");
-}
-
-const statusVariant: Record<LocationStatus, "default" | "secondary" | "outline"> = {
-  published: "default",
-  draft: "secondary",
-  paused: "outline",
-};
 
 export default function HostLocationsPage() {
   const t = useTranslations("host");
@@ -129,123 +112,61 @@ export default function HostLocationsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((loc) => {
-            const coverUrl =
-              loc.mediaGallery.find((m) => m.isFeatured)?.url ??
-              loc.mediaGallery[0]?.url;
-
-            return (
-              <Link
-                key={loc.id}
-                href={`/host/locations/${loc.id}/view`}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-xl"
-              >
-                {coverUrl ? (
-                  <Image
-                    src={coverUrl}
-                    alt={loc.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    unoptimized={isSupabaseStorageUrl(coverUrl)}
-                  />
-                ) : (
-                  <div className="size-full bg-muted" />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-                <Badge
-                  variant={statusVariant[loc.status]}
-                  className="absolute top-3 start-3"
-                >
-                  {t(`locations.${loc.status}` as "locations.draft")}
-                </Badge>
-
-                {/* Dropdown – stop propagation so the Link doesn't navigate */}
-                <div
-                  className="absolute top-3 end-3"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="size-8 rounded-full bg-white/80 backdrop-blur-sm text-foreground hover:bg-white"
-                      >
-                        <MoreHorizontal className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/host/locations/${loc.id}/view`}>
-                          {t("locations.view")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/host/locations/${loc.id}/edit`}>
-                          {t("locations.edit")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/host/locations/${loc.id}/availability`}>
-                          {t("locations.manageAvailability")}
-                        </Link>
-                      </DropdownMenuItem>
-                      {loc.status === "draft" && (
-                        <DropdownMenuItem
-                          onClick={() => setLocationStatus(loc.id, "published")}
-                        >
-                          {t("locations.publish")}
-                        </DropdownMenuItem>
-                      )}
-                      {loc.status === "published" && (
-                        <DropdownMenuItem
-                          onClick={() => setLocationStatus(loc.id, "paused")}
-                        >
-                          {t("locations.pause")}
-                        </DropdownMenuItem>
-                      )}
-                      {loc.status === "paused" && (
-                        <DropdownMenuItem
-                          onClick={() => setLocationStatus(loc.id, "draft")}
-                        >
-                          {t("locations.toDraft")}
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => deleteLocation(loc.id)}
-                      >
-                        {t("locations.delete")}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <div className="absolute inset-x-0 bottom-0 p-4">
-                  <div className="rounded-xl bg-white/20 backdrop-blur-md border border-white/30 p-3.5 shadow-lg">
-                    <div className="flex items-end justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-semibold text-white truncate leading-snug">
-                          {loc.title}
-                        </h3>
-                        <p className="flex items-center gap-1 text-[12px] text-white/80 mt-0.5">
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          {loc.address.city}
-                        </p>
-                      </div>
-                      <span className="shrink-0 text-sm font-semibold text-white">
-                        ₪{loc.pricing.dailyRate}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((loc) => (
+            <LocationCard
+              key={loc.id}
+              location={loc}
+              href={`/host/locations/${loc.id}/view`}
+              showStatus
+              menuContent={
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/host/locations/${loc.id}/view`}>
+                      {t("locations.view")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/host/locations/${loc.id}/edit`}>
+                      {t("locations.edit")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/host/locations/${loc.id}/availability`}>
+                      {t("locations.manageAvailability")}
+                    </Link>
+                  </DropdownMenuItem>
+                  {loc.status === "draft" && (
+                    <DropdownMenuItem
+                      onClick={() => setLocationStatus(loc.id, "published")}
+                    >
+                      {t("locations.publish")}
+                    </DropdownMenuItem>
+                  )}
+                  {loc.status === "published" && (
+                    <DropdownMenuItem
+                      onClick={() => setLocationStatus(loc.id, "paused")}
+                    >
+                      {t("locations.pause")}
+                    </DropdownMenuItem>
+                  )}
+                  {loc.status === "paused" && (
+                    <DropdownMenuItem
+                      onClick={() => setLocationStatus(loc.id, "draft")}
+                    >
+                      {t("locations.toDraft")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => deleteLocation(loc.id)}
+                  >
+                    {t("locations.delete")}
+                  </DropdownMenuItem>
+                </>
+              }
+            />
+          ))}
         </div>
       )}
     </div>

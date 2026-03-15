@@ -95,6 +95,7 @@ const marketing = {
     title: "גלה לוקיישנים",
     intro: "סננו לפי קטגוריה, אזור ומחיר. בחרו לוקיישן ובקשו הזמנה.",
     activeFilters: "סינונים פעילים",
+    showFilters: "סינונים",
     clearFilters: "נקה סינונים",
     category: "קטגוריה",
     city: "עיר / אזור",

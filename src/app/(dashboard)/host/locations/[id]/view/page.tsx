@@ -50,7 +50,7 @@ export default function HostLocationViewPage() {
     gallery[0]?.url;
 
   return (
-    <div className="container max-w-4xl px-4 pb-12 sm:px-6">
+    <div className="container mx-auto max-w-4xl px-4 pb-12 sm:px-6">
       <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/host/locations" className="hover:text-foreground">
           {t("locations.title")}

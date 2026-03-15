@@ -159,7 +159,7 @@ export default function BookingSummaryPage() {
 
   if (location === undefined) {
     return (
-      <div className="container flex min-h-[50vh] items-center justify-center px-4 py-16">
+      <div className="container mx-auto flex min-h-[50vh] items-center justify-center px-4 py-16">
         <Loader2 className="size-10 animate-spin text-muted-foreground" aria-hidden />
       </div>
     );
@@ -167,7 +167,7 @@ export default function BookingSummaryPage() {
 
   if (!location || !dateFrom || !dateTo || days <= 0) {
     return (
-      <div className="container px-4 py-16 text-center">
+      <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-muted-foreground">{t("invalidBooking")}</p>
         <Button asChild className="mt-4">
           <Link href={`/locations/${encodeURIComponent(slug)}`}>
@@ -184,7 +184,7 @@ export default function BookingSummaryPage() {
 
   if (submitted) {
     return (
-      <div className="container flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="container mx-auto flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center">
         <div className="rounded-full bg-green-100 p-4">
           <CheckCircle2 className="size-12 text-green-600" />
         </div>
@@ -209,7 +209,7 @@ export default function BookingSummaryPage() {
   }
 
   return (
-    <div className="container px-4 py-8 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <Link
           href={`/locations/${encodeURIComponent(slug)}`}

@@ -34,7 +34,7 @@ export function FeaturedLocations() {
 
   return (
     <section className="bg-muted/40 py-14 sm:py-20">
-      <div className="container px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
@@ -83,20 +83,12 @@ export function FeaturedLocations() {
 
         {/* Location cards — same component as discover page (/locations) */}
         {loading ? (
-          <div className="mt-10 grid gap-5">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="flex overflow-hidden rounded-xl border border-border bg-card"
-              >
-                <div className="w-72 shrink-0 aspect-[4/3] sm:min-h-[220px] bg-muted animate-pulse" />
-                <div className="flex-1 p-5 space-y-3">
-                  <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
-                  <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
-                  <div className="h-4 w-full bg-muted rounded animate-pulse" />
-                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
-                </div>
-              </div>
+                className="aspect-[3/4] overflow-hidden rounded-xl bg-muted animate-pulse"
+              />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -114,7 +106,7 @@ export function FeaturedLocations() {
             </Button>
           </div>
         ) : (
-          <div className="mt-10 grid gap-5">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((loc) => (
               <LocationCard key={loc.id} location={loc} />
             ))}
