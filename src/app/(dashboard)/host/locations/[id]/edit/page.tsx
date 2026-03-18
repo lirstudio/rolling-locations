@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useRouter, useParams } from "next/navigation";
 import { LocationForm } from "@/components/locations/location-form";
-import { useHostStore } from "@/stores/host-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useHostLocations } from "@/hooks/use-host-locations";
 import type { LocationFormValues } from "@/schemas/location";
 import type { MediaItem } from "@/types";
 
@@ -11,8 +12,9 @@ export default function EditLocationPage() {
   const t = useTranslations("host");
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const location = useHostStore((s) => s.locations.find((l) => l.id === params.id));
-  const updateLocation = useHostStore((s) => s.updateLocation);
+  const user = useAuthStore((s) => s.user);
+  const { locations, updateLocation } = useHostLocations(user?.id);
+  const location = locations.find((l) => l.id === params.id);
 
   if (!location) {
     return (

@@ -1,25 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchAllBookingRequests,
   type DbBookingRequest,
 } from "@/app/actions/bookings";
+import { queryKeys } from "@/lib/query-keys";
 
 export function useHostBookingRequests() {
-  const [requests, setRequests] = useState<DbBookingRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    const data = await fetchAllBookingRequests();
-    setRequests(data);
-    setLoading(false);
-  }, []);
+  const { data: requests = [], isLoading: loading } = useQuery<
+    DbBookingRequest[]
+  >({
+    queryKey: queryKeys.bookings.host(),
+    queryFn: fetchAllBookingRequests,
+  });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const refresh = () =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.bookings.host() });
 
   return { requests, loading, refresh };
 }

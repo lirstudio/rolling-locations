@@ -6,6 +6,7 @@ const settings = {
     description: "עדכן את המידע האישי וההעדפות שלך",
     profilePicture: "תמונת פרופיל",
     uploadPhoto: "העלאת תמונה",
+    uploading: "מעלה…",
     reset: "איפוס",
     allowedFormats: "JPG, GIF או PNG. גודל מקסימלי 800K",
     firstName: "שם פרטי",

@@ -25,7 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
 
 const allowSelfAdminEmails =
@@ -98,6 +98,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
             >
               <Avatar className="h-8 w-8 shrink-0 rounded-lg">
+                <AvatarImage src={user.avatar || undefined} alt="" />
                 <AvatarFallback className="rounded-lg text-xs">
                   {initials}
                 </AvatarFallback>
@@ -120,6 +121,7 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={user.avatar || undefined} alt="" />
                   <AvatarFallback className="rounded-lg text-xs">
                     {initials}
                   </AvatarFallback>

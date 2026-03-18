@@ -5,9 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
-import { Upload } from "lucide-react";
+import { Camera, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { uploadAvatar } from "@/lib/upload-avatar";
 import {
   Card,
   CardContent,
@@ -49,10 +50,11 @@ type UserFormValues = z.infer<typeof userFormSchema>;
 
 export default function UserSettingsPage() {
   const t = useTranslations("settings");
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, updateUserMetadata } = useAuthStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(user?.avatarUrl ?? null);
+  const [uploading, setUploading] = useState(false);
 
   const nameParts = user?.name?.split(" ") ?? [""];
   const firstName = nameParts[0] ?? "";
@@ -72,6 +74,7 @@ export default function UserSettingsPage() {
 
   useEffect(() => {
     if (user) {
+      setProfileImage(user.avatarUrl ?? null);
       const parts = user.name.split(" ");
       form.reset({
         firstName: parts[0] ?? "",
@@ -106,18 +109,34 @@ export default function UserSettingsPage() {
 
   const handleFileUpload = () => fileInputRef.current?.click();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => setProfileImage(e.target?.result as string);
-      reader.readAsDataURL(file);
+    if (!file || !user) return;
+    setUploading(true);
+    try {
+      const url = await uploadAvatar(file);
+      await updateUserMetadata({ avatar_url: url });
+      updateUser({ avatarUrl: url });
+      setProfileImage(url);
+      toast.success(t("saved"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    if (!user) return;
     setProfileImage(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    try {
+      await updateUserMetadata({ avatar_url: "" });
+      toast.success(t("saved"));
+    } catch {
+      toast.error(t("saved"));
+    }
   };
 
   const initials = user?.name
@@ -138,38 +157,67 @@ export default function UserSettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Avatar */}
-              <div className="flex items-center gap-6">
-                <Avatar className="h-20 w-20 rounded-lg">
-                  <AvatarImage src={profileImage ?? undefined} />
-                  <AvatarFallback className="rounded-lg text-lg">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
+              <div className="flex items-center gap-5">
+                <button
+                  type="button"
+                  onClick={handleFileUpload}
+                  disabled={uploading}
+                  className="group relative h-24 w-24 shrink-0 cursor-pointer rounded-xl overflow-hidden border-2 border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
+                  aria-label={t("user.uploadPhoto")}
+                >
+                  <Avatar className="h-full w-full rounded-xl">
+                    <AvatarImage
+                      src={profileImage ?? undefined}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="rounded-xl text-2xl font-semibold bg-muted">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 group-disabled:opacity-0">
+                    {uploading ? (
+                      <Loader2 className="h-6 w-6 text-white animate-spin" />
+                    ) : (
+                      <Camera className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                </button>
+
                 <div className="flex flex-col gap-2">
-                  <div className="flex gap-2">
+                  <p className="text-sm font-medium">{t("user.profilePicture")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("user.allowedFormats")}
+                  </p>
+                  <div className="flex gap-2 mt-1">
                     <Button
                       variant="outline"
                       size="sm"
                       type="button"
                       onClick={handleFileUpload}
+                      disabled={uploading}
                       className="cursor-pointer"
                     >
-                      <Upload className="me-2 h-4 w-4" />
-                      {t("user.uploadPhoto")}
+                      {uploading ? (
+                        <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Camera className="me-2 h-4 w-4" />
+                      )}
+                      {uploading ? t("user.uploading") : t("user.uploadPhoto")}
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      type="button"
-                      onClick={handleReset}
-                      className="cursor-pointer"
-                    >
-                      {t("user.reset")}
-                    </Button>
+                    {profileImage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        onClick={handleReset}
+                        disabled={uploading}
+                        className="cursor-pointer text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="me-2 h-4 w-4" />
+                        {t("user.reset")}
+                      </Button>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("user.allowedFormats")}
-                  </p>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -217,7 +265,7 @@ export default function UserSettingsPage() {
                     <FormItem>
                       <FormLabel>{t("user.email")}</FormLabel>
                       <FormControl>
-                        <Input type="email" {...field} />
+                        <Input type="email" dir="ltr" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

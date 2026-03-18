@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarConfigProvider } from "@/contexts/sidebar-context";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { QueryProvider } from "@/components/query-provider";
 import { heebo } from "@/lib/fonts";
 import heMessages from "@/locales/he";
 
@@ -30,11 +31,13 @@ export default function RootLayout({
       <body className={heebo.className}>
         <NextIntlClientProvider locale={locale} messages={heMessages}>
           <ThemeProvider defaultTheme="light" storageKey="rollin-theme">
-            <AuthProvider>
-              <SidebarConfigProvider>
-                {children}
-              </SidebarConfigProvider>
-            </AuthProvider>
+            <QueryProvider>
+              <AuthProvider>
+                <SidebarConfigProvider>
+                  {children}
+                </SidebarConfigProvider>
+              </AuthProvider>
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

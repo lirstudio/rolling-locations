@@ -1,7 +1,8 @@
 "use server";
 
+import { unstable_cache, revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { Location } from "@/types";
 
 // ── DB row shapes ─────────────────────────────────────────────────────────────
@@ -148,6 +149,8 @@ export async function saveLocation(location: Location): Promise<{ error?: string
     }
   }
 
+  revalidateTag(CACHE_TAGS.publishedLocations, "max");
+  revalidateTag(CACHE_TAGS.locationSlug(location.slug), "max");
   return {};
 }
 
@@ -155,6 +158,7 @@ export async function deleteLocationAction(locationId: string): Promise<{ error?
   const db = createAdminClient();
   const { error } = await db.from("locations").delete().eq("id", locationId);
   if (error) return { error: error.message };
+  revalidateTag(CACHE_TAGS.publishedLocations, "max");
   return {};
 }
 
@@ -186,8 +190,8 @@ export async function fetchAllLocations(): Promise<Location[]> {
   return (data as LocationRow[]).map(fromDbRow);
 }
 
-export async function fetchPublishedLocations(): Promise<Location[]> {
-  const db = await createClient();
+async function _fetchPublishedLocations(): Promise<Location[]> {
+  const db = createAdminClient();
   const { data, error } = await db
     .from("locations")
     .select("*, location_media(*)")
@@ -198,8 +202,18 @@ export async function fetchPublishedLocations(): Promise<Location[]> {
   return (data as LocationRow[]).map(fromDbRow);
 }
 
-export async function fetchLocationBySlug(slug: string): Promise<Location | null> {
-  const db = await createClient();
+const cachedPublishedLocations = unstable_cache(
+  _fetchPublishedLocations,
+  ["published-locations"],
+  { tags: [CACHE_TAGS.publishedLocations], revalidate: 300 }
+);
+
+export async function fetchPublishedLocations(): Promise<Location[]> {
+  return cachedPublishedLocations();
+}
+
+async function _fetchLocationBySlug(slug: string): Promise<Location | null> {
+  const db = createAdminClient();
   const { data, error } = await db
     .from("locations")
     .select("*, location_media(*)")
@@ -209,6 +223,14 @@ export async function fetchLocationBySlug(slug: string): Promise<Location | null
 
   if (error || !data) return null;
   return fromDbRow(data as LocationRow);
+}
+
+export async function fetchLocationBySlug(slug: string): Promise<Location | null> {
+  return unstable_cache(
+    () => _fetchLocationBySlug(slug),
+    [`location-slug-${slug}`],
+    { tags: [CACHE_TAGS.locationSlug(slug)], revalidate: 300 }
+  )();
 }
 
 export async function getPublishedLocationCount(): Promise<number> {

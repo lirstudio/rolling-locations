@@ -12,18 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useHostStore } from "@/stores/host-store";
-import { useStoreHydrated } from "@/hooks/use-store-hydrated";
 import { useAuthStore } from "@/stores/auth-store";
+import { useHostLocations } from "@/hooks/use-host-locations";
 import { AvailabilityCalendar } from "@/components/availability/availability-calendar";
 import { GoogleCalendarTab } from "@/components/availability/google-calendar-tab";
 
 export default function HostAvailabilityPage() {
   const t = useTranslations("host");
   const searchParams = useSearchParams();
-  const hydrated = useStoreHydrated();
   const user = useAuthStore((s) => s.user);
-  const locations = useHostStore((s) => s.locations);
+  const { locations: hostLocations, isLoading } = useHostLocations(user?.id);
 
   React.useEffect(() => {
     const error = searchParams.get("error");
@@ -43,12 +41,6 @@ export default function HostAvailabilityPage() {
     }
   }, [searchParams, t]);
 
-  const hostLocations = React.useMemo(
-    () =>
-      user ? locations.filter((l) => l.hostId === user.id) : locations,
-    [locations, user]
-  );
-
   const [selectedLocationId, setSelectedLocationId] = React.useState<
     string | undefined
   >();
@@ -59,7 +51,7 @@ export default function HostAvailabilityPage() {
     }
   }, [hostLocations, selectedLocationId]);
 
-  if (!hydrated || !user) {
+  if (!user || isLoading) {
     return (
       <div className="flex flex-col gap-6 px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight">

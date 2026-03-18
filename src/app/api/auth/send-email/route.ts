@@ -36,7 +36,7 @@ function buildAuthEmailHtml(params: {
   const verifyUrl =
     SUPABASE_URL &&
     `${SUPABASE_URL}/auth/v1/verify?token=${encodeURIComponent(tokenHash)}&type=email&redirect_to=${encodeURIComponent(redirectTo)}`;
-  const isMagicLink = emailActionType === "magiclink" || emailActionType === "signup";
+  const isMagicLink = emailActionType === "magiclink";
 
   return `
 <!DOCTYPE html>

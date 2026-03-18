@@ -1,24 +1,8 @@
-import { useState, useEffect } from "react";
-import { useHostStore } from "@/stores/host-store";
-
 /**
- * Returns `true` once the Zustand persist middleware has finished
- * rehydrating the host store from localStorage.
- * Uses the built-in persist API rather than store state to avoid
- * setState-during-initialization issues.
+ * Previously used to wait for Zustand persist hydration.
+ * The host-store no longer uses persist middleware, so hydration
+ * is instantaneous. This hook is kept for backward compatibility.
  */
 export function useStoreHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(
-    useHostStore.persist.hasHydrated()
-  );
-
-  useEffect(() => {
-    if (hydrated) return;
-    const unsub = useHostStore.persist.onFinishHydration(() =>
-      setHydrated(true)
-    );
-    return unsub;
-  }, [hydrated]);
-
-  return hydrated;
+  return true;
 }

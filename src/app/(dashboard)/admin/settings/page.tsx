@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Lock } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,43 +18,56 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { queryKeys } from "@/lib/query-keys"
+
+async function fetchSiteSettings(): Promise<{ heroVideoUrl: string | null }> {
+  const r = await fetch("/api/admin/site-settings")
+  return r.ok ? r.json() : { heroVideoUrl: null }
+}
 
 export default function AdminSettingsPage() {
   const t = useTranslations("admin.settings")
+  const queryClient = useQueryClient()
   const [platformName, setPlatformName] = useState("Rollin Locations")
   const [defaultLang, setDefaultLang] = useState("he")
   const [heroVideoUrl, setHeroVideoUrl] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+
+  const { data: settingsData, isLoading: loading } = useQuery({
+    queryKey: queryKeys.admin.settings(),
+    queryFn: fetchSiteSettings,
+  })
 
   useEffect(() => {
-    fetch("/api/admin/site-settings")
-      .then((r) => (r.ok ? r.json() : { heroVideoUrl: null }))
-      .then((data: { heroVideoUrl?: string | null }) => {
-        setHeroVideoUrl(data?.heroVideoUrl ?? "")
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+    if (settingsData) {
+      setHeroVideoUrl(settingsData.heroVideoUrl ?? "")
+    }
+  }, [settingsData])
 
-  async function handleSave() {
-    setSaving(true)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (url: string | null) => {
       const res = await fetch("/api/admin/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroVideoUrl: heroVideoUrl.trim() || null }),
+        body: JSON.stringify({ heroVideoUrl: url }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error ?? "Failed to save")
+        throw new Error((data as { error?: string })?.error ?? "Failed to save")
       }
+    },
+    onSuccess: () => {
       toast.success("ההגדרות נשמרו")
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "שגיאה בשמירה")
-    } finally {
-      setSaving(false)
-    }
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.settings() })
+    },
+    onError: (e: Error) => {
+      toast.error(e.message ?? "שגיאה בשמירה")
+    },
+  })
+
+  const saving = saveMutation.isPending
+
+  function handleSave() {
+    saveMutation.mutate(heroVideoUrl.trim() || null)
   }
 
   return (

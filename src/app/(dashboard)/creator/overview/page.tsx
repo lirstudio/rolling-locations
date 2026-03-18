@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Clock, CheckCircle, DollarSign } from "lucide-react";
 import Link from "next/link";
@@ -44,23 +44,6 @@ export default function CreatorOverviewPage() {
     () => bookingRequests.filter((r) => r.creatorId === CREATOR_ID),
     [bookingRequests]
   );
-
-  // #region agent log
-  useEffect(() => {
-    fetch("http://127.0.0.1:7937/ingest/46418d2a-1ca7-40ce-acd2-210424890731", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "706b3d" },
-      body: JSON.stringify({
-        sessionId: "706b3d",
-        location: "creator/overview/page.tsx",
-        message: "Creator overview mounted",
-        data: { bookingsCount: creatorBookings.length },
-        timestamp: Date.now(),
-        hypothesisId: "H3",
-      }),
-    }).catch(() => {});
-  }, [creatorBookings.length]);
-  // #endregion
 
   const activeBookings = creatorBookings.filter(
     (r) => r.status === "approved"

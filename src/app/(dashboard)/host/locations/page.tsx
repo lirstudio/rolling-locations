@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Plus, Search, MapPin } from "lucide-react";
+import { Plus, Search, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,31 +21,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationCard } from "@/components/locations/location-card";
-import { useHostStore } from "@/stores/host-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { useStoreHydrated } from "@/hooks/use-store-hydrated";
+import { useHostLocations } from "@/hooks/use-host-locations";
 
 export default function HostLocationsPage() {
   const t = useTranslations("host");
-  const hydrated = useStoreHydrated();
   const user = useAuthStore((s) => s.user);
-  const syncFromDb = useHostStore((s) => s.syncFromDb);
-  const locations = useHostStore((s) => s.locations);
-  const hostLocations = React.useMemo(
-    () =>
-      user
-        ? locations.filter((l) => l.hostId === user.id)
-        : locations,
-    [locations, user]
-  );
-  const setLocationStatus = useHostStore((s) => s.setLocationStatus);
-  const deleteLocation = useHostStore((s) => s.deleteLocation);
-
-  // On first mount after hydration: sync from DB and backfill host_id
-  React.useEffect(() => {
-    if (hydrated && user) syncFromDb(user.id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, user?.id]);
+  const {
+    locations: hostLocations,
+    isLoading,
+    setLocationStatus,
+    deleteLocation,
+  } = useHostLocations(user?.id);
 
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -59,6 +46,17 @@ export default function HostLocationsPage() {
       statusFilter === "all" || loc.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6 px-4 lg:px-6">
+        <h1 className="text-2xl font-bold tracking-tight">{t("locations.title")}</h1>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">

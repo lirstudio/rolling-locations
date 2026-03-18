@@ -56,6 +56,20 @@ const auth = {
   onboardingDescription: "ספר לנו קצת על עצמך כדי להתחיל",
   completeProfile: "סיום והמשך",
 
+  onboardingWelcomeTitle: "ברוך הבא ל-Rollin!",
+  onboardingWelcomeSubtitle: "כמה פרטים קצרים ומתחילים",
+  onboardingLetsStart: "בואו נתחיל",
+  onboardingPersonalTitle: "הפרטים שלך",
+  onboardingPersonalSubtitle: "נצטרך את פרטי הקשר שלך כדי להמשיך",
+  onboardingRoleTitle: "מה מביא אותך ל-Rollin?",
+  onboardingRoleSubtitle: "בחר/י את התפקיד שמתאים לך",
+  onboardingNext: "המשך",
+  onboardingBack: "חזרה",
+  onboardingStepOf: "שלב {current} מתוך {total}",
+  onboardingEmailLabel: "כתובת אימייל",
+  onboardingSuccessTitle: "הכל מוכן!",
+  onboardingSuccessSubtitle: "הפרופיל שלך מוכן, מיד תועבר למערכת",
+
   setAsAdmin: "הגדר כאדמין",
 } as const;
 

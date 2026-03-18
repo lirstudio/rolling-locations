@@ -12,7 +12,13 @@ export const verifyOtpSchema = z.object({
 export const onboardingSchema = z.object({
   role: z.enum(["creator", "host"]),
   name: z.string().min(2, "שם חייב להכיל לפחות 2 תווים"),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .min(1, "מספר טלפון הוא שדה חובה")
+    .refine(
+      (val) => val.replace(/\D/g, "").length >= 9,
+      "מספר טלפון לא תקין",
+    ),
 });
 
 export const forgotPasswordSchema = z.object({

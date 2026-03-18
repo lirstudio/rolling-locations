@@ -112,7 +112,7 @@ export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
   const user = {
     name: authUser?.name ?? "",
     email: authUser?.email ?? "",
-    avatar: "",
+    avatar: authUser?.avatarUrl ?? "",
   }
 
   return (

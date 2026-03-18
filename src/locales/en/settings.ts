@@ -6,6 +6,7 @@ const settings = {
     description: "Update your personal information and preferences",
     profilePicture: "Profile Picture",
     uploadPhoto: "Upload photo",
+    uploading: "Uploading…",
     reset: "Reset",
     allowedFormats: "JPG, GIF or PNG. Max size 800K",
     firstName: "First Name",

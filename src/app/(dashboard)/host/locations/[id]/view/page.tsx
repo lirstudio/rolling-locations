@@ -9,9 +9,8 @@ import { MapPin, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { VideoCarousel } from "@/components/locations/video-carousel";
-import { useHostStore } from "@/stores/host-store";
-
-const HOST_ID = "user-host-1";
+import { useAuthStore } from "@/stores/auth-store";
+import { useHostLocations } from "@/hooks/use-host-locations";
 
 function isSupabaseStorageUrl(url: string): boolean {
   return url.includes("supabase.co") && url.includes("/storage/");
@@ -22,12 +21,14 @@ export default function HostLocationViewPage() {
   const id = typeof params.id === "string" ? params.id : "";
   const t = useTranslations("host");
   const tDetail = useTranslations("marketing.locationDetails");
-  const location = useHostStore((s) => s.locations.find((l) => l.id === id));
+  const user = useAuthStore((s) => s.user);
+  const { locations } = useHostLocations(user?.id);
+  const location = locations.find((l) => l.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => setSelectedImageIndex(0), [id]);
 
-  const isOwnLocation = location?.hostId === HOST_ID;
+  const isOwnLocation = user ? location?.hostId === user.id : !!location;
 
   if (!location || !isOwnLocation) {
     return (

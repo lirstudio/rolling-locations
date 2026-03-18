@@ -56,6 +56,20 @@ const auth = {
   onboardingDescription: "Tell us a bit about yourself to get started",
   completeProfile: "Complete & Continue",
 
+  onboardingWelcomeTitle: "Welcome to Rollin!",
+  onboardingWelcomeSubtitle: "Just a few quick details and you're in",
+  onboardingLetsStart: "Let's get started",
+  onboardingPersonalTitle: "Your Details",
+  onboardingPersonalSubtitle: "We need your contact info to continue",
+  onboardingRoleTitle: "What brings you to Rollin?",
+  onboardingRoleSubtitle: "Choose the role that fits you",
+  onboardingNext: "Continue",
+  onboardingBack: "Back",
+  onboardingStepOf: "Step {current} of {total}",
+  onboardingEmailLabel: "Email address",
+  onboardingSuccessTitle: "All Set!",
+  onboardingSuccessSubtitle: "Your profile is ready, redirecting you now",
+
   setAsAdmin: "Set as admin",
 } as const;
 

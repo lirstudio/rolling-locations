@@ -9,12 +9,16 @@ import { usePublishedLocations } from "@/hooks/use-published-locations";
 import { mockCategories } from "@/mocks/categories";
 import { LocationCard } from "@/components/locations/location-card";
 
-export function FeaturedLocations() {
+interface FeaturedLocationsProps {
+  initialData?: import("@/types").Location[];
+}
+
+export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
   const t = useTranslations("marketing.featuredLocations");
   const tCat = useTranslations("marketing.categories");
   const tLoc = useTranslations("locations");
   const [activeCategory, setActiveCategoryRaw] = useState<string | null>(null);
-  const { locations, loading } = usePublishedLocations();
+  const { locations, loading } = usePublishedLocations(initialData);
 
   const setActiveCategory = (id: string | null) => {
     setActiveCategoryRaw(id);

@@ -13,6 +13,10 @@ function supabaseUserToAppUser(sb: SupabaseUser): User {
     name: typeof name === "string" ? name : "User",
     email: sb.email ?? "",
     phone: meta.phone,
+    avatarUrl:
+    typeof meta.avatar_url === "string" && meta.avatar_url
+      ? meta.avatar_url
+      : undefined,
     role: ["guest", "creator", "host", "admin"].includes(role) ? role : "guest",
     createdAt: sb.created_at ?? new Date().toISOString(),
   };
@@ -34,7 +38,7 @@ interface AuthState {
   verifyOtp: (email: string, token: string) => Promise<void>;
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUserMetadata: (data: { role?: string; name?: string; phone?: string }) => Promise<void>;
+  updateUserMetadata: (data: { role?: string; name?: string; phone?: string; avatar_url?: string }) => Promise<void>;
   updateUser: (patch: Partial<User>) => void;
   clearError: () => void;
 }
@@ -70,7 +74,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       email: email.trim().toLowerCase(),
       options: {
         emailRedirectTo: redirect,
-        shouldCreateUser: true,
+        shouldCreateUser: false,
       },
     });
 
@@ -134,7 +138,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     set({ user: null, session: null, isAuthenticated: false, error: null });
   },
 
-  updateUserMetadata: async (data: { role?: string; name?: string; phone?: string }) => {
+  updateUserMetadata: async (data: { role?: string; name?: string; phone?: string; avatar_url?: string }) => {
     const supabase = createClient();
     const { data: updated, error } = await supabase.auth.updateUser({
       data: { ...data },

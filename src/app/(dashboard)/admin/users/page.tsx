@@ -1,68 +1,64 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { DataTable } from "@/components/admin/data-table"
 import type { DataTableFilter } from "@/components/admin/data-table"
 import { getUserColumns } from "./components/columns"
 import type { User, UserRole } from "@/types"
 import { Loader2, Users } from "lucide-react"
+import { queryKeys } from "@/lib/query-keys"
+
+async function fetchUsers(): Promise<User[]> {
+  const res = await fetch("/api/admin/users")
+  if (!res.ok) {
+    if (res.status === 403) throw new Error("אין הרשאה")
+    throw new Error(await res.text())
+  }
+  return res.json()
+}
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch("/api/admin/users")
-      if (!res.ok) {
-        if (res.status === 403) throw new Error("אין הרשאה")
-        throw new Error(await res.text())
-      }
-      const data: User[] = await res.json()
-      setUsers(data)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "שגיאה בטעינת משתמשים")
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const {
+    data: users = [],
+    isLoading: loading,
+    error,
+  } = useQuery<User[], Error>({
+    queryKey: queryKeys.admin.users(),
+    queryFn: fetchUsers,
+  })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
-
-  const updateUserRole = useCallback(
-    async (id: string, role: UserRole) => {
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ id, role }: { id: string; role: UserRole }) => {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role }),
       })
-      if (!res.ok) return
-      await fetchUsers()
+      if (!res.ok) throw new Error("Failed to update role")
     },
-    [fetchUsers]
-  )
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() }),
+  })
 
-  const deleteUser = useCallback(
-    async (id: string) => {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
       const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" })
-      if (!res.ok) return
-      await fetchUsers()
+      if (!res.ok) throw new Error("Failed to delete user")
     },
-    [fetchUsers]
-  )
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() }),
+  })
 
   const columns = useMemo(
     () =>
       getUserColumns({
-        onChangeRole: updateUserRole,
-        onDelete: deleteUser,
+        onChangeRole: (id, role) => updateRoleMutation.mutate({ id, role }),
+        onDelete: (id) => deleteMutation.mutate(id),
       }),
-    [updateUserRole, deleteUser]
+    [updateRoleMutation, deleteMutation]
   )
 
   const filters: DataTableFilter[] = [
@@ -100,7 +96,7 @@ export default function AdminUsersPage() {
           <p className="text-muted-foreground">ניהול משתמשי הפלטפורמה</p>
         </div>
         <div className="rounded-xl border border-border bg-muted/50 px-4 py-6 text-center text-muted-foreground">
-          {error}
+          {error.message}
         </div>
       </div>
     )
