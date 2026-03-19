@@ -71,8 +71,8 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
 
   return (
     <section className="relative">
-      {/* Full-width hero background: video (from admin) or image fallback */}
-      <div className="relative min-h-[420px] sm:min-h-[500px] lg:min-h-[560px]">
+      {/* Full-width hero background: video (from admin) or image fallback — 90vh */}
+      <div className="relative min-h-[90vh]">
         {showVideo ? (
           <>
             <HeroVideoBackground videoId={youtubeId!} />
@@ -92,94 +92,109 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
           </>
         )}
 
-        {/* Centered text content */}
-        <div className="relative flex h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center pb-16" style={{ zIndex: 2 }}>
-          <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-md">
+        {/* Centered content: title, subtitle, then search bar */}
+        <div
+          className="relative flex min-h-[90vh] flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8"
+          style={{ zIndex: 2 }}
+        >
+          <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl">
             {t("title")}
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-white/85 sm:text-lg drop-shadow-sm">
+          <p className="mt-4 max-w-2xl text-base text-white/85 drop-shadow-sm sm:text-lg">
             {t("subtitle")}
           </p>
+
+          {/* Search bar — pill, solid white, reference layout */}
+          <div className="mx-auto mt-8 w-full max-w-5xl min-w-0 sm:mt-10">
+            <form
+              onSubmit={handleSubmit}
+              className="flex min-w-0 flex-col rounded-full bg-white py-3 px-4 shadow-float md:flex-row md:items-center md:gap-0 md:py-4 md:px-5"
+            >
+              {/* Section 1: Location search */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[140px] md:flex-[2] md:ps-2">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                  <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label className="block text-xs font-semibold text-foreground">
+                    {t("searchQuery")}
+                  </label>
+                  <Input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={t("searchQueryPlaceholder")}
+                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
+                    aria-label={t("searchQuery")}
+                  />
+                </div>
+              </div>
+
+              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+
+              {/* Section 2: City / region */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[120px] md:flex-1 md:px-2">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                  <MapPin className="h-4 w-4 text-muted-foreground" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label className="block text-xs font-semibold text-foreground">
+                    {t("searchCity")}
+                  </label>
+                  <Input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder={t("searchCity")}
+                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
+                    aria-label={t("searchCity")}
+                  />
+                </div>
+              </div>
+
+              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+
+              {/* Section 3: Category */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[120px] md:flex-1 md:px-2">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                  <Tag className="h-4 w-4 text-muted-foreground" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label className="block text-xs font-semibold text-foreground">
+                    {t("searchCategory")}
+                  </label>
+                  <Select value={categorySlug} onValueChange={setCategorySlug}>
+                    <SelectTrigger
+                      className="mt-0.5 h-auto min-w-0 border-0 bg-transparent py-1 ps-0 pe-6 text-sm text-foreground shadow-none focus:ring-0 focus-visible:ring-0 [&>span]:text-muted-foreground data-[placeholder]:text-muted-foreground"
+                      aria-label={t("searchCategory")}
+                    >
+                      <SelectValue placeholder={t("allCategories")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_CATEGORY}>{t("allCategories")}</SelectItem>
+                      {topLevelCategories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.slug}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+
+              {/* CTA */}
+              <div className="pt-2 md:ps-2 md:pt-0">
+                <Button type="submit" size="lg" className="w-full rounded-full md:w-auto">
+                  {t("cta")}
+                  <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180 shrink-0" />
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-
-      {/* Search bar — overlapping the hero bottom edge */}
-      <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 -mt-14 sm:-mt-16 min-w-0">
-        <form
-          onSubmit={handleSubmit}
-          className="min-w-0 rounded-2xl border border-border/60 bg-card p-5 shadow-float sm:p-6 md:p-7"
-        >
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr_1fr] md:items-end">
-            {/* General search field */}
-            <div className="min-w-0">
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">
-                {t("searchQuery")}
-              </label>
-              <div className="relative">
-                <Search className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t("searchQueryPlaceholder")}
-                  className="bg-background ps-10 pe-4 w-full"
-                  aria-label={t("searchQuery")}
-                />
-              </div>
-            </div>
-
-            {/* City / region field */}
-            <div className="min-w-0">
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">
-                {t("searchCity")}
-              </label>
-              <div className="relative">
-                <MapPin className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder={t("searchCity")}
-                  className="bg-background ps-10 pe-4 w-full"
-                  aria-label={t("searchCity")}
-                />
-              </div>
-            </div>
-
-            {/* Category select */}
-            <div className="min-w-0">
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">
-                {t("searchCategory")}
-              </label>
-              <div className="relative">
-                <Tag className="absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
-                <Select value={categorySlug} onValueChange={setCategorySlug}>
-                  <SelectTrigger className="bg-background ps-10 w-full min-w-0" aria-label={t("searchCategory")}>
-                    <SelectValue placeholder={t("allCategories")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={EMPTY_CATEGORY}>{t("allCategories")}</SelectItem>
-                    {topLevelCategories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.slug}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-end">
-              <Button type="submit" size="lg" className="h-10 w-full rounded-full">
-                {t("cta")}
-                <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180 shrink-0" />
-              </Button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <div className="h-10 sm:h-14" />
     </section>
   );
 }
