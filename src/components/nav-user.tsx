@@ -114,11 +114,11 @@ export function NavUser({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            dir={direction}
             side={dropdownSide}
             align="end"
             sideOffset={4}
           >
+            <div dir={direction}>
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -167,6 +167,7 @@ export function NavUser({
               <LogOut />
               {t("signOut")}
             </DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
