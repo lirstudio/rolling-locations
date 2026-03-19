@@ -3,7 +3,8 @@
  * Generates APP_VERSION from git rev-list count.
  * Version format: 1.0, 1.1, 1.2 … (increments by 0.1 per commit).
  *
- * On Vercel: skips generation — shallow clone makes rev-list wrong; use committed version.ts.
+ * Skips writing when git history is not trustworthy (shallow clone, missing .git, CI hosts):
+ * use committed src/generated/version.ts (updated by pre-commit hook locally).
  */
 
 import { execSync } from "child_process";
@@ -14,20 +15,46 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 
-if (process.env.VERCEL === "1") {
-  console.log("[version] Vercel: using committed version.ts (shallow clone)");
+function isShallowClone() {
+  try {
+    return (
+      execSync("git rev-parse --is-shallow-repository", { cwd: root, encoding: "utf8" }).trim() === "true"
+    );
+  } catch {
+    return true;
+  }
+}
+
+function shouldUseCommittedVersion() {
+  if (process.env.VERCEL === "1") return "VERCEL";
+  if (process.env.NETLIFY === "true") return "NETLIFY";
+  if (process.env.CF_PAGES === "1") return "CF_PAGES";
+  if (process.env.RAILWAY_ENVIRONMENT !== undefined) return "RAILWAY";
+  if (isShallowClone()) return "shallow_clone";
+  return null;
+}
+
+const skipReason = shouldUseCommittedVersion();
+if (skipReason) {
+  console.log(`[version] Skip generation (${skipReason}): using committed version.ts`);
   process.exit(0);
 }
 
 function getCommitCount() {
   try {
-    return parseInt(execSync("git rev-list --count HEAD", { cwd: root, encoding: "utf8" }).trim(), 10) || 0;
+    const raw = execSync("git rev-list --count HEAD", { cwd: root, encoding: "utf8" }).trim();
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 0 ? n : null;
   } catch {
-    return 0;
+    return null;
   }
 }
 
 const count = getCommitCount();
+if (count === null) {
+  console.log("[version] Skip generation (git rev-list failed): using committed version.ts");
+  process.exit(0);
+}
 const version = `1.${count}`;
 const outPath = join(root, "src", "generated", "version.ts");
 
