@@ -5,12 +5,33 @@
  */
 
 import { execSync } from "child_process";
-import { mkdirSync, writeFileSync } from "fs";
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+// Skip on Vercel: shallow clone makes rev-list wrong; use committed version.ts
+if (process.env.VERCEL === "1") {
+  console.log("[version] Vercel: using committed version.ts (shallow clone)");
+  // #region agent log
+  try {
+    const LOG_PATH = join(root, ".cursor", "debug-7eaba8.log");
+    appendFileSync(LOG_PATH, JSON.stringify({ sessionId: "7eaba8", location: "generate-version.mjs", message: "Vercel skip", data: { VERCEL: "1" }, timestamp: Date.now(), hypothesisId: "H1" }) + "\n");
+  } catch (_) {}
+  // #endregion
+  process.exit(0);
+}
+
+// #region agent log
+const LOG_PATH = join(root, ".cursor", "debug-7eaba8.log");
+function dbg(msg, data) {
+  const entry = JSON.stringify({ sessionId: "7eaba8", location: "generate-version.mjs", message: msg, data: data ?? {}, timestamp: Date.now(), hypothesisId: "H1" }) + "\n";
+  try { appendFileSync(LOG_PATH, entry); } catch (_) {}
+  console.log("[version-debug]", msg, JSON.stringify(data ?? {}));
+}
+// #endregion
 
 function getCommitCount() {
   try {
@@ -20,8 +41,22 @@ function getCommitCount() {
   }
 }
 
+// #region agent log
+let isShallow = false;
+try {
+  isShallow = execSync("git rev-parse --is-shallow-repository", { cwd: root, encoding: "utf8" }).trim() === "true";
+} catch (_) {}
+const countBeforeUnshallow = getCommitCount();
+dbg("Pre-unshallow state", { countBeforeUnshallow, isShallow, VERCEL: process.env.VERCEL });
+// #endregion
+
 const count = getCommitCount();
 const version = `1.${count}`;
+
+// #region agent log
+dbg("Final version", { count, version, isShallow, VERCEL: process.env.VERCEL });
+// #endregion
+
 const outPath = join(root, "src", "generated", "version.ts");
 
 mkdirSync(dirname(outPath), { recursive: true });

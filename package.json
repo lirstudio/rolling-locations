@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prepare": "node scripts/install-version-hook.mjs",
     "dev": "node scripts/generate-version.mjs && next dev",
-    "build": "git fetch --unshallow 2>/dev/null || true && node scripts/generate-version.mjs && next build",
+    "build": "node scripts/generate-version.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "setup:auth-hook": "node --env-file=.env.local scripts/setup-auth-email-hook.mjs"
