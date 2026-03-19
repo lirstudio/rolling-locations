@@ -53,20 +53,20 @@ const kpiConfig = [
   {
     key: "pendingRequests" as const,
     icon: Inbox,
-    colorBg: "bg-orange-50",
-    colorIcon: "text-orange-500",
+    colorBg: "bg-primary/10",
+    colorIcon: "text-primary",
   },
   {
     key: "activeListings" as const,
     icon: MapPin,
-    colorBg: "bg-blue-50",
-    colorIcon: "text-blue-500",
+    colorBg: "bg-primary/10",
+    colorIcon: "text-primary",
   },
   {
     key: "approvedThisMonth" as const,
     icon: CheckCircle,
-    colorBg: "bg-green-50",
-    colorIcon: "text-green-500",
+    colorBg: "bg-primary/10",
+    colorIcon: "text-primary",
   },
   {
     key: "totalRevenue" as const,
@@ -156,7 +156,7 @@ export default function HostOverviewPage() {
           </Avatar>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              {t("overview.greeting")}, {firstName} 👋
+              {t("overview.greeting")}, {firstName}
             </h1>
             <p className="text-sm text-muted-foreground">
               {t("overview.subtitle")}
