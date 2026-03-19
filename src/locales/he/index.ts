@@ -7,6 +7,7 @@ import host from "./host";
 import creator from "./creator";
 import admin from "./admin";
 import settings from "./settings";
+import commandSearch from "./commandSearch";
 
 const heMessages = {
   common,
@@ -18,6 +19,7 @@ const heMessages = {
   creator,
   admin,
   settings,
+  commandSearch,
 } as const;
 
 export default heMessages;

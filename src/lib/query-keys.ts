@@ -21,4 +21,7 @@ export const queryKeys = {
   site: {
     amenityCatalog: () => ["site", "amenity-catalog"] as const,
   },
+  search: {
+    command: (q: string) => ["search", "command", q] as const,
+  },
 } as const;

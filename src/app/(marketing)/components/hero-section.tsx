@@ -108,15 +108,15 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
           <div className="mx-auto mt-8 w-full max-w-5xl min-w-0 sm:mt-10">
             <form
               onSubmit={handleSubmit}
-              className="flex min-w-0 flex-col rounded-full bg-white py-3 px-4 shadow-float md:flex-row md:items-center md:gap-0 md:py-4 md:px-5"
+              className="flex min-w-0 flex-col items-stretch rounded-3xl bg-white px-5 py-4 text-start shadow-float lg:flex-row lg:items-center lg:gap-0 lg:rounded-full lg:py-4"
             >
               {/* Section 1: Location search */}
-              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[140px] md:flex-[2] md:ps-2">
+              <div className="flex w-full min-w-0 shrink-0 items-center gap-3 py-2 lg:min-w-[140px] lg:flex-[2] lg:ps-2">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
                   <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <label className="block text-xs font-semibold text-foreground">
+                  <label className="block text-start text-xs font-semibold leading-snug text-foreground">
                     {t("searchQuery")}
                   </label>
                   <Input
@@ -124,21 +124,21 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t("searchQueryPlaceholder")}
-                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
+                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-start text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
                     aria-label={t("searchQuery")}
                   />
                 </div>
               </div>
 
-              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+              <div className="h-px w-full shrink-0 bg-border lg:h-8 lg:w-px lg:flex-none" aria-hidden />
 
               {/* Section 2: City / region */}
-              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[120px] md:flex-1 md:px-2">
+              <div className="flex w-full min-w-0 shrink-0 items-center gap-3 py-2 lg:min-w-[120px] lg:flex-1 lg:px-2">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
                   <MapPin className="h-4 w-4 text-muted-foreground" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <label className="block text-xs font-semibold text-foreground">
+                  <label className="block text-start text-xs font-semibold leading-snug text-foreground">
                     {t("searchCity")}
                   </label>
                   <Input
@@ -146,26 +146,26 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder={t("searchCity")}
-                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
+                    className="mt-0.5 border-0 bg-transparent px-0 py-1 text-start text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
                     aria-label={t("searchCity")}
                   />
                 </div>
               </div>
 
-              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+              <div className="h-px w-full shrink-0 bg-border lg:h-8 lg:w-px lg:flex-none" aria-hidden />
 
               {/* Section 3: Category */}
-              <div className="flex min-w-0 flex-1 items-center gap-3 py-2 md:min-w-[120px] md:flex-1 md:px-2">
+              <div className="flex w-full min-w-0 shrink-0 items-center gap-3 py-2 lg:min-w-[120px] lg:flex-1 lg:px-2">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
                   <Tag className="h-4 w-4 text-muted-foreground" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <label className="block text-xs font-semibold text-foreground">
+                  <label className="block text-start text-xs font-semibold leading-snug text-foreground">
                     {t("searchCategory")}
                   </label>
                   <Select value={categorySlug} onValueChange={setCategorySlug}>
                     <SelectTrigger
-                      className="mt-0.5 h-auto min-w-0 border-0 bg-transparent py-1 ps-0 pe-6 text-sm text-foreground shadow-none focus:ring-0 focus-visible:ring-0 [&>span]:text-muted-foreground data-[placeholder]:text-muted-foreground"
+                      className="mt-0.5 h-auto w-full min-w-0 justify-between border-0 bg-transparent py-1 ps-0 pe-6 text-start text-sm text-foreground whitespace-normal shadow-none focus:ring-0 focus-visible:ring-0 *:data-[slot=select-value]:line-clamp-2 *:data-[slot=select-value]:whitespace-normal data-[placeholder]:text-muted-foreground"
                       aria-label={t("searchCategory")}
                     >
                       <SelectValue placeholder={t("allCategories")} />
@@ -182,11 +182,11 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
                 </div>
               </div>
 
-              <div className="h-px w-full shrink-0 bg-border md:h-8 md:w-px md:flex-none" aria-hidden />
+              <div className="h-px w-full shrink-0 bg-border lg:h-8 lg:w-px lg:flex-none" aria-hidden />
 
               {/* CTA */}
-              <div className="pt-2 md:ps-2 md:pt-0">
-                <Button type="submit" size="lg" className="w-full rounded-full md:w-auto">
+              <div className="w-full shrink-0 pt-2 lg:w-auto lg:ps-2 lg:pt-0">
+                <Button type="submit" size="lg" className="w-full rounded-2xl lg:w-auto lg:rounded-full">
                   {t("cta")}
                   <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180 shrink-0" />
                 </Button>
