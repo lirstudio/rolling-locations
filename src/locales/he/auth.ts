@@ -36,7 +36,8 @@ const auth = {
   termsAgreement: "אני מסכים/ה לתנאי השירות ומדיניות הפרטיות",
   termsOfService: "תנאי שירות",
   privacyPolicy: "מדיניות פרטיות",
-  termsFooter: "בלחיצה על המשך, אתה מסכים ל{terms} ול{privacy}.",
+  termsFooter:
+    "בלחיצה על המשך, אתה מסכים ל<terms>תנאי השימוש</terms> ול<privacy>מדיניות הפרטיות</privacy>.",
 
   invalidCredentials: "אימייל או סיסמה שגויים",
   emailAlreadyExists: "כתובת אימייל זו כבר רשומה במערכת",

@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -40,12 +42,6 @@ const footerLinks = {
     { name: 'Guides', href: '#guides' },
     { name: 'Webinars', href: '#webinars' },
   ],
-  legal: [
-    { name: 'Privacy', href: '#privacy' },
-    { name: 'Terms', href: '#terms' },
-    { name: 'Security', href: '#security' },
-    { name: 'Status', href: '#status' },
-  ],
 }
 
 const socialLinks = [
@@ -56,6 +52,13 @@ const socialLinks = [
 ]
 
 export function LandingFooter() {
+  const tFooter = useTranslations("marketing.footer")
+
+  const legalLinks = [
+    { name: tFooter("privacy"), href: "/privacy" as const },
+    { name: tFooter("terms"), href: "/terms" as const },
+  ]
+
   const form = useForm<z.infer<typeof newsletterSchema>>({
     resolver: zodResolver(newsletterSchema),
     defaultValues: {
@@ -182,16 +185,16 @@ export function LandingFooter() {
           </div>
 
           <div className='lg:col-span-1'>
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold mb-4">{tFooter("legal")}</h4>
             <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <a
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -217,15 +220,12 @@ export function LandingFooter() {
             <span>© {new Date().getFullYear()} for the developer community</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-4 md:mt-0">
-            <a href="#privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#terms" className="hover:text-foreground transition-colors">
-              Terms of Service
-            </a>
-            <a href="#cookies" className="hover:text-foreground transition-colors">
-              Cookie Policy
-            </a>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              {tFooter("privacy")}
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">
+              {tFooter("terms")}
+            </Link>
           </div>
         </div>
       </div>

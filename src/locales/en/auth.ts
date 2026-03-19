@@ -36,7 +36,8 @@ const auth = {
   termsAgreement: "I agree to the terms of service and privacy policy",
   termsOfService: "Terms of Service",
   privacyPolicy: "Privacy Policy",
-  termsFooter: "By clicking continue, you agree to our {terms} and {privacy}.",
+  termsFooter:
+    "By clicking continue, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>.",
 
   invalidCredentials: "Invalid email or password",
   emailAlreadyExists: "This email address is already registered",

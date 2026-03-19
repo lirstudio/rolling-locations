@@ -213,9 +213,11 @@ const marketing = {
   },
   legal: {
     termsTitle: "תנאי שימוש",
-    termsPlaceholder: "מקום להצבת תנאי השימוש.",
-    privacyTitle: "פרטיות",
-    privacyPlaceholder: "מקום להצבת מדיניות הפרטיות.",
+    termsMetaDescription: "תנאי השימוש של Rollin Locations — שירות גילוי והזמנת לוקיישנים.",
+    privacyTitle: "מדיניות פרטיות",
+    privacyMetaDescription: "מדיניות הפרטיות של Rollin Locations — איסוף ושימוש במידע אישי.",
+    legalNotice:
+      "מסמך זה מהווה טיוטה כללית בלבד ואינו מהווה ייעוץ משפטי; יש להציג לעורך דין לפני פרסום.",
   },
   faq: {
     title: "שאלות נפוצות",

@@ -213,9 +213,11 @@ const marketing = {
   },
   legal: {
     termsTitle: "Terms of Use",
-    termsPlaceholder: "Placeholder for terms of use.",
+    termsMetaDescription: "Rollin Locations terms of use — location discovery and booking.",
     privacyTitle: "Privacy Policy",
-    privacyPlaceholder: "Placeholder for privacy policy.",
+    privacyMetaDescription: "Rollin Locations privacy policy — how we collect and use personal data.",
+    legalNotice:
+      "This document is a general draft only and is not legal advice; have a lawyer review before publishing.",
   },
   faq: {
     title: "FAQ",
