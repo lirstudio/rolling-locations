@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
   },
   turbopack: {},
 
+  // Bundle markdown files as raw strings so they work on Vercel serverless
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.md$/,
+      type: "asset/source",
+    });
+    return config;
+  },
+
   // Image optimization
   images: {
     remotePatterns: [

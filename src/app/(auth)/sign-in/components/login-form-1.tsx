@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trans, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -215,28 +215,24 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
               </div>
 
               <p className="mt-4 text-center text-xs text-muted-foreground">
-                <Trans
-                  i18nKey="termsFooter"
-                  t={t}
-                  components={{
-                    terms: (chunks) => (
-                      <Link
-                        href="/terms"
-                        className="underline underline-offset-2 hover:text-foreground"
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                    privacy: (chunks) => (
-                      <Link
-                        href="/privacy"
-                        className="underline underline-offset-2 hover:text-foreground"
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                  }}
-                />
+                {t.rich("termsFooter", {
+                  terms: (chunks) => (
+                    <Link
+                      href="/terms"
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                  privacy: (chunks) => (
+                    <Link
+                      href="/privacy"
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </>
           )}
