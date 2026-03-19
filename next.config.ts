@@ -8,9 +8,16 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
     globalNotFound: true,
   },
-  turbopack: {},
+  turbopack: {
+    rules: {
+      "*.md": {
+        loaders: ["raw-loader"],
+        as: "*.js",
+      },
+    },
+  },
 
-  // Bundle markdown files as raw strings so they work on Vercel serverless
+  // Webpack fallback (non-Turbopack builds)
   webpack(config) {
     config.module.rules.push({
       test: /\.md$/,
