@@ -1,0 +1,4 @@
+{"sessionId":"7eaba8","location":"generate-version.mjs","message":"Pre-unshallow state","data":{"countBeforeUnshallow":36,"isShallow":false},"timestamp":1773932685976,"hypothesisId":"H1"}
+{"sessionId":"7eaba8","location":"generate-version.mjs","message":"Final version","data":{"count":36,"version":"1.36","isShallow":false},"timestamp":1773932685989,"hypothesisId":"H1"}
+{"sessionId":"7eaba8","location":"generate-version.mjs","message":"Pre-unshallow state","data":{"countBeforeUnshallow":36,"isShallow":false},"timestamp":1773933060019,"hypothesisId":"H1"}
+{"sessionId":"7eaba8","location":"generate-version.mjs","message":"Final version","data":{"count":36,"version":"1.36","isShallow":false},"timestamp":1773933060042,"hypothesisId":"H1"}
