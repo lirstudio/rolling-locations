@@ -5,7 +5,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MapPin, CheckCircle2, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { VideoCarousel } from "@/components/locations/video-carousel";
@@ -119,17 +120,17 @@ export default function HostLocationViewPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {tDetail("amenities")}
               </h2>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {location.amenities.map((a) => (
-                  <li
+                  <Badge
                     key={a}
-                    className="flex items-center gap-2 text-sm text-muted-foreground"
+                    variant="outline"
+                    className="rounded-xl border-border px-3 py-1.5 text-sm font-normal text-foreground"
                   >
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
                     {a}
-                  </li>
+                  </Badge>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
 

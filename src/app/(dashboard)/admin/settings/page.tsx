@@ -19,10 +19,16 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { queryKeys } from "@/lib/query-keys"
+import { CleanTagInput } from "@/components/ui/clean-tag-input"
 
-async function fetchSiteSettings(): Promise<{ heroVideoUrl: string | null }> {
+async function fetchSiteSettings(): Promise<{
+  heroVideoUrl: string | null
+  amenityCatalog: string[]
+}> {
   const r = await fetch("/api/admin/site-settings")
-  return r.ok ? r.json() : { heroVideoUrl: null }
+  return r.ok
+    ? r.json()
+    : { heroVideoUrl: null, amenityCatalog: [] }
 }
 
 export default function AdminSettingsPage() {
@@ -31,6 +37,7 @@ export default function AdminSettingsPage() {
   const [platformName, setPlatformName] = useState("Rollin Locations")
   const [defaultLang, setDefaultLang] = useState("he")
   const [heroVideoUrl, setHeroVideoUrl] = useState("")
+  const [amenityCatalogDraft, setAmenityCatalogDraft] = useState<string[]>([])
 
   const { data: settingsData, isLoading: loading } = useQuery({
     queryKey: queryKeys.admin.settings(),
@@ -40,15 +47,19 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     if (settingsData) {
       setHeroVideoUrl(settingsData.heroVideoUrl ?? "")
+      setAmenityCatalogDraft(settingsData.amenityCatalog ?? [])
     }
   }, [settingsData])
 
   const saveMutation = useMutation({
-    mutationFn: async (url: string | null) => {
+    mutationFn: async () => {
       const res = await fetch("/api/admin/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroVideoUrl: url }),
+        body: JSON.stringify({
+          heroVideoUrl: heroVideoUrl.trim() || null,
+          amenityCatalog: amenityCatalogDraft,
+        }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -56,18 +67,19 @@ export default function AdminSettingsPage() {
       }
     },
     onSuccess: () => {
-      toast.success("ההגדרות נשמרו")
+      toast.success(t("saveSuccess"))
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.settings() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.site.amenityCatalog() })
     },
     onError: (e: Error) => {
-      toast.error(e.message ?? "שגיאה בשמירה")
+      toast.error(e.message ?? t("saveError"))
     },
   })
 
   const saving = saveMutation.isPending
 
   function handleSave() {
-    saveMutation.mutate(heroVideoUrl.trim() || null)
+    saveMutation.mutate()
   }
 
   return (
@@ -127,6 +139,22 @@ export default function AdminSettingsPage() {
                 {t("heroVideoUrlDesc")}
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl">
+          <CardHeader>
+            <CardTitle className="text-base">{t("amenityCatalogTitle")}</CardTitle>
+            <CardDescription>{t("amenityCatalogDesc")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CleanTagInput
+              value={amenityCatalogDraft}
+              onChange={setAmenityCatalogDraft}
+              placeholder={t("amenityCatalogPlaceholder")}
+              removeTagAriaLabel={t("amenityCatalogRemoveTag")}
+              hint={t("amenityCatalogHint")}
+            />
           </CardContent>
         </Card>
 

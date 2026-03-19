@@ -110,6 +110,15 @@ const admin = {
     commissionValue: "ערך עמלה",
     comingSoon: "בקרוב בגרסה 2",
     saveSettings: "שמור הגדרות",
+    saveSuccess: "ההגדרות נשמרו",
+    saveError: "שגיאה בשמירה",
+    amenityCatalogTitle: "קטלוג מתקנים ושירותים",
+    amenityCatalogDesc:
+      "התגיות כאן יופיעו למארחים בבחירת לוקיישן. מארחים לא יכולים להוסיף תגיות משלהם — רק לבחור מהרשימה.",
+    amenityCatalogPlaceholder: "הקלד תגית ולחץ Enter",
+    amenityCatalogHint:
+      "Enter להוספה, Backspace על שדה ריק מסירה את התגית האחרונה מהקטלוג.",
+    amenityCatalogRemoveTag: "הסר מהקטלוג",
   },
 } as const;
 

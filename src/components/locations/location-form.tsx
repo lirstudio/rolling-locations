@@ -4,11 +4,13 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, X, Star, Upload, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { AmenityCatalogPicker } from "@/components/locations/amenity-catalog-picker";
+import { queryKeys } from "@/lib/query-keys";
 import {
   Card,
   CardContent,
@@ -26,7 +28,6 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { locationSchema, type LocationFormValues } from "@/schemas/location";
 import { mockCategories } from "@/mocks/categories";
 import { uploadLocationImage } from "@/lib/upload-location-images";
@@ -41,20 +42,17 @@ type MediaEntry = {
   error?: string;
 };
 
-const PREDEFINED_AMENITY_KEYS = [
-  "wifi",
-  "ac",
-  "parking",
-  "bathrooms",
-  "kitchen",
-  "backdrops",
-  "professionalLighting",
-  "generator",
-  "monolights",
-  "dressingRoom",
-  "garden",
-  "accessibility",
-] as const;
+async function fetchAmenityCatalog(): Promise<string[]> {
+  try {
+    const r = await fetch("/api/site-settings/amenity-catalog");
+    if (!r.ok) return [];
+    const data = (await r.json()) as { options?: unknown };
+    if (!Array.isArray(data.options)) return [];
+    return data.options.filter((x): x is string => typeof x === "string");
+  } catch {
+    return [];
+  }
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -88,6 +86,23 @@ export function LocationForm({
     },
   });
 
+  const { data: amenityCatalog = [], isFetching: amenityCatalogLoading } =
+    useQuery({
+      queryKey: queryKeys.site.amenityCatalog(),
+      queryFn: fetchAmenityCatalog,
+      staleTime: 60_000,
+    });
+
+  React.useEffect(() => {
+    if (amenityCatalog.length === 0) return;
+    const valid = new Set(amenityCatalog);
+    const cur = form.getValues("amenities") ?? [];
+    const filtered = cur.filter((a) => valid.has(a));
+    if (filtered.length !== cur.length) {
+      form.setValue("amenities", filtered, { shouldValidate: true });
+    }
+  }, [amenityCatalog, form]);
+
   // Compute URLs directly from mediaEntries at submit time to avoid
   // the useEffect race condition (effect runs after paint, button enabled
   // in the same render that marks uploading=false).
@@ -95,7 +110,9 @@ export function LocationForm({
     const mediaUrls = mediaEntries
       .filter((e) => e.publicUrl != null && !e.error)
       .map((e) => e.publicUrl!);
-    onSubmit({ ...values, mediaUrls });
+    const valid = new Set(amenityCatalog);
+    const amenities = (values.amenities ?? []).filter((a) => valid.has(a));
+    onSubmit({ ...values, amenities, mediaUrls });
   });
 
   // ── Category hierarchy ────────────────────────────────────────────────────
@@ -175,15 +192,6 @@ export function LocationForm({
     });
   }
 
-  // ── Custom amenity management ─────────────────────────────────────────────
-
-  const predefinedKeys = PREDEFINED_AMENITY_KEYS.map(
-    (k) => t(`locations.amenitiesList.${k}` as "locations.amenitiesList.wifi")
-  );
-  const currentAmenities = form.watch("amenities") ?? [];
-  const customAmenities = currentAmenities.filter((a) => !predefinedKeys.includes(a));
-  const [customInput, setCustomInput] = React.useState("");
-
   // ── Showcase video URL management ─────────────────────────────────────────
 
   const currentVideoUrls = form.watch("showcaseVideoUrls") ?? [];
@@ -207,21 +215,6 @@ export function LocationForm({
     form.setValue(
       "showcaseVideoUrls",
       currentVideoUrls.filter((u) => u !== url),
-      { shouldValidate: true }
-    );
-  }
-
-  function addCustomAmenity() {
-    const trimmed = customInput.trim();
-    if (!trimmed || currentAmenities.includes(trimmed)) return;
-    form.setValue("amenities", [...currentAmenities, trimmed], { shouldValidate: true });
-    setCustomInput("");
-  }
-
-  function removeCustomAmenity(value: string) {
-    form.setValue(
-      "amenities",
-      currentAmenities.filter((a) => a !== value),
       { shouldValidate: true }
     );
   }
@@ -459,94 +452,31 @@ export function LocationForm({
             <CardTitle>{t("locations.amenities")}</CardTitle>
             <CardDescription>{t("locations.amenitiesDesc")}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-4">
             <FormField
               control={form.control}
               name="amenities"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {PREDEFINED_AMENITY_KEYS.map((key) => {
-                      const label = t(
-                        `locations.amenitiesList.${key}` as "locations.amenitiesList.wifi"
-                      );
-                      return (
-                        <FormField
-                          key={key}
-                          control={form.control}
-                          name="amenities"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(label)}
-                                  onCheckedChange={(checked) => {
-                                    const current = field.value ?? [];
-                                    field.onChange(
-                                      checked
-                                        ? [...current, label]
-                                        : current.filter((v) => v !== label)
-                                    );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="cursor-pointer font-normal text-sm">
-                                {label}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      );
-                    })}
-                  </div>
+                  <AmenityCatalogPicker
+                    options={amenityCatalog}
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    loading={amenityCatalogLoading}
+                    triggerPlaceholder={t(
+                      "locations.amenitiesSelectPlaceholder"
+                    )}
+                    loadingLabel={t("locations.amenitiesCatalogLoading")}
+                    emptyCatalogMessage={t(
+                      "locations.amenitiesCatalogEmpty"
+                    )}
+                    popoverLabel={t("locations.amenitiesPopoverTitle")}
+                    removeTagAriaLabel={t("locations.amenitiesRemoveTag")}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {customAmenities.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {customAmenities.map((a) => (
-                  <Badge key={a} variant="secondary" className="gap-1 pe-1">
-                    {a}
-                    <button
-                      type="button"
-                      onClick={() => removeCustomAmenity(a)}
-                      className="ms-1 rounded-sm opacity-70 hover:opacity-100"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            <Separator />
-
-            <div className="flex gap-2">
-              <Input
-                value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
-                placeholder={t("locations.customAmenityPlaceholder")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCustomAmenity();
-                  }
-                }}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addCustomAmenity}
-                disabled={!customInput.trim()}
-              >
-                <Plus className="size-4 me-1" />
-                {t("locations.addAmenity")}
-              </Button>
-            </div>
           </CardContent>
         </Card>
 

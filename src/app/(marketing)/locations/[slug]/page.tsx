@@ -6,7 +6,8 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format, isSameDay } from "date-fns";
 import { he } from "date-fns/locale/he";
-import { MapPin, CheckCircle2, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -166,19 +167,17 @@ export default function LocationDetailsPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t("amenities")}
               </h2>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {location.amenities.map((a) => (
-                  <li
+                  <Badge
                     key={a}
-                    className="flex items-center gap-3 text-sm text-muted-foreground rounded-xl border border-border/50 bg-muted/30 px-3.5 py-2.5"
+                    variant="outline"
+                    className="rounded-xl border-border px-3 py-1.5 text-sm font-normal text-foreground"
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </span>
                     {a}
-                  </li>
+                  </Badge>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
 

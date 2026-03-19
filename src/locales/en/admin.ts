@@ -110,6 +110,15 @@ const admin = {
     commissionValue: "Commission Value",
     comingSoon: "Coming in v2",
     saveSettings: "Save Settings",
+    saveSuccess: "Settings saved",
+    saveError: "Could not save settings",
+    amenityCatalogTitle: "Amenities catalog",
+    amenityCatalogDesc:
+      "Tags listed here appear to hosts when editing a location. Hosts can only pick from this list — they cannot add custom tags.",
+    amenityCatalogPlaceholder: "Type a tag and press Enter",
+    amenityCatalogHint:
+      "Enter to add; Backspace on an empty field removes the last catalog tag.",
+    amenityCatalogRemoveTag: "Remove from catalog",
   },
 } as const;
 

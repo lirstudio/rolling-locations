@@ -142,7 +142,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-none;
   }
   body {
     @apply bg-background text-foreground font-sans;
@@ -175,21 +175,11 @@
     outline: none !important;
   }
 
-  [data-slot="input"]:focus,
-  [data-slot="input"]:focus-visible,
+  /* Suppress Tailwind focus ring on select trigger (underline fields have no focus chrome) */
   [data-slot="select-trigger"]:focus,
-  [data-slot="select-trigger"]:focus-visible,
-  [data-slot="select-trigger"][data-state="open"],
-  [data-slot="textarea"]:focus,
-  [data-slot="textarea"]:focus-visible {
-    border-top: none !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 2px solid var(--ring) !important;
-    border-radius: 0 !important;
+  [data-slot="select-trigger"]:focus-visible {
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
-    outline: none !important;
   }
 
   [data-slot="input"][aria-invalid="true"],
@@ -265,10 +255,9 @@ a, button, [role="button"] {
   transition-duration: 150ms;
 }
 
-/* ── Better focus ring ── */
+/* No global focus outline — avoid red frame on fields; interactive chrome uses component ring/shadow where needed */
 :focus-visible {
-  outline: 2px solid oklch(0.44 0.22 27 / 50%);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* ── Mobile touch targets ── */

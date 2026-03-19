@@ -18,4 +18,7 @@ export const queryKeys = {
     users: () => ["admin", "users"] as const,
     settings: () => ["admin", "settings"] as const,
   },
+  site: {
+    amenityCatalog: () => ["site", "amenity-catalog"] as const,
+  },
 } as const;
