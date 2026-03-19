@@ -7,14 +7,19 @@ import { HowItWorks } from "./components/how-it-works";
 import { CTABanner } from "./components/cta-banner";
 
 const getHeroVideoUrl = unstable_cache(
-  async () => {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "hero_video_url")
-      .maybeSingle();
-    return data?.value?.trim() ?? null;
+  async (): Promise<string | null> => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "hero_video_url")
+        .maybeSingle();
+      return data?.value?.trim() ?? null;
+    } catch {
+      // env vars missing or table not yet seeded — render page without video
+      return null;
+    }
   },
   ["hero-video-url"],
   { tags: ["admin-settings"], revalidate: 300 }
