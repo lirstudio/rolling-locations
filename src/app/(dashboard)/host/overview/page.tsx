@@ -171,18 +171,17 @@ export default function HostOverviewPage() {
         </Button>
       </div>
 
-      {/* KPI cards — always shown */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpiConfig.map(({ key, icon: Icon, colorBg, colorIcon }) => (
-          <Card key={key} className="rounded-xl">
+          <Card key={key} className="card-hover rounded-2xl border-border/60 shadow-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardDescription className="text-sm font-medium">
                 {t(`overview.${key}`)}
               </CardDescription>
               <div
-                className={`flex h-9 w-9 items-center justify-center rounded-lg ${colorBg}`}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl ${colorBg}`}
               >
-                <Icon className={`size-4 ${colorIcon}`} />
+                <Icon className={`size-4.5 ${colorIcon}`} />
               </div>
             </CardHeader>
             <CardContent>
@@ -196,9 +195,8 @@ export default function HostOverviewPage() {
         ))}
       </div>
 
-      {/* Empty state banner — only when 0 locations and done loading */}
       {showEmptyLocationsBanner && (
-        <Card className="rounded-xl border-dashed border-2 bg-muted/30">
+        <Card className="rounded-2xl border-dashed border-2 bg-muted/30">
           <CardContent className="flex items-center justify-between gap-4 py-5 px-6">
             <div className="flex items-center gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -223,10 +221,8 @@ export default function HostOverviewPage() {
         </Card>
       )}
 
-      {/* Bottom row: recent requests + quick actions */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent requests – takes 2/3 */}
-        <Card className="rounded-xl lg:col-span-2">
+        <Card className="rounded-2xl border-border/60 shadow-card lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">
               {t("overview.recentRequests")}
@@ -256,7 +252,7 @@ export default function HostOverviewPage() {
                   <Link
                     key={req.id}
                     href={`/host/requests/${req.id}`}
-                    className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted"
+                    className="flex items-center justify-between rounded-xl border border-border/60 p-3.5 transition-all hover:bg-muted/50 hover:shadow-sm"
                   >
                     <div className="flex flex-col gap-1 min-w-0">
                       <span className="text-sm font-medium truncate">
@@ -293,18 +289,17 @@ export default function HostOverviewPage() {
           </CardContent>
         </Card>
 
-        {/* Quick actions – takes 1/3 */}
-        <Card className="rounded-xl">
+        <Card className="rounded-2xl border-border/60 shadow-card">
           <CardHeader>
             <CardTitle className="text-base">
               {t("overview.quickActions")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-2">
+          <CardContent className="flex flex-col gap-2.5">
             <Button
               asChild
               variant="outline"
-              className="w-full justify-start cursor-pointer"
+              className="w-full justify-start rounded-xl cursor-pointer"
             >
               <Link href="/host/locations/new">
                 <Plus className="me-2 h-4 w-4 text-primary" />
@@ -314,7 +309,7 @@ export default function HostOverviewPage() {
             <Button
               asChild
               variant="outline"
-              className="w-full justify-start cursor-pointer"
+              className="w-full justify-start rounded-xl cursor-pointer"
             >
               <Link href="/host/availability">
                 <CalendarDays className="me-2 h-4 w-4 text-blue-500" />
@@ -324,7 +319,7 @@ export default function HostOverviewPage() {
             <Button
               asChild
               variant="outline"
-              className="w-full justify-start cursor-pointer"
+              className="w-full justify-start rounded-xl cursor-pointer"
             >
               <Link href="/host/requests">
                 <Inbox className="me-2 h-4 w-4 text-orange-500" />

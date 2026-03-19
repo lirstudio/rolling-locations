@@ -8,11 +8,13 @@ export function CTABanner() {
   const t = useTranslations("marketing.ctaBanner");
 
   return (
-    <section id="cta-banner" className="border-b border-border bg-primary py-16 sm:py-20 text-primary-foreground scroll-mt-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section id="cta-banner" className="relative overflow-hidden border-b border-border bg-primary py-20 sm:py-24 text-primary-foreground scroll-mt-16">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.12)_0%,_transparent_60%)]" />
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">{t("title")}</h2>
-        <p className="mt-4 text-primary-foreground/90 max-w-xl mx-auto text-base sm:text-lg">{t("subtitle")}</p>
-        <Button size="lg" className="mt-8 px-8 text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90" asChild>
+        <p className="mt-5 text-primary-foreground/90 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">{t("subtitle")}</p>
+        <Button size="lg" className="mt-10 px-10 text-base rounded-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg" asChild>
           <Link href="/auth/sign-up">{t("cta")}</Link>
         </Button>
       </div>

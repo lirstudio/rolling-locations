@@ -24,7 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
 import { roleRedirectPath } from "@/lib/auth";
 
@@ -94,6 +94,11 @@ function NavAvatar() {
       <Button variant="ghost" size="icon" className="rounded-full" aria-label={tNav("dashboard")} asChild>
         <Link href={dashboardHref}>
           <Avatar className="h-8 w-8 rounded-full">
+            <AvatarImage
+              src={user.avatarUrl ?? undefined}
+              alt=""
+              className="object-cover"
+            />
             <AvatarFallback className="rounded-full text-xs">
               {initials}
             </AvatarFallback>
@@ -107,14 +112,20 @@ function NavAvatar() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-        className="min-w-56 rounded-lg"
-        side={dropdownSide}
-        align="end"
-        sideOffset={4}
-      >
+          className="min-w-56 rounded-lg"
+          dir={direction}
+          side={dropdownSide}
+          align="end"
+          sideOffset={4}
+        >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
             <Avatar className="h-8 w-8 shrink-0 rounded-full">
+              <AvatarImage
+                src={user.avatarUrl ?? undefined}
+                alt=""
+                className="object-cover"
+              />
               <AvatarFallback className="rounded-full text-xs">
                 {initials}
               </AvatarFallback>
@@ -171,10 +182,10 @@ export function SiteNav() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)} aria-label="Rollin Locations">
-          <span className="font-bold text-foreground">Rollin Locations</span>
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-nav">
+      <div className="container mx-auto flex h-[4.5rem] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)} aria-label="Rollin Locations">
+          <span className="text-lg font-bold text-foreground tracking-tight">Rollin Locations</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
@@ -191,12 +202,12 @@ export function SiteNav() {
                   {t("whatToShoot")}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="grid w-[640px] grid-cols-3 gap-3 p-4">
+                  <div className="grid w-[660px] grid-cols-3 gap-3.5 p-5">
                     {SHOOT_OPTIONS.map((opt) => (
                       <Link
                         key={opt.categorySlug}
                         href={`/locations?category=${opt.categorySlug}`}
-                        className="group relative block aspect-[4/3] overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                        className="group relative block aspect-[4/3] overflow-hidden rounded-2xl shadow-card focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                       >
                         <Image
                           src={opt.image}
@@ -206,8 +217,8 @@ export function SiteNav() {
                           sizes="200px"
                           unoptimized
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <span className="absolute inset-x-0 bottom-0 p-3 text-center text-base font-semibold text-white">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+                        <span className="absolute inset-x-0 bottom-0 p-3.5 text-center text-base font-semibold text-white drop-shadow-sm">
                           {t(opt.labelKey)}
                         </span>
                       </Link>
@@ -229,13 +240,13 @@ export function SiteNav() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side={sheetSide} className="w-[280px] sm:w-[320px] flex flex-col p-0">
-            <SheetHeader className="border-b border-border p-4">
-              <SheetTitle className="flex items-center gap-2">
+          <SheetContent side={sheetSide} className="w-[300px] sm:w-[340px] flex flex-col p-0">
+            <SheetHeader className="border-b border-border/60 px-5 py-5">
+              <SheetTitle className="flex items-center gap-2.5 text-lg tracking-tight">
                 Rollin Locations
               </SheetTitle>
             </SheetHeader>
-            <nav className="flex flex-1 flex-col gap-1 p-4">
+            <nav className="flex flex-1 flex-col gap-1.5 p-5">
               {navLinks.map(({ href, label }) => (
                 <Button key={href} variant="ghost" className="justify-start" asChild>
                   <Link href={href} onClick={() => setOpen(false)}>
@@ -253,13 +264,13 @@ export function SiteNav() {
                 <ChevronDown className={`size-4 transition-transform ${shootMenuOpen ? "rotate-180" : ""}`} />
               </button>
               {shootMenuOpen && (
-                <div className="grid grid-cols-1 gap-2 px-2 pb-2">
+                <div className="grid grid-cols-1 gap-2.5 px-2 pb-2">
                   {SHOOT_OPTIONS.map((opt) => (
                     <Link
                       key={opt.categorySlug}
                       href={`/locations?category=${opt.categorySlug}`}
                       onClick={() => setOpen(false)}
-                      className="group relative block aspect-video overflow-hidden rounded-lg"
+                      className="group relative block aspect-video overflow-hidden rounded-xl shadow-card"
                     >
                       <Image
                         src={opt.image}
@@ -278,7 +289,7 @@ export function SiteNav() {
                 </div>
               )}
 
-              <div className="mt-4 border-t border-border pt-4 flex items-center justify-end">
+              <div className="mt-auto border-t border-border/60 pt-5 flex items-center justify-end">
                 <NavAvatar />
               </div>
             </nav>

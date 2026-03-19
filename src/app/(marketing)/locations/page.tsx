@@ -264,10 +264,10 @@ export default function LocationsIndexPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t("title")}</h1>
-        <p className="mt-2 text-muted-foreground">{t("intro")}</p>
+    <div className="container mx-auto px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl tracking-tight">{t("title")}</h1>
+        <p className="mt-2.5 text-muted-foreground leading-relaxed">{t("intro")}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {/* Mobile filter trigger */}
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -299,35 +299,35 @@ export default function LocationsIndexPage() {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        <aside className="hidden lg:block space-y-6 rounded-xl border border-border bg-muted/30 p-4">
+      <div className="grid gap-8 lg:grid-cols-[240px_1fr] lg:gap-10">
+        <aside className="hidden lg:block space-y-6 rounded-2xl border border-border/60 bg-muted/30 p-5 shadow-card h-fit sticky top-24">
           {filterPanel}
         </aside>
 
         <div>
           {paginated.length === 0 ? (
-            <div className="rounded-xl border border-border bg-muted/30 p-12 text-center">
+            <div className="rounded-2xl border border-border/60 bg-muted/30 p-16 text-center shadow-card">
               <h2 className="text-lg font-semibold text-foreground">{t("emptyTitle")}</h2>
-              <p className="mt-2 text-muted-foreground">{t("emptyDesc")}</p>
-              <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-                <Button variant="outline" onClick={clearFilters}>
+              <p className="mt-2.5 text-muted-foreground">{t("emptyDesc")}</p>
+              <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Button variant="outline" className="rounded-full" onClick={clearFilters}>
                   {t("clearFilters")}
                 </Button>
-                <Button asChild>
+                <Button className="rounded-full" asChild>
                   <Link href="/">{t("backToHome")}</Link>
                 </Button>
               </div>
             </div>
           ) : (
             <>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {paginated.map((loc) => (
                   <LocationCard key={loc.id} location={loc} />
                 ))}
               </div>
               {hasMore && (
-                <div className="mt-8 flex justify-center">
-                  <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
+                <div className="mt-10 flex justify-center">
+                  <Button variant="outline" className="rounded-full px-8" onClick={() => setPage((p) => p + 1)}>
                     {t("loadMore")}
                   </Button>
                 </div>

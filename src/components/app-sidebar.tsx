@@ -117,14 +117,14 @@ export function AppSidebar({ role = "admin", ...props }: AppSidebarProps) {
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="pb-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-medium">Rollin Locations</span>
-                  <span className="truncate text-xs text-muted-foreground">MVP</span>
+                  <span className="truncate font-semibold tracking-tight">Rollin Locations</span>
+                  <span className="truncate text-[11px] text-muted-foreground/70">MVP</span>
                 </div>
               </Link>
             </SidebarMenuButton>

@@ -109,7 +109,7 @@ export default function AccountSettingsPage() {
       {/* Personal info */}
       <Form {...profileForm}>
         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader>
               <CardTitle>{t("account.personalInfo")}</CardTitle>
               <CardDescription>
@@ -177,7 +177,7 @@ export default function AccountSettingsPage() {
       {/* Password */}
       <Form {...passwordForm}>
         <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader>
               <CardTitle>{t("account.changePassword")}</CardTitle>
               <CardDescription>
@@ -232,8 +232,7 @@ export default function AccountSettingsPage() {
         </form>
       </Form>
 
-      {/* Danger zone */}
-      <Card>
+      <Card className="rounded-2xl border-border/60 shadow-card">
         <CardHeader>
           <CardTitle>{t("account.dangerZone")}</CardTitle>
           <CardDescription>{t("account.dangerZoneDescription")}</CardDescription>

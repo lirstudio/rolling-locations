@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Camera, Loader2, Trash2 } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -180,73 +180,52 @@ export default function HostSettingsPage() {
                     {t("settings.profileDescription")}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Avatar upload */}
+                <CardContent className="space-y-8">
                   <div className="flex items-center gap-5">
-                    <button
-                      type="button"
-                      onClick={handleFileUpload}
-                      disabled={uploading}
-                      className="group relative h-24 w-24 shrink-0 cursor-pointer rounded-xl overflow-hidden border-2 border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
-                      aria-label={t("settings.uploadPhoto")}
-                    >
-                      <Avatar className="h-full w-full rounded-xl">
-                        <AvatarImage
-                          src={profileImage ?? undefined}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="rounded-xl text-2xl font-semibold bg-muted">
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 group-disabled:opacity-0">
-                        {uploading ? (
-                          <Loader2 className="h-6 w-6 text-white animate-spin" />
-                        ) : (
-                          <Camera className="h-6 w-6 text-white" />
-                        )}
-                      </div>
-                    </button>
+                    <div className="relative shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleFileUpload}
+                        disabled={uploading}
+                        className="group relative h-20 w-20 cursor-pointer rounded-full overflow-hidden border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
+                        aria-label={t("settings.uploadPhoto")}
+                      >
+                        <Avatar className="h-full w-full">
+                          <AvatarImage
+                            src={profileImage ?? undefined}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="text-xl font-semibold bg-muted">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 group-disabled:opacity-0">
+                          {uploading ? (
+                            <Loader2 className="h-5 w-5 text-white animate-spin" />
+                          ) : (
+                            <Camera className="h-5 w-5 text-white" />
+                          )}
+                        </div>
+                      </button>
+                      {profileImage && !uploading && (
+                        <button
+                          type="button"
+                          onClick={handleResetPhoto}
+                          className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
+                          aria-label={t("settings.resetPhoto")}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                       <p className="text-sm font-medium">
                         {t("settings.profilePicture")}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {t("settings.allowedFormats")}
                       </p>
-                      <div className="flex gap-2 mt-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          type="button"
-                          onClick={handleFileUpload}
-                          disabled={uploading}
-                          className="cursor-pointer"
-                        >
-                          {uploading ? (
-                            <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Camera className="me-2 h-4 w-4" />
-                          )}
-                          {uploading
-                            ? t("settings.uploading")
-                            : t("settings.uploadPhoto")}
-                        </Button>
-                        {profileImage && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            type="button"
-                            onClick={handleResetPhoto}
-                            disabled={uploading}
-                            className="cursor-pointer text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="me-2 h-4 w-4" />
-                            {t("settings.resetPhoto")}
-                          </Button>
-                        )}
-                      </div>
                     </div>
 
                     <input
@@ -260,8 +239,7 @@ export default function HostSettingsPage() {
 
                   <Separator />
 
-                  {/* Form fields */}
-                  <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
                     <FormField
                       control={form.control}
                       name="displayName"

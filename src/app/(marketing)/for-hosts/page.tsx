@@ -78,7 +78,7 @@ export default function ForHostsPage() {
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur-sm border border-white/10">
+            <span className="inline-block rounded-full bg-white/15 px-5 py-2 text-xs font-medium tracking-wide text-white/90 backdrop-blur-md border border-white/10 shadow-lg">
               {t("hero.badge")}
             </span>
 
@@ -92,7 +92,7 @@ export default function ForHostsPage() {
 
             <Button
               size="lg"
-              className="mt-10 px-10 text-base bg-white text-primary hover:bg-white/90 shadow-lg shadow-black/10"
+              className="mt-10 px-10 text-base rounded-full bg-white text-primary hover:bg-white/90 shadow-lg shadow-black/10"
               asChild
             >
               <Link href={SIGN_UP_URL}>
@@ -131,13 +131,13 @@ export default function ForHostsPage() {
             </h2>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2">
+          <div className="mx-auto mt-14 grid max-w-5xl gap-6 sm:grid-cols-2">
             {benefits.map((b, i) => (
               <div
                 key={i}
-                className="group relative rounded-xl border border-border bg-card p-7 sm:p-8 transition-all hover:border-primary/30 hover:shadow-md"
+                className="card-hover group relative rounded-2xl border border-border/60 bg-card p-7 sm:p-8 shadow-card"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <b.icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-foreground">
@@ -152,8 +152,7 @@ export default function ForHostsPage() {
         </div>
       </section>
 
-      {/* ── Process / How it works ── */}
-      <section className="bg-muted/50 py-16 sm:py-24 border-y border-border">
+      <section className="bg-muted/50 py-16 sm:py-24 border-y border-border/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
@@ -163,14 +162,12 @@ export default function ForHostsPage() {
 
           <div className="mx-auto mt-14 max-w-3xl">
             <div className="relative">
-              {/* Vertical connector line */}
-              <div className="absolute start-6 top-0 bottom-0 w-px bg-border sm:start-7" aria-hidden />
+              <div className="absolute start-6 top-0 bottom-0 w-0.5 bg-border/60 sm:start-7" aria-hidden />
 
               <ul className="relative space-y-10">
                 {processSteps.map((step, i) => (
                   <li key={i} className="relative flex gap-5 sm:gap-6">
-                    {/* Step number circle */}
-                    <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-card text-primary font-bold text-sm shadow-sm sm:h-14 sm:w-14 sm:text-base">
+                    <div className="relative z-10 flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-card text-primary font-bold text-sm shadow-card sm:h-14 sm:w-14 sm:text-base">
                       {i + 1}
                     </div>
 
@@ -206,9 +203,9 @@ export default function ForHostsPage() {
             {prepareItems.map((item, i) => (
               <div
                 key={i}
-                className="flex items-start gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/20"
+                className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-all hover:border-primary/25 hover:shadow-card-hover"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
                   <item.icon className="h-5 w-5" />
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground pt-2">
@@ -220,8 +217,7 @@ export default function ForHostsPage() {
         </div>
       </section>
 
-      {/* ── Who is it for ── */}
-      <section className="bg-muted/50 py-16 sm:py-24 border-y border-border">
+      <section className="bg-muted/50 py-16 sm:py-24 border-y border-border/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
@@ -235,7 +231,7 @@ export default function ForHostsPage() {
               {spaceTypes.map((type, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium text-foreground shadow-sm"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-border/60 bg-card px-6 py-3 text-sm font-medium text-foreground shadow-card"
                 >
                   <type.icon className="h-4 w-4 text-primary" />
                   {t(`whoIsItFor.${type.labelKey}`)}
@@ -264,18 +260,19 @@ export default function ForHostsPage() {
         </div>
       </section>
 
-      {/* ── Bottom CTA banner ── */}
-      <section className="bg-primary py-16 sm:py-20 text-primary-foreground">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative overflow-hidden bg-primary py-20 sm:py-24 text-primary-foreground">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.12)_0%,_transparent_60%)]" />
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
             {t("ctaBottom")}
           </h2>
-          <p className="mt-4 text-primary-foreground/85 max-w-xl mx-auto text-base sm:text-lg">
+          <p className="mt-5 text-primary-foreground/85 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
             {t("hero.subtitle")}
           </p>
           <Button
             size="lg"
-            className="mt-8 px-10 text-base bg-white text-primary hover:bg-white/90 shadow-lg"
+            className="mt-10 px-10 text-base rounded-full bg-white text-primary hover:bg-white/90 shadow-lg"
             asChild
           >
             <Link href={SIGN_UP_URL}>

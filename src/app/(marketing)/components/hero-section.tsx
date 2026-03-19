@@ -104,12 +104,11 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
       </div>
 
       {/* Search bar — overlapping the hero bottom edge */}
-      <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14 min-w-0">
+      <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 -mt-14 sm:-mt-16 min-w-0">
         <form
           onSubmit={handleSubmit}
-          className="min-w-0 rounded-xl border border-border bg-card p-4 shadow-lg sm:p-5 md:p-6"
+          className="min-w-0 rounded-2xl border border-border/60 bg-card p-5 shadow-float sm:p-6 md:p-7"
         >
-          {/* Grid: equal gap-4; proportional widths 2:1:1:1 on md+ */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr_1fr] md:items-end">
             {/* General search field */}
             <div className="min-w-0">
@@ -170,9 +169,8 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
               </div>
             </div>
 
-            {/* CTA — same grid cell, full height alignment */}
             <div className="flex flex-col justify-end">
-              <Button type="submit" size="lg" className="h-10 w-full">
+              <Button type="submit" size="lg" className="h-10 w-full rounded-full">
                 {t("cta")}
                 <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180 shrink-0" />
               </Button>
@@ -181,8 +179,7 @@ export function HeroSection({ initialHeroVideoUrl = null }: HeroSectionProps) {
         </form>
       </div>
 
-      {/* Spacer so next section doesn't overlap */}
-      <div className="h-8 sm:h-10" />
+      <div className="h-10 sm:h-14" />
     </section>
   );
 }

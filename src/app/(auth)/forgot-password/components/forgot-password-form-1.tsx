@@ -50,7 +50,7 @@ export function ForgotPasswordForm1({
 
   return (
     <div className={className} {...props}>
-      <Card>
+      <Card className="rounded-2xl border-border/60 shadow-float">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             {t("forgotPasswordTitle")}
@@ -85,6 +85,7 @@ export function ForgotPasswordForm1({
                               type="email"
                               placeholder="name@example.com"
                               autoComplete="email"
+                              dir="ltr"
                               {...field}
                             />
                           </FormControl>

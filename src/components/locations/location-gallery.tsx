@@ -70,7 +70,7 @@ export function LocationGallery({ gallery, title }: LocationGalleryProps) {
       {/* ── Preview bento (on detail page) ── */}
       <section className="group relative">
         {gallery.length >= 3 ? (
-          <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[280px] sm:h-[360px] md:h-[420px]">
+          <div className="grid grid-cols-4 grid-rows-2 gap-2.5 h-[280px] sm:h-[360px] md:h-[440px]">
             <button
               type="button"
               className="relative col-span-2 row-span-2 overflow-hidden rounded-s-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -165,7 +165,7 @@ export function LocationGallery({ gallery, title }: LocationGalleryProps) {
           <Button
             variant="outline"
             size="sm"
-            className="absolute bottom-3 end-3 gap-1.5 bg-background/80 backdrop-blur-sm shadow-md opacity-0 group-hover:opacity-100 transition-opacity focus-visible:opacity-100"
+            className="absolute bottom-4 end-4 gap-1.5 rounded-full bg-background/85 backdrop-blur-md shadow-float opacity-0 group-hover:opacity-100 transition-opacity focus-visible:opacity-100"
             onClick={openGallery}
           >
             <Grid2X2 className="size-4" />
@@ -306,9 +306,9 @@ export function LocationGallery({ gallery, title }: LocationGalleryProps) {
                   key={m.id}
                   type="button"
                   onClick={() => setViewerIndex(i)}
-                  className={`relative h-14 w-20 shrink-0 rounded overflow-hidden transition-all focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`relative h-14 w-20 shrink-0 rounded-lg overflow-hidden transition-all focus-visible:ring-2 focus-visible:ring-ring ${
                     i === viewerIndex
-                      ? "ring-2 ring-white opacity-100"
+                      ? "ring-2 ring-white opacity-100 scale-105"
                       : "opacity-50 hover:opacity-80"
                   }`}
                 >

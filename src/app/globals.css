@@ -149,12 +149,144 @@
   h6 {
     @apply font-sans;
   }
+
+  /* ── Underline-only form fields ── */
+  [data-slot="input"],
+  [data-slot="select-trigger"],
+  [data-slot="textarea"] {
+    border-top: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    outline: none !important;
+  }
+
+  [data-slot="input"]:focus,
+  [data-slot="input"]:focus-visible,
+  [data-slot="select-trigger"]:focus,
+  [data-slot="select-trigger"]:focus-visible,
+  [data-slot="select-trigger"][data-state="open"],
+  [data-slot="textarea"]:focus,
+  [data-slot="textarea"]:focus-visible {
+    border-top: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 2px solid var(--ring) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    outline: none !important;
+  }
+
+  [data-slot="input"][aria-invalid="true"],
+  [data-slot="textarea"][aria-invalid="true"] {
+    border-bottom-color: var(--destructive) !important;
+  }
 }
 
 /* Ensure consistent font rendering across different DPI levels */
 @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
   body {
     -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* ── Premium shadow system ── */
+.shadow-card {
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 4%),
+    0 4px 12px oklch(0 0 0 / 3%),
+    0 0 0 1px oklch(0 0 0 / 2%);
+}
+.shadow-card-hover {
+  box-shadow:
+    0 4px 6px oklch(0 0 0 / 5%),
+    0 12px 32px oklch(0 0 0 / 6%),
+    0 0 0 1px oklch(0 0 0 / 3%);
+}
+.shadow-float {
+  box-shadow:
+    0 8px 24px oklch(0 0 0 / 8%),
+    0 2px 8px oklch(0 0 0 / 4%);
+}
+.shadow-nav {
+  box-shadow: 0 1px 3px oklch(0 0 0 / 5%), 0 4px 16px oklch(0 0 0 / 3%);
+}
+.shadow-sticky {
+  box-shadow: 0 -4px 20px oklch(0 0 0 / 8%);
+}
+
+/* ── Card hover lift utility ── */
+.card-hover {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 4px 6px oklch(0 0 0 / 5%),
+    0 12px 32px oklch(0 0 0 / 6%),
+    0 0 0 1px oklch(0 0 0 / 3%);
+}
+
+/* ── Subtle custom scrollbar (dashboard) ── */
+[data-slot="sidebar-inset"] {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0 0 0 / 12%) transparent;
+}
+[data-slot="sidebar-inset"]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-slot="sidebar-inset"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-slot="sidebar-inset"]::-webkit-scrollbar-thumb {
+  background-color: oklch(0 0 0 / 12%);
+  border-radius: 3px;
+}
+
+/* ── Smooth interactive transitions ── */
+a, button, [role="button"] {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 150ms;
+}
+
+/* ── Better focus ring ── */
+:focus-visible {
+  outline: 2px solid oklch(0.44 0.22 27 / 50%);
+  outline-offset: 2px;
+}
+
+/* ── Mobile touch targets ── */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
+/* ── Disable hover effects on touch ── */
+@media (hover: none) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 4%),
+      0 4px 12px oklch(0 0 0 / 3%),
+      0 0 0 1px oklch(0 0 0 / 2%);
   }
 }
 
@@ -198,6 +330,20 @@
 [dir="rtl"] [data-slot="sidebar-menu-sub"] {
   border-left-width: 0;
   border-right-width: 1px;
+}
+
+/* Subtle form labels */
+[data-slot="form-label"] {
+  font-size: 0.8125rem;
+}
+
+/* RTL form field text alignment */
+[dir="rtl"] [data-slot="input"],
+[dir="rtl"] [data-slot="textarea"],
+[dir="rtl"] [data-slot="select-trigger"],
+[dir="rtl"] [data-slot="form-label"],
+[dir="rtl"] [data-slot="form-item"] {
+  text-align: start;
 }
 
 /* Smooth scrolling for the entire page */

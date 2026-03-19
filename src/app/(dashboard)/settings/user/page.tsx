@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
-import { Camera, Loader2, Trash2 } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { uploadAvatar } from "@/lib/upload-avatar";
@@ -133,6 +133,7 @@ export default function UserSettingsPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
     try {
       await updateUserMetadata({ avatar_url: "" });
+      updateUser({ avatarUrl: undefined });
       toast.success(t("saved"));
     } catch {
       toast.error(t("saved"));
@@ -150,74 +151,55 @@ export default function UserSettingsPage() {
     <div className="px-4 lg:px-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader>
               <CardTitle>{t("user.title")}</CardTitle>
               <CardDescription>{t("user.description")}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Avatar */}
+            <CardContent className="space-y-8">
               <div className="flex items-center gap-5">
-                <button
-                  type="button"
-                  onClick={handleFileUpload}
-                  disabled={uploading}
-                  className="group relative h-24 w-24 shrink-0 cursor-pointer rounded-xl overflow-hidden border-2 border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
-                  aria-label={t("user.uploadPhoto")}
-                >
-                  <Avatar className="h-full w-full rounded-xl">
-                    <AvatarImage
-                      src={profileImage ?? undefined}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="rounded-xl text-2xl font-semibold bg-muted">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 group-disabled:opacity-0">
-                    {uploading ? (
-                      <Loader2 className="h-6 w-6 text-white animate-spin" />
-                    ) : (
-                      <Camera className="h-6 w-6 text-white" />
-                    )}
-                  </div>
-                </button>
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleFileUpload}
+                    disabled={uploading}
+                    className="group relative h-20 w-20 cursor-pointer rounded-full overflow-hidden border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
+                    aria-label={t("user.uploadPhoto")}
+                  >
+                    <Avatar className="h-full w-full">
+                      <AvatarImage
+                        src={profileImage ?? undefined}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-xl font-semibold bg-muted">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 group-disabled:opacity-0">
+                      {uploading ? (
+                        <Loader2 className="h-5 w-5 text-white animate-spin" />
+                      ) : (
+                        <Camera className="h-5 w-5 text-white" />
+                      )}
+                    </div>
+                  </button>
+                  {profileImage && !uploading && (
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
+                      aria-label={t("user.reset")}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">{t("user.profilePicture")}</p>
                   <p className="text-xs text-muted-foreground">
                     {t("user.allowedFormats")}
                   </p>
-                  <div className="flex gap-2 mt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                      onClick={handleFileUpload}
-                      disabled={uploading}
-                      className="cursor-pointer"
-                    >
-                      {uploading ? (
-                        <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Camera className="me-2 h-4 w-4" />
-                      )}
-                      {uploading ? t("user.uploading") : t("user.uploadPhoto")}
-                    </Button>
-                    {profileImage && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        type="button"
-                        onClick={handleReset}
-                        disabled={uploading}
-                        className="cursor-pointer text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="me-2 h-4 w-4" />
-                        {t("user.reset")}
-                      </Button>
-                    )}
-                  </div>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -230,8 +212,7 @@ export default function UserSettingsPage() {
 
               <Separator />
 
-              {/* Form fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -332,16 +313,15 @@ export default function UserSettingsPage() {
                 )}
               />
 
-              {/* Actions */}
               <div className="flex gap-3">
-                <Button type="submit" className="cursor-pointer">
+                <Button type="submit" className="rounded-full px-6 cursor-pointer">
                   {t("saveChanges")}
                 </Button>
                 <Button
                   variant="outline"
                   type="button"
                   onClick={handleDiscard}
-                  className="cursor-pointer"
+                  className="rounded-full cursor-pointer"
                 >
                   {t("discard")}
                 </Button>

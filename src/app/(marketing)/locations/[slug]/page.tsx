@@ -145,18 +145,17 @@ export default function LocationDetailsPage() {
       {/* Gallery — full width above the grid */}
       <LocationGallery gallery={gallery} title={location.title} />
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        {/* Left: details */}
-        <div className="lg:col-span-2 space-y-8">
+      <div className="mt-10 grid gap-8 lg:grid-cols-3 lg:gap-10">
+        <div className="lg:col-span-2 space-y-10">
           <section>
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl tracking-tight">
               {location.title}
             </h1>
-            <p className="mt-1.5 flex items-center gap-1.5 text-muted-foreground">
+            <p className="mt-2 flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4 shrink-0" />
               {location.address.street}, {location.address.city}
             </p>
-            <Separator className="my-5" />
+            <div className="my-6 h-px bg-border/60" />
             <p className="text-muted-foreground leading-relaxed">
               {location.description}
             </p>
@@ -167,11 +166,11 @@ export default function LocationDetailsPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t("amenities")}
               </h2>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                 {location.amenities.map((a) => (
                   <li
                     key={a}
-                    className="flex items-center gap-2.5 text-sm text-muted-foreground"
+                    className="flex items-center gap-3 text-sm text-muted-foreground rounded-xl border border-border/50 bg-muted/30 px-3.5 py-2.5"
                   >
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -208,10 +207,9 @@ export default function LocationDetailsPage() {
 
         {/* Right: booking card */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-24 overflow-hidden border border-border shadow-sm">
+          <Card className="sticky top-24 overflow-hidden rounded-2xl border border-border/60 shadow-float">
             <CardContent className="p-0">
-              {/* Price header */}
-              <div className="px-5 pt-5 pb-4">
+              <div className="px-6 pt-6 pb-4">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-2xl font-bold text-foreground">
                     ₪{location.pricing.dailyRate.toLocaleString("he-IL")}
@@ -222,10 +220,9 @@ export default function LocationDetailsPage() {
                 </div>
               </div>
 
-              <Separator />
+              <div className="h-px bg-border/60" />
 
-              {/* Date picker */}
-              <div className="px-5 py-4 space-y-3">
+              <div className="px-6 py-5 space-y-4">
                 <Popover
                   open={calendarOpen}
                   onOpenChange={(open) => {
@@ -332,10 +329,9 @@ export default function LocationDetailsPage() {
                 )}
               </div>
 
-              {/* CTA */}
-              <div className="px-5 pb-5 space-y-2">
+              <div className="px-6 pb-6 space-y-2">
                 <Button
-                  className="w-full"
+                  className="w-full rounded-full"
                   size="lg"
                   disabled={days <= 0 || hasBlockedInRange}
                   asChild={days > 0 && !hasBlockedInRange}
@@ -383,8 +379,7 @@ export default function LocationDetailsPage() {
         </section>
       )}
 
-      {/* Mobile sticky CTA */}
-      <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm p-4 lg:hidden">
+      <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl shadow-sticky px-4 py-4 lg:hidden">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <span className="text-base font-bold text-foreground">

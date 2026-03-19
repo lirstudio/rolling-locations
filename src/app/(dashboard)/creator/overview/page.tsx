@@ -77,12 +77,12 @@ export default function CreatorOverviewPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi) => (
-          <Card key={kpi.label}>
+          <Card key={kpi.label} className="card-hover rounded-2xl border-border/60 shadow-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardDescription className="text-sm font-medium">
                 {kpi.label}
               </CardDescription>
-              <kpi.icon className="size-4 text-muted-foreground" />
+              <kpi.icon className="size-4.5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{kpi.value}</div>
@@ -91,7 +91,7 @@ export default function CreatorOverviewPage() {
         ))}
       </div>
 
-      <Card>
+      <Card className="rounded-2xl border-border/60 shadow-card">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>{t("overview.recentBookings")}</CardTitle>
@@ -115,7 +115,7 @@ export default function CreatorOverviewPage() {
                   <Link
                     key={booking.id}
                     href={`/creator/bookings/${booking.id}`}
-                    className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted"
+                    className="flex items-center justify-between rounded-xl border border-border/60 p-3.5 transition-all hover:bg-muted/50 hover:shadow-sm"
                   >
                     <div className="flex flex-col gap-1">
                       <span className="text-sm font-medium">

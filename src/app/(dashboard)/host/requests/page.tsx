@@ -35,7 +35,7 @@ function RequestCard({
 }) {
   return (
     <Link href={`/host/requests/${req.id}`}>
-      <Card className="transition-colors hover:bg-muted/50 hover:shadow-sm">
+      <Card className="card-hover rounded-2xl border-border/60 shadow-card">
         <CardContent className="p-4 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-1.5 min-w-0">

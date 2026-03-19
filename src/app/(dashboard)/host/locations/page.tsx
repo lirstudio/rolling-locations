@@ -79,7 +79,7 @@ export default function HostLocationsPage() {
             placeholder={t("locations.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="ps-9"
+            className="ps-9 rounded-xl"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -96,9 +96,9 @@ export default function HostLocationsPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <MapPin className="mb-4 size-12 text-muted-foreground" />
+        <Card className="rounded-2xl border-border/60 shadow-card">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <MapPin className="mb-4 size-12 text-muted-foreground/50" />
             <CardTitle className="mb-2">{t("locations.noLocations")}</CardTitle>
             <CardDescription>{t("locations.noLocationsDesc")}</CardDescription>
             <Button asChild className="mt-4">
@@ -110,7 +110,7 @@ export default function HostLocationsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((loc) => (
             <LocationCard
               key={loc.id}

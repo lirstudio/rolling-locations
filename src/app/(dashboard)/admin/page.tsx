@@ -56,12 +56,12 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.href} className="rounded-xl">
+          <Card key={stat.href} className="card-hover rounded-2xl border-border/60 shadow-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="size-4 text-muted-foreground" />
+              <stat.icon className="size-4.5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between">
@@ -77,8 +77,8 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="rounded-xl">
+      <div className="grid gap-5 md:grid-cols-2">
+        <Card className="rounded-2xl border-border/60 shadow-card">
           <CardHeader>
             <CardTitle className="text-base">הזמנות אחרונות</CardTitle>
           </CardHeader>
@@ -89,7 +89,7 @@ export default function AdminDashboardPage() {
               return (
                 <div
                   key={b.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className="flex items-center justify-between rounded-xl border border-border/60 p-3.5 transition-colors hover:bg-muted/30"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">
@@ -106,7 +106,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-2xl border-border/60 shadow-card">
           <CardHeader>
             <CardTitle className="text-base">לוקיישנים לפי סטטוס</CardTitle>
           </CardHeader>
@@ -116,7 +116,7 @@ export default function AdminDashboardPage() {
               return (
                 <div
                   key={status}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className="flex items-center justify-between rounded-xl border border-border/60 p-3.5"
                 >
                   <StatusBadge status={status} />
                   <span className="text-lg font-semibold">{count}</span>

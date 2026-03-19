@@ -37,14 +37,13 @@ export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
   if (!loading && locations.length === 0) return null;
 
   return (
-    <section className="bg-muted/40 py-14 sm:py-20">
+    <section className="bg-muted/40 py-16 sm:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
             {t("title")}
           </h2>
-          <Button asChild className="rounded-full gap-1.5 px-5 w-fit">
+          <Button asChild className="rounded-full gap-1.5 px-6 w-fit shadow-card">
             <Link href="/locations">
               {t("viewAll")}
               <ArrowUpRight className="h-4 w-4" />
@@ -52,16 +51,15 @@ export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
           </Button>
         </div>
 
-        {/* Category filter chips */}
-        <div className="mt-6 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
-          <div className="flex gap-2 min-w-0 pb-2 sm:pb-0">
+        <div className="mt-8 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+          <div className="flex gap-2.5 min-w-0 pb-2 sm:pb-0">
             <button
               type="button"
               onClick={() => setActiveCategory(null)}
-              className={`shrink-0 snap-start rounded-full border px-5 py-2.5 font-medium text-sm transition-colors ${
+              className={`shrink-0 snap-start rounded-full border px-5 py-2.5 font-medium text-sm shadow-sm transition-all ${
                 activeCategory === null
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted/50"
+                  ? "border-primary bg-primary text-primary-foreground shadow-card"
+                  : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted/50 hover:shadow-card"
               }`}
             >
               {tCat("allCategories")}
@@ -73,10 +71,10 @@ export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
                 onClick={() =>
                   setActiveCategory(activeCategory === cat.id ? null : cat.id)
                 }
-                className={`shrink-0 snap-start rounded-full border px-5 py-2.5 font-medium text-sm transition-colors ${
+                className={`shrink-0 snap-start rounded-full border px-5 py-2.5 font-medium text-sm shadow-sm transition-all ${
                   activeCategory === cat.id
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted/50"
+                    ? "border-primary bg-primary text-primary-foreground shadow-card"
+                    : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted/50 hover:shadow-card"
                 }`}
               >
                 {tLoc(`categories.${cat.slug}`)}
@@ -91,7 +89,7 @@ export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-[3/4] overflow-hidden rounded-xl bg-muted animate-pulse"
+                className="aspect-[3/4] overflow-hidden rounded-2xl bg-muted animate-pulse"
               />
             ))}
           </div>
@@ -110,14 +108,14 @@ export function FeaturedLocations({ initialData }: FeaturedLocationsProps) {
             </Button>
           </div>
         ) : (
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((loc) => (
               <LocationCard key={loc.id} location={loc} />
             ))}
           </div>
         )}
 
-        <p className="mt-8 text-sm text-muted-foreground max-w-md text-start sm:text-end leading-relaxed">
+        <p className="mt-10 text-sm text-muted-foreground max-w-md text-start sm:text-end leading-relaxed">
           {t("subtitle")}
         </p>
       </div>

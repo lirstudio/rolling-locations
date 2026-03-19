@@ -88,7 +88,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
 
   return (
     <div className={className} {...props}>
-      <Card>
+      <Card className="rounded-2xl border-border/60 shadow-float">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">{t("welcomeTitle")}</CardTitle>
           <CardDescription>{t("authDescription")}</CardDescription>
@@ -170,6 +170,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
                             type="email"
                             placeholder="name@example.com"
                             autoComplete="email"
+                            dir="ltr"
                             autoFocus
                             {...field}
                           />

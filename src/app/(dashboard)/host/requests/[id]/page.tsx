@@ -147,8 +147,7 @@ export default function RequestDetailPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
-          {/* Location */}
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -161,8 +160,7 @@ export default function RequestDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Creator details */}
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <User className="h-4 w-4 text-primary" />
@@ -188,8 +186,7 @@ export default function RequestDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Booking details */}
-          <Card>
+          <Card className="rounded-2xl border-border/60 shadow-card">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <CalendarDays className="h-4 w-4 text-primary" />
@@ -236,9 +233,8 @@ export default function RequestDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Action panel for pending requests */}
           {isPending && (
-            <Card>
+            <Card className="rounded-2xl border-border/60 shadow-card">
               <CardContent className="space-y-4 p-6">
                 <div>
                   <Label className="mb-2 block">{t("requests.hostNote")}</Label>
@@ -306,15 +302,14 @@ export default function RequestDetailPage() {
           )}
         </div>
 
-        {/* Timeline sidebar */}
-        <Card className="h-fit">
+        <Card className="h-fit rounded-2xl border-border/60 shadow-card">
           <CardHeader>
             <CardTitle className="text-base">{t("requests.timeline")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="mt-1 size-2 shrink-0 rounded-full bg-primary" />
+                <div className="mt-1 size-2.5 shrink-0 rounded-full bg-primary" />
                 <div>
                   <p className="text-sm font-medium">{t("requests.requested")}</p>
                   <p className="text-xs text-muted-foreground">
