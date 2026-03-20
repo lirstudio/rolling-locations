@@ -75,7 +75,7 @@ const creator = {
     viewAll: "הצג הכל",
     addToFavorites: "הוסף למועדפים",
     removeFromFavorites: "הסר ממועדפים",
-    browseLocations: "גלה לוקיישנים",
+    browseLocations: "לוקיישנים",
   },
 } as const;
 

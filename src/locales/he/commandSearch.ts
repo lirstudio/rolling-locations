@@ -53,7 +53,7 @@ const commandSearch = {
     settingsNotifications: "התראות",
     settingsConnections: "חיבורים",
     home: "עמוד הבית",
-    discoverLocations: "גלה לוקיישנים",
+    discoverLocations: "לוקיישנים",
     about: "אודות",
     contact: "צור קשר",
     faq: "שאלות נפוצות",

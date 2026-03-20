@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CommandSearch, SearchTrigger } from "@/components/command-search"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { NavAvatar } from "@/components/marketing/site-nav"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -105,6 +106,7 @@ export function SiteHeader() {
           </div>
           <div className="ms-auto flex items-center gap-2">
             <ThemeToggle />
+            <NavAvatar />
           </div>
         </div>
       </header>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu, User, LogOut, CircleUser, Settings, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Menu, User, LogOut, CircleUser, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -56,18 +56,29 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function NavAvatar() {
+export function NavAvatar() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("auth");
   const tSettings = useTranslations("settings");
   const tNav = useTranslations("marketing.nav");
+  const tCommandSearch = useTranslations("commandSearch");
   const { user, isAuthenticated, signOut } = useAuthStore();
 
   const direction = typeof document === "undefined" ? "rtl" : document.documentElement.dir;
   const dropdownSide = direction === "rtl" ? "left" : "right";
 
   const initials = user ? getInitials(user.name) : null;
+
+  // Fallback translations for dashboard context
+  // useTranslations returns the full key path if translation doesn't exist (e.g. "marketing.nav.dashboard")
+  const dashboardNav = tNav("dashboard");
+  const signUpNav = tNav("signUp");
+  const accountMenuNav = tNav("accountMenu");
+  
+  const dashboardLabel = dashboardNav.includes(".") ? tCommandSearch("dashboard") : dashboardNav;
+  const signUpLabel = signUpNav.includes(".") ? t("signUp") : signUpNav;
+  const accountMenuLabel = accountMenuNav.includes(".") ? "תפריט חשבון" : accountMenuNav;
 
   async function handleSignOut() {
     await signOut();
@@ -77,7 +88,7 @@ function NavAvatar() {
   if (!isAuthenticated || !user) {
     return (
       <Button variant="ghost" size="icon" className="rounded-full" asChild>
-        <Link href="/auth/sign-up" aria-label={tNav("signUp")}>
+        <Link href="/auth/sign-up" aria-label={signUpLabel}>
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarFallback className="rounded-full bg-muted">
               <User className="size-4 text-muted-foreground" />
@@ -89,10 +100,24 @@ function NavAvatar() {
   }
 
   const dashboardHref = roleRedirectPath(user.role);
+  
+  // Role-aware settings path
+  const getAccountSettingsPath = () => {
+    switch (user.role) {
+      case "admin":
+        return "/settings/account";
+      case "creator":
+        return "/creator/settings";
+      case "host":
+        return "/host/settings";
+      default:
+        return "/settings/account";
+    }
+  };
 
   return (
     <div className="flex items-center gap-0.5">
-      <Button variant="ghost" size="icon" className="rounded-full" aria-label={tNav("dashboard")} asChild>
+      <Button variant="ghost" size="icon" className="rounded-full" aria-label={dashboardLabel} asChild>
         <Link href={dashboardHref}>
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarImage
@@ -108,7 +133,7 @@ function NavAvatar() {
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full size-8" aria-label={tNav("accountMenu")}>
+          <Button variant="ghost" size="icon" className="rounded-full size-8" aria-label={accountMenuLabel}>
             <ChevronDown className="size-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -146,15 +171,9 @@ function NavAvatar() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href="/settings/account">
+            <Link href={getAccountSettingsPath()}>
               <CircleUser />
               {tSettings("account.title")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href="/settings/user">
-              <Settings />
-              {tSettings("user.title")}
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

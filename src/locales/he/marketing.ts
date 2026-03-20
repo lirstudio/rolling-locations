@@ -1,6 +1,6 @@
 const marketing = {
   nav: {
-    discover: "גלה לוקיישנים",
+    discover: "לוקיישנים",
     howItWorks: "איך זה עובד",
     forHosts: "למארחים",
     whatToShoot: "מה מצלמים?",
@@ -70,7 +70,7 @@ const marketing = {
     product: "מוצר",
     company: "חברה",
     legal: "משפטי",
-    discover: "גלה לוקיישנים",
+    discover: "לוקיישנים",
     howItWorks: "איך זה עובד",
     forHosts: "למארחים",
     about: "אודות",
@@ -94,7 +94,7 @@ const marketing = {
     removeFromFavorites: "הסר ממועדפים",
   },
   locationsIndex: {
-    title: "גלה לוקיישנים",
+    title: "לוקיישנים",
     intro: "סננו לפי קטגוריה, אזור ומחיר. בחרו לוקיישן ובקשו הזמנה.",
     activeFilters: "סינונים פעילים",
     showFilters: "סינונים",
@@ -184,13 +184,13 @@ const marketing = {
     selectAlternative: "בחר",
     successTitle: "הבקשה נשלחה בהצלחה!",
     successMessage: "המארח קיבל את הפרטים שלכם ויחזור אליכם טלפונית לסגירת העסקה. גם שלחנו לכם מייל עם פרטי ההזמנה.",
-    browseMore: "גלה לוקיישנים נוספים",
+    browseMore: "לוקיישנים נוספים",
   },
   notFound: {
     title: "הדף לא נמצא",
     message: "ייתכן שהכתובת השתנתה או שהדף הוסר.",
     backHome: "חזרה לדף הבית",
-    browseLocations: "גלה לוקיישנים",
+    browseLocations: "לוקיישנים",
   },
   about: {
     title: "אודות Rollin Locations",
@@ -201,7 +201,7 @@ const marketing = {
     forCreatorsBody: "חפשו לוקיישן לפי סוג, מיקום ומחיר. בקשו הזמנה ליום או כמה ימים, קבלו אישור והגיעו לצלם.",
     forHosts: "למארחים",
     forHostsBody: "הפכו חלל ריק להכנסה. פרסמו בחינם, קבלו בקשות ואשרו לפי הזמינות.",
-    cta: "גלה לוקיישנים",
+    cta: "לוקיישנים",
   },
   contact: {
     title: "צור קשר",
@@ -232,7 +232,7 @@ const marketing = {
     a3: "נרשמים למערכת, בוחרים \"הרשמה כמארח\" או נכנסים ל\"למארחים\", ומוסיפים לוקיישן עם תמונות, מחירים והזמינות.",
     q4: "האם אפשר לבטל הזמנה?",
     a4: "כן. יוצר או מארח יכולים לבטל בהתאם למדיניות הביטול.",
-    cta: "גלה לוקיישנים",
+    cta: "לוקיישנים",
   },
   forHostsPage: {
     hero: {
