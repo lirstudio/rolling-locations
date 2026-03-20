@@ -290,38 +290,48 @@ export function LocationCard({
         </div>
       </div>
 
-      {/* CTA button - bottom */}
+      {/* CTA — overlay <Link> mode: no nested <a> inside <a> */}
       <div className="p-4 pt-0">
-        <Button
-          asChild
-          className="w-full"
-          variant="default"
-        >
-          <Link href={linkHref} onClick={(e) => e.stopPropagation()}>
+        {ctaAsDecorativeSpan ? (
+          <span
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              "w-full pointer-events-none"
+            )}
+          >
             {t("viewDetails")}
-          </Link>
-        </Button>
+          </span>
+        ) : (
+          <Button asChild className="w-full" variant="default">
+            <Link href={linkHref} onClick={(e) => e.stopPropagation()}>
+              {t("viewDetails")}
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );
 
   if (asLink) {
     return (
-      <div
-        className={`group block cursor-pointer ${className ?? ""}`}
-        onClick={() => router.push(linkHref)}
-        role="link"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && router.push(linkHref)}
-      >
-        {cardContent}
+      <div className={cn("group relative block h-full", className)}>
+        <Link
+          href={linkHref}
+          className="absolute inset-0 z-[1] rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={`${location.title}, ${location.address.city}`}
+        >
+          <span className="sr-only">{t("viewDetails")}</span>
+        </Link>
+        <div className="relative z-[2] [&_*]:pointer-events-none [&_button]:pointer-events-auto">
+          {cardContent(true)}
+        </div>
       </div>
     );
   }
 
   return (
     <div className={`group ${className ?? ""}`} role="group">
-      {cardContent}
+      {cardContent(false)}
     </div>
   );
 }
