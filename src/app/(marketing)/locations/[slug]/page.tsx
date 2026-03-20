@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format, isSameDay } from "date-fns";
 import { he } from "date-fns/locale/he";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, Map as MapIcon, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,6 +22,8 @@ import {
 import { VideoCarousel } from "@/components/locations/video-carousel";
 import { LocationCard } from "@/components/locations/location-card";
 import { LocationGallery } from "@/components/locations/location-gallery";
+import { LocationMap } from "@/components/maps/location-map";
+import { searchAddress } from "@/lib/nominatim";
 import { useUnavailableDates } from "@/hooks/use-unavailable-dates";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Location } from "@/types";
@@ -77,6 +79,36 @@ export default function LocationDetailsPage() {
 
   const { unavailableDates } = useUnavailableDates(location?.id);
   const isMobile = useIsMobile();
+
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapCoords, setMapCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapLoading, setMapLoading] = useState(false);
+
+  const handleShowMap = async () => {
+    if (mapOpen) {
+      setMapOpen(false);
+      return;
+    }
+
+    if (location?.address.lat != null && location?.address.lng != null) {
+      setMapCoords({ lat: location.address.lat, lng: location.address.lng });
+      setMapOpen(true);
+      return;
+    }
+
+    if (!location) return;
+    const addressQuery = `${location.address.street}, ${location.address.city}`;
+    setMapLoading(true);
+    try {
+      const results = await searchAddress(addressQuery, { limit: 1 });
+      if (results.length > 0) {
+        setMapCoords({ lat: results[0].lat, lng: results[0].lng });
+        setMapOpen(true);
+      }
+    } finally {
+      setMapLoading(false);
+    }
+  };
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -165,10 +197,36 @@ export default function LocationDetailsPage() {
             <h1 className="text-2xl font-bold text-foreground sm:text-3xl tracking-tight">
               {location.title}
             </h1>
-            <p className="mt-2 flex items-center gap-2 text-muted-foreground">
+            <div className="mt-2 flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4 shrink-0" />
-              {location.address.street}, {location.address.city}
-            </p>
+              <span>{location.address.street}, {location.address.city}</span>
+              <button
+                type="button"
+                onClick={handleShowMap}
+                disabled={mapLoading}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted hover:border-foreground/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ms-1"
+              >
+                {mapLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : mapOpen ? (
+                  <X className="h-3.5 w-3.5" />
+                ) : (
+                  <MapIcon className="h-3.5 w-3.5" />
+                )}
+                {mapOpen ? t("hideMap") : t("showOnMap")}
+              </button>
+            </div>
+
+            {mapOpen && mapCoords && (
+              <div className="mt-4 overflow-hidden rounded-xl border border-border/60">
+                <LocationMap
+                  lat={mapCoords.lat}
+                  lng={mapCoords.lng}
+                  title={location.title}
+                />
+              </div>
+            )}
+
             <div className="my-6 h-px bg-border/60" />
             <p className="text-muted-foreground leading-relaxed">
               {location.description}

@@ -31,6 +31,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { locationSchema, type LocationFormValues } from "@/schemas/location";
 import { mockCategories } from "@/mocks/categories";
 import { uploadLocationImage } from "@/lib/upload-location-images";
+import { AddressAutocomplete } from "@/components/locations/address-autocomplete";
+import type { ParsedAddress } from "@/lib/nominatim";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -429,8 +431,25 @@ export function LocationForm({
         <Card>
           <CardHeader>
             <CardTitle>{t("locations.address")}</CardTitle>
+            <CardDescription>{t("locations.addressDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <FormLabel>{t("locations.addressSearch")}</FormLabel>
+              <AddressAutocomplete
+                value={form.getValues("address.street") ? `${form.getValues("address.street")}, ${form.getValues("address.city")}` : ""}
+                onSelect={(addr: ParsedAddress) => {
+                  form.setValue("address.street", addr.street, { shouldValidate: true });
+                  form.setValue("address.city", addr.city, { shouldValidate: true });
+                  form.setValue("address.neighborhood", addr.neighborhood || "", { shouldValidate: true });
+                  form.setValue("address.country", addr.country || "IL", { shouldValidate: true });
+                  form.setValue("address.lat", addr.lat, { shouldValidate: true });
+                  form.setValue("address.lng", addr.lng, { shouldValidate: true });
+                }}
+                className="mt-1.5"
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="address.street"

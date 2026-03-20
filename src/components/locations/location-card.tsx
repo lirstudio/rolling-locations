@@ -23,6 +23,7 @@ import type { Location, LocationStatus } from "@/types";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/use-favorites";
+import { formatDistance } from "@/utils/geo";
 
 function isSupabaseStorageUrl(url: string): boolean {
   return url.includes("supabase.co") && url.includes("/storage/");
@@ -57,6 +58,8 @@ export interface LocationCardProps {
   className?: string;
   /** Show favorite button (default: true for authenticated creators) */
   showFavoriteButton?: boolean;
+  /** Distance from user in km (if available) */
+  distanceKm?: number;
 }
 
 /**
@@ -74,6 +77,7 @@ export function LocationCard({
   asLink = true,
   className,
   showFavoriteButton = true,
+  distanceKm,
 }: LocationCardProps) {
   const t = useTranslations("marketing.locationCard");
   const tHost = useTranslations("host");
@@ -283,6 +287,11 @@ export function LocationCard({
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{location.address.city}</span>
+          {distanceKm != null && (
+            <Badge variant="secondary" className="ms-auto shrink-0 text-[11px] px-1.5 py-0">
+              {formatDistance(distanceKm)}
+            </Badge>
+          )}
         </div>
         <div className="text-lg font-bold text-foreground">
           ₪{location.pricing.dailyRate.toLocaleString("he-IL")}
@@ -321,7 +330,7 @@ export function LocationCard({
         >
           <span className="sr-only">{t("viewDetails")}</span>
         </Link>
-        <div className="relative z-[2] [&_*]:pointer-events-none [&_button]:pointer-events-auto">
+        <div className="relative z-[2] pointer-events-none [&_button]:pointer-events-auto">
           {cardContent(true)}
         </div>
       </div>

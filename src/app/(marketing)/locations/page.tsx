@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Map as MapIcon, LayoutGrid, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -26,8 +26,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { usePublishedLocations } from "@/hooks/use-published-locations";
+import { LocationsMapView } from "@/components/maps/locations-map-view";
+import { useUserLocation } from "@/hooks/use-user-location";
+import { haversineDistance, formatDistance } from "@/utils/geo";
 import { mockCategories } from "@/mocks/categories";
 import type { Location } from "@/types";
+
+type ViewMode = "grid" | "map";
 
 const PAGE_SIZE = 6;
 const PRICE_MIN = 0;
@@ -57,6 +62,9 @@ export default function LocationsIndexPage() {
   const queryParam = searchParams.get("q") ?? "";
 
   const { locations: publishedLocations } = usePublishedLocations();
+  const { coords: userCoords, loading: geoLoading, requestLocation } = useUserLocation();
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [sortByDistance, setSortByDistance] = useState(false);
 
   const topLevelCategories = useMemo(
     () => mockCategories.filter((c) => c.visible && !c.parentId),
@@ -112,11 +120,31 @@ export default function LocationsIndexPage() {
     return list;
   }, [publishedLocations, query, selectedCategoryIds, locationType, city, priceRange]);
 
+  const distanceMap = useMemo(() => {
+    if (!userCoords) return new Map<string, number>();
+    const m = new Map<string, number>();
+    for (const loc of filtered) {
+      if (loc.address.lat != null && loc.address.lng != null) {
+        m.set(loc.id, haversineDistance(userCoords.lat, userCoords.lng, loc.address.lat, loc.address.lng));
+      }
+    }
+    return m;
+  }, [filtered, userCoords]);
+
+  const sortedFiltered = useMemo(() => {
+    if (!sortByDistance || !userCoords) return filtered;
+    return [...filtered].sort((a, b) => {
+      const da = distanceMap.get(a.id) ?? Infinity;
+      const db = distanceMap.get(b.id) ?? Infinity;
+      return da - db;
+    });
+  }, [filtered, sortByDistance, userCoords, distanceMap]);
+
   const paginated = useMemo(
-    () => filtered.slice(0, page * PAGE_SIZE),
-    [filtered, page]
+    () => sortedFiltered.slice(0, page * PAGE_SIZE),
+    [sortedFiltered, page]
   );
-  const hasMore = paginated.length < filtered.length;
+  const hasMore = paginated.length < sortedFiltered.length;
   const activeFilters =
     (query ? 1 : 0) +
     (selectedCategoryIds.length > 0 ? 1 : 0) +
@@ -296,6 +324,58 @@ export default function LocationsIndexPage() {
               {t("clearFilters")}
             </Button>
           )}
+
+          <div className="flex items-center gap-1 ms-auto">
+            {!userCoords && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={requestLocation}
+                disabled={geoLoading}
+              >
+                <Navigation className="h-4 w-4" />
+                {t("nearMe")}
+              </Button>
+            )}
+            {userCoords && (
+              <Button
+                variant={sortByDistance ? "default" : "outline"}
+                size="sm"
+                className="gap-2"
+                onClick={() => setSortByDistance((v) => !v)}
+              >
+                <Navigation className="h-4 w-4" />
+                {t("sortByDistance")}
+              </Button>
+            )}
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`flex h-8 w-8 items-center justify-center transition-colors ${
+                  viewMode === "grid"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                }`}
+                aria-label={t("gridView")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("map")}
+                className={`flex h-8 w-8 items-center justify-center transition-colors ${
+                  viewMode === "map"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                }`}
+                aria-label={t("mapView")}
+              >
+                <MapIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -305,7 +385,12 @@ export default function LocationsIndexPage() {
         </aside>
 
         <div>
-          {paginated.length === 0 ? (
+          {viewMode === "map" ? (
+            <LocationsMapView
+              locations={sortedFiltered}
+              className="h-[calc(100vh-220px)] min-h-[400px] w-full rounded-xl"
+            />
+          ) : paginated.length === 0 ? (
             <div className="rounded-2xl border border-border/60 bg-muted/30 p-16 text-center shadow-card">
               <h2 className="text-lg font-semibold text-foreground">{t("emptyTitle")}</h2>
               <p className="mt-2.5 text-muted-foreground">{t("emptyDesc")}</p>
@@ -322,7 +407,11 @@ export default function LocationsIndexPage() {
             <>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {paginated.map((loc) => (
-                  <LocationCard key={loc.id} location={loc} />
+                  <LocationCard
+                    key={loc.id}
+                    location={loc}
+                    distanceKm={distanceMap.get(loc.id)}
+                  />
                 ))}
               </div>
               {hasMore && (
