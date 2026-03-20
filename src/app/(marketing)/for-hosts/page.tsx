@@ -343,7 +343,12 @@ export default function ForHostsPage() {
                     required
                   />
                 </div>
-                <Button type="submit">{tContact("send")}</Button>
+                {contactError && (
+                  <p className="text-sm text-destructive">{contactError}</p>
+                )}
+                <Button type="submit" disabled={isSubmitting}>
+                  {tContact("send")}
+                </Button>
               </form>
             )}
           </div>
