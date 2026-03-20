@@ -25,7 +25,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import { MegaMenu } from '@/components/landing/mega-menu'
-import { ModeToggle } from '@/components/mode-toggle'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useTheme } from '@/hooks/use-theme'
 
 const navigationItems = [
@@ -123,7 +123,7 @@ export function LandingNavbar() {
 
         {/* Desktop CTA */}
         <div className="hidden lg:flex items-center gap-2">
-          <ModeToggle variant="ghost" />
+          <ThemeToggle />
           <Button variant="ghost" size="icon" asChild className="cursor-pointer">
             <a href="https://github.com/silicondeck/shadcn-dashboard-landing-template" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
               <Github className="h-5 w-5" />
@@ -158,15 +158,7 @@ export function LandingNavbar() {
                 <div className="flex items-center gap-2">
                   <SheetTitle className="text-lg font-semibold">ShadcnStore</SheetTitle>
                   <div className="ml-auto flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                      className="cursor-pointer h-8 w-8"
-                    >
-                      <Moon className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                      <Sun className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    </Button>
+                    <ThemeToggle className="scale-75" />
                     <Button variant="ghost" size="icon" asChild className="cursor-pointer h-8 w-8">
                       <a href="https://github.com/silicondeck/shadcn-dashboard-landing-template" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
                         <Github className="h-4 w-4" />

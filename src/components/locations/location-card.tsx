@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -14,7 +13,7 @@ import {
   Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Location, LocationStatus } from "@/types";
 import { useAuthStore } from "@/stores/auth-store";
+import { cn } from "@/lib/utils";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/use-favorites";
 
 function isSupabaseStorageUrl(url: string): boolean {
@@ -77,7 +77,6 @@ export function LocationCard({
 }: LocationCardProps) {
   const t = useTranslations("marketing.locationCard");
   const tHost = useTranslations("host");
-  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isCreator = user?.role === "creator";
@@ -176,7 +175,7 @@ export function LocationCard({
   }
 
   // Card variant: new design - image top, content middle, button bottom
-  const cardContent = (
+  const cardContent = (ctaAsDecorativeSpan: boolean) => (
     <div className="flex flex-col h-full bg-card rounded-2xl overflow-hidden shadow-card">
       {/* Image section - top */}
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
@@ -199,7 +198,7 @@ export function LocationCard({
             <button
               type="button"
               onClick={go(-1)}
-              className="absolute top-1/2 start-2.5 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md opacity-100 md:opacity-70 md:group-hover:opacity-100 transition-all hover:bg-black/80 hover:scale-110 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="absolute top-1/2 start-2.5 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md opacity-100 md:opacity-70 md:group-hover:opacity-100 transition-all hover:bg-black/80 hover:scale-110 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               aria-label={t("previousImage")}
             >
               <ChevronRight className="h-5 w-5 rtl:rotate-180" />
@@ -207,7 +206,7 @@ export function LocationCard({
             <button
               type="button"
               onClick={go(1)}
-              className="absolute top-1/2 end-2.5 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md opacity-100 md:opacity-70 md:group-hover:opacity-100 transition-all hover:bg-black/80 hover:scale-110 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="absolute top-1/2 end-2.5 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md opacity-100 md:opacity-70 md:group-hover:opacity-100 transition-all hover:bg-black/80 hover:scale-110 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               aria-label={t("nextImage")}
             >
               <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
@@ -237,7 +236,7 @@ export function LocationCard({
           <button
             type="button"
             onClick={handleFavoriteClick}
-            className="absolute top-3 end-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-foreground hover:bg-white transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="absolute top-3 end-3 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-foreground hover:bg-white transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label={isFavorite ? t("removeFromFavorites") : t("addToFavorites")}
             aria-pressed={isFavorite}
             disabled={toggleFavorite.isPending}
@@ -255,7 +254,7 @@ export function LocationCard({
         {/* Host menu - top right (if favorite button not shown, or below it) */}
         {menuContent != null && (
           <div
-            className={`absolute z-10 ${shouldShowFavorite ? "top-14 end-3" : "top-3 end-3"}`}
+            className={`absolute z-30 ${shouldShowFavorite ? "top-14 end-3" : "top-3 end-3"}`}
             onClick={(e) => e.preventDefault()}
           >
             <DropdownMenu>

@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuthStore } from "@/stores/auth-store";
 import { roleRedirectPath } from "@/lib/auth";
 
@@ -232,6 +233,7 @@ export function SiteNav() {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          <ThemeToggle />
           <NavAvatar />
         </div>
 
@@ -242,10 +244,13 @@ export function SiteNav() {
             </Button>
           </SheetTrigger>
           <SheetContent side={sheetSide} className="w-[300px] sm:w-[340px] flex flex-col p-0">
-            <SheetHeader className="border-b border-border/60 px-5 py-5">
+            <SheetHeader className="relative border-b border-border/60 px-5 py-5">
               <SheetTitle className="flex items-center gap-2.5 text-lg tracking-tight">
                 Rollin Locations
               </SheetTitle>
+              <div className="absolute top-5 end-5">
+                <ThemeToggle />
+              </div>
             </SheetHeader>
             <nav className="flex flex-1 flex-col gap-1.5 p-5">
               {navLinks.map(({ href, label }) => (

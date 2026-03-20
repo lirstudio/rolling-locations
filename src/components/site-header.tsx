@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CommandSearch, SearchTrigger } from "@/components/command-search"
-import { ModeToggle } from "@/components/mode-toggle"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -104,7 +104,7 @@ export function SiteHeader() {
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
           <div className="ms-auto flex items-center gap-2">
-            <ModeToggle />
+            <ThemeToggle />
           </div>
         </div>
       </header>
