@@ -13,7 +13,7 @@ import {
   Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Location, LocationStatus } from "@/types";
 import { useAuthStore } from "@/stores/auth-store";
+import { cn } from "@/lib/utils";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/use-favorites";
 
 function isSupabaseStorageUrl(url: string): boolean {
@@ -174,7 +175,7 @@ export function LocationCard({
   }
 
   // Card variant: new design - image top, content middle, button bottom
-  const cardContent = (
+  const cardContent = (ctaAsDecorativeSpan: boolean) => (
     <div className="flex flex-col h-full bg-card rounded-2xl overflow-hidden shadow-card">
       {/* Image section - top */}
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">

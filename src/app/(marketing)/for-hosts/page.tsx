@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { sendContactMessage } from "@/app/actions/contact";
 import {
   UserPlus,
   MapPin,
@@ -43,6 +44,8 @@ export default function ForHostsPage() {
   const tFaq = useTranslations("marketing.faq");
   const tContact = useTranslations("marketing.contact");
   const [contactSent, setContactSent] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const benefits = [
     { icon: Eye, titleKey: "visibility" as const, descKey: "visibilityDesc" as const },
@@ -309,9 +312,19 @@ export default function ForHostsPage() {
               </p>
             ) : (
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setContactSent(true);
+                  setIsSubmitting(true);
+                  setContactError(null);
+                  const result = await sendContactMessage(
+                    new FormData(e.currentTarget)
+                  );
+                  setIsSubmitting(false);
+                  if (result.error) {
+                    setContactError(result.error);
+                  } else {
+                    setContactSent(true);
+                  }
                 }}
                 className="mt-10 space-y-6"
               >
