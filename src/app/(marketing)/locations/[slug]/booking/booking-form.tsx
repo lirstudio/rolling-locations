@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
@@ -10,7 +9,6 @@ import { he } from "date-fns/locale/he";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import {
-  MapPin,
   CalendarDays,
   Clock,
   ArrowRight,
@@ -26,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LocationCard } from "@/components/locations/location-card";
 import { createBookingRequest } from "@/app/actions/bookings";
 import type { Location } from "@/types";
 
@@ -177,9 +176,6 @@ export function BookingForm({ slug, initialLocation }: BookingFormProps) {
     );
   }
 
-  const coverUrl =
-    location.mediaGallery.find((m) => m.isFeatured)?.url ??
-    location.mediaGallery[0]?.url;
 
   if (submitted) {
     return (
@@ -227,32 +223,13 @@ export function BookingForm({ slug, initialLocation }: BookingFormProps) {
           {/* Location card */}
           <Card>
             <CardContent className="p-4 sm:p-6">
-              <div className="flex gap-4">
-                {coverUrl && (
-                  <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-36">
-                    <Image
-                      src={coverUrl}
-                      alt={location.title}
-                      fill
-                      className="object-cover"
-                      sizes="144px"
-                      unoptimized={
-                        coverUrl.includes("supabase.co") &&
-                        coverUrl.includes("/storage/")
-                      }
-                    />
-                  </div>
-                )}
-                <div className="flex flex-col justify-center gap-1">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {location.title}
-                  </h2>
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    {location.address.street}, {location.address.city}
-                  </p>
-                </div>
-              </div>
+              <LocationCard
+                location={location}
+                variant="compact"
+                asLink={true}
+                href={`/locations/${slug}`}
+                className="w-full"
+              />
             </CardContent>
           </Card>
 

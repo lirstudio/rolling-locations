@@ -2,6 +2,7 @@ const creator = {
   nav: {
     overview: "Overview",
     myBookings: "My Bookings",
+    favorites: "Favorites",
     invoices: "Invoices",
     settings: "Settings",
   },
@@ -14,6 +15,9 @@ const creator = {
     recentBookings: "Recent Bookings",
     noBookings: "No bookings yet",
     viewAll: "View All",
+    favorites: "Favorites",
+    noFavorites: "No favorites yet",
+    favoritesDesc: "Save locations you love for easy access.",
   },
   bookings: {
     title: "My Bookings",
@@ -63,6 +67,15 @@ const creator = {
     bookingStatusNotification: "Booking status updates",
     newMessageNotification: "New messages from hosts",
     marketingNotification: "Tips & marketing emails",
+  },
+  favorites: {
+    title: "Favorites",
+    emptyTitle: "No favorites yet",
+    emptyDesc: "Save locations you love for easy access.",
+    viewAll: "View All",
+    addToFavorites: "Add to favorites",
+    removeFromFavorites: "Remove from favorites",
+    browseLocations: "Discover Locations",
   },
 } as const;
 

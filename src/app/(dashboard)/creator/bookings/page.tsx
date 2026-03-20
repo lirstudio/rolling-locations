@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationCard } from "@/components/locations/location-card";
 import { useCreatorStore } from "@/stores/creator-store";
 import type { BookingStatus } from "@/types";
 
@@ -97,32 +98,55 @@ export default function CreatorBookingsPage() {
           {sorted.map((booking) => {
             const location = locations.find((l) => l.id === booking.locationId);
 
+            if (!location) {
+              return (
+                <Link key={booking.id} href={`/creator/bookings/${booking.id}`}>
+                  <Card className="transition-colors hover:bg-muted/50">
+                    <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 flex-1 items-center gap-4">
+                        <div className="flex min-w-0 flex-col gap-0.5">
+                          <span className="truncate font-medium">—</span>
+                          <span className="text-sm text-muted-foreground">
+                            {formatDateTime(booking.start)} ·{" "}
+                            {formatTime(booking.start)}–{formatTime(booking.end)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3 sm:justify-end">
+                        <span className="text-sm font-semibold">
+                          ₪{booking.priceEstimate.toLocaleString("he-IL")}
+                        </span>
+                        <Badge variant={statusVariant[booking.status]}>
+                          {t(`bookings.status.${booking.status}` as "bookings.status.requested")}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            }
+
             return (
               <Link key={booking.id} href={`/creator/bookings/${booking.id}`}>
                 <Card className="transition-colors hover:bg-muted/50">
                   <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex min-w-0 flex-1 items-center gap-4">
-                      <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
-                        {location?.mediaGallery[0] && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={location.mediaGallery[0].url}
-                            alt={location.title}
-                            className="size-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="truncate font-medium">
-                          {location?.title ?? "—"}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {formatDateTime(booking.start)} ·{" "}
-                          {formatTime(booking.start)}–{formatTime(booking.end)}
-                        </span>
+                      <LocationCard
+                        location={location}
+                        variant="compact"
+                        asLink={false}
+                        className="flex-1"
+                      />
+                      <div className="hidden min-w-0 text-sm text-muted-foreground sm:block">
+                        {formatDateTime(booking.start)} ·{" "}
+                        {formatTime(booking.start)}–{formatTime(booking.end)}
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-3 sm:justify-end">
+                    <div className="flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3">
+                      <div className="min-w-0 text-sm text-muted-foreground sm:hidden">
+                        {formatDateTime(booking.start)} ·{" "}
+                        {formatTime(booking.start)}–{formatTime(booking.end)}
+                      </div>
                       <span className="text-sm font-semibold">
                         ₪{booking.priceEstimate.toLocaleString("he-IL")}
                       </span>

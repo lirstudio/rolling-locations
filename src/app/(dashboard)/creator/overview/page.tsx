@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpen, Clock, CheckCircle, DollarSign } from "lucide-react";
+import { BookOpen, Clock, CheckCircle, DollarSign, Heart } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LocationCard } from "@/components/locations/location-card";
 import { useCreatorStore } from "@/stores/creator-store";
+import { useFavorites } from "@/hooks/use-favorites";
 import type { BookingStatus } from "@/types";
 
 const CREATOR_ID = "user-creator-1";
@@ -40,6 +42,7 @@ export default function CreatorOverviewPage() {
   const t = useTranslations("creator");
   const bookingRequests = useCreatorStore((s) => s.bookingRequests);
   const locations = useCreatorStore((s) => s.locations);
+  const { locations: favoriteLocations } = useFavorites();
   const creatorBookings = useMemo(
     () => bookingRequests.filter((r) => r.creatorId === CREATOR_ID),
     [bookingRequests]
@@ -131,6 +134,43 @@ export default function CreatorOverviewPage() {
                   </Link>
                 );
               })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border-border/60 shadow-card">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>{t("overview.favorites")}</CardTitle>
+            <CardDescription>{t("overview.favoritesDesc")}</CardDescription>
+          </div>
+          {favoriteLocations.length > 0 && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/creator/favorites">{t("overview.viewAll")}</Link>
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {favoriteLocations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Heart className="h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-4">
+                {t("overview.noFavorites")}
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/locations">{t("favorites.browseLocations")}</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {favoriteLocations.slice(0, 6).map((location) => (
+                <LocationCard
+                  key={location.id}
+                  location={location}
+                  showFavoriteButton={true}
+                />
+              ))}
             </div>
           )}
         </CardContent>

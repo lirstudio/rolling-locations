@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { LocationCard } from "@/components/locations/location-card";
 import { useCreatorStore } from "@/stores/creator-store";
 import { mockUsers } from "@/mocks/users";
 import type { BookingStatus } from "@/types";
@@ -132,23 +133,23 @@ export default function CreatorBookingDetailPage() {
             <CardHeader>
               <CardTitle>{t("bookings.location")}</CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <div className="size-16 overflow-hidden rounded-lg bg-muted">
-                {location?.mediaGallery[0] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={location.mediaGallery[0].url}
-                    alt={location.title}
-                    className="size-full object-cover"
-                  />
-                )}
-              </div>
-              <div>
-                <p className="font-medium">{location?.title ?? "—"}</p>
-                <p className="text-sm text-muted-foreground">
-                  {location?.address.city}
-                </p>
-              </div>
+            <CardContent>
+              {location ? (
+                <LocationCard
+                  location={location}
+                  variant="compact"
+                  asLink={true}
+                  href={`/locations/${location.slug}`}
+                />
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className="size-16 overflow-hidden rounded-lg bg-muted" />
+                  <div>
+                    <p className="font-medium">—</p>
+                    <p className="text-sm text-muted-foreground">—</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

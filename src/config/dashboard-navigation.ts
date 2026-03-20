@@ -22,6 +22,7 @@ import {
   Handshake,
   Shield,
   AlertTriangle,
+  Heart,
 } from "lucide-react";
 import type { UserRole } from "@/types";
 
@@ -148,6 +149,12 @@ export const dashboardNavByRole: Record<
           path: "/creator/bookings",
           icon: BookOpen,
           keywords: ["bookings"],
+        },
+        {
+          id: "creatorFavorites",
+          path: "/creator/favorites",
+          icon: Heart,
+          keywords: ["favorites", "מועדפים", "saved"],
         },
         {
           id: "creatorInvoices",

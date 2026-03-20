@@ -24,4 +24,9 @@ export const queryKeys = {
   search: {
     command: (q: string) => ["search", "command", q] as const,
   },
+  favorites: {
+    all: () => ["favorites"] as const,
+    byLocationId: (locationId: string) =>
+      ["favorites", "location", locationId] as const,
+  },
 } as const;

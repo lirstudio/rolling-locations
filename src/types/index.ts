@@ -22,6 +22,10 @@ export interface User {
   avatarUrl?: string;
   role: UserRole;
   createdAt: string;
+  /** ISO timestamp from auth `last_sign_in_at` (admin list only). */
+  lastLoginAt?: string | null;
+  /** Whether verified MFA factors exist (admin list only). */
+  twoStepEnabled?: boolean;
 }
 
 // ─── Categories ───────────────────────────────────────────────────────────────
@@ -74,6 +78,7 @@ export interface Location {
   showcaseVideos?: string[];
   status: LocationStatus;
   createdAt: string;
+  viewCount?: number;
 }
 
 // ─── Availability ─────────────────────────────────────────────────────────────
@@ -134,4 +139,13 @@ export interface BookingRequestVM extends BookingRequest {
   locationTitle: string;
   locationCoverUrl: string;
   creatorName: string;
+}
+
+// ─── User Favorites ─────────────────────────────────────────────────────────────
+
+export interface UserFavorite {
+  id: string;
+  userId: string;
+  locationId: string;
+  createdAt: string;
 }

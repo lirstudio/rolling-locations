@@ -2,6 +2,7 @@ const creator = {
   nav: {
     overview: "סקירה",
     myBookings: "ההזמנות שלי",
+    favorites: "מועדפים",
     invoices: "חשבוניות",
     settings: "הגדרות",
   },
@@ -14,6 +15,9 @@ const creator = {
     recentBookings: "הזמנות אחרונות",
     noBookings: "אין הזמנות עדיין",
     viewAll: "הצג הכל",
+    favorites: "מועדפים",
+    noFavorites: "אין מועדפים עדיין",
+    favoritesDesc: "שמור לוקיישנים שאתה אוהב כדי לגשת אליהם בקלות.",
   },
   bookings: {
     title: "ההזמנות שלי",
@@ -63,6 +67,15 @@ const creator = {
     bookingStatusNotification: "עדכוני סטטוס הזמנה",
     newMessageNotification: "הודעות חדשות ממארחים",
     marketingNotification: "טיפים ומיילים שיווקיים",
+  },
+  favorites: {
+    title: "מועדפים",
+    emptyTitle: "אין מועדפים עדיין",
+    emptyDesc: "שמור לוקיישנים שאתה אוהב כדי לגשת אליהם בקלות.",
+    viewAll: "הצג הכל",
+    addToFavorites: "הוסף למועדפים",
+    removeFromFavorites: "הסר ממועדפים",
+    browseLocations: "גלה לוקיישנים",
   },
 } as const;
 

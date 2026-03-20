@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -25,11 +26,23 @@ import {
   Factory,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const SIGN_UP_URL = "/auth/sign-up";
 
 export default function ForHostsPage() {
   const t = useTranslations("marketing.forHostsPage");
+  const tFaq = useTranslations("marketing.faq");
+  const tContact = useTranslations("marketing.contact");
+  const [contactSent, setContactSent] = useState(false);
 
   const benefits = [
     { icon: Eye, titleKey: "visibility" as const, descKey: "visibilityDesc" as const },
@@ -242,44 +255,125 @@ export default function ForHostsPage() {
         </div>
       </section>
 
-      {/* ── Eligibility + links ── */}
-      <section className="bg-background py-12 sm:py-16">
+      {/* ── FAQ ── */}
+      <section className="bg-background py-16 sm:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm text-muted-foreground">{t("eligibility")}</p>
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl text-center">
+              {tFaq("title")}
+            </h2>
+            <p className="mt-2 text-muted-foreground text-center">
+              {tFaq("subtitle")}
+            </p>
 
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/faq">{t("faqLink")}</Link>
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/contact">{t("contactLink")}</Link>
+            <Accordion type="single" collapsible className="mt-10">
+              {[
+                { q: "q1", a: "a1" },
+                { q: "q2", a: "a2" },
+                { q: "q3", a: "a3" },
+                { q: "q4", a: "a4" },
+              ].map(({ q, a }) => (
+                <AccordionItem key={q} value={q} className="border-b border-border">
+                  <AccordionTrigger className="text-start">
+                    {tFaq(q)}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {tFaq(a)}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            <div className="mt-10 text-center">
+              <Button asChild>
+                <Link href="/locations">{tFaq("cta")}</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-primary py-20 sm:py-24 text-primary-foreground">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.12)_0%,_transparent_60%)]" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-            {t("ctaBottom")}
-          </h2>
-          <p className="mt-5 text-primary-foreground/85 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
-            {t("hero.subtitle")}
-          </p>
-          <Button
-            size="lg"
-            className="mt-10 px-10 text-base rounded-full bg-white text-primary hover:bg-white/90 shadow-lg"
-            asChild
-          >
-            <Link href={SIGN_UP_URL}>
-              {t("hero.cta")}
-              <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
-            </Link>
-          </Button>
+      {/* ── Contact ── */}
+      <section className="bg-muted/50 py-16 sm:py-24 border-y border-border/60">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-xl">
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl text-center">
+              {tContact("title")}
+            </h2>
+            <p className="mt-2 text-muted-foreground text-center">
+              {tContact("subtitle")}
+            </p>
+            {contactSent ? (
+              <p className="mt-8 rounded-xl border border-border bg-card p-6 text-foreground text-center">
+                {tContact("success")}
+              </p>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setContactSent(true);
+                }}
+                className="mt-10 space-y-6"
+              >
+                <div>
+                  <Label htmlFor="contact-name">{tContact("name")}</Label>
+                  <Input id="contact-name" name="name" className="mt-2" required />
+                </div>
+                <div>
+                  <Label htmlFor="contact-email">{tContact("email")}</Label>
+                  <Input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    className="mt-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="contact-subject">{tContact("subject")}</Label>
+                  <Input id="contact-subject" name="subject" className="mt-2" />
+                </div>
+                <div>
+                  <Label htmlFor="contact-message">{tContact("message")}</Label>
+                  <Textarea
+                    id="contact-message"
+                    name="message"
+                    rows={5}
+                    className="mt-2"
+                    required
+                  />
+                </div>
+                <Button type="submit">{tContact("send")}</Button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative mx-auto w-[90%] max-w-6xl rounded-3xl bg-primary overflow-hidden text-primary-foreground">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.12)_0%,_transparent_60%)]" />
+            <div className="relative z-10 px-8 sm:px-12 lg:px-16 py-20 sm:py-24 text-center">
+              <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
+                {t("ctaBottom")}
+              </h2>
+              <p className="mt-5 text-primary-foreground/85 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
+                {t("hero.subtitle")}
+              </p>
+              <Button
+                size="lg"
+                className="mt-10 px-10 text-base rounded-full bg-white text-primary hover:bg-white/90 shadow-lg"
+                asChild
+              >
+                <Link href={SIGN_UP_URL}>
+                  {t("hero.cta")}
+                  <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </div>

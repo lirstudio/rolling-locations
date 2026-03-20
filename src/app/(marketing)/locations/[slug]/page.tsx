@@ -14,7 +14,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { fetchLocationBySlug, fetchPublishedLocations } from "@/app/actions/locations";
+import {
+  fetchLocationBySlug,
+  fetchPublishedLocations,
+  incrementLocationViewCount,
+} from "@/app/actions/locations";
 import { VideoCarousel } from "@/components/locations/video-carousel";
 import { LocationCard } from "@/components/locations/location-card";
 import { LocationGallery } from "@/components/locations/location-gallery";
@@ -46,6 +50,15 @@ export default function LocationDetailsPage() {
     fetchLocationBySlug(slug).then((loc) => {
       setLocation(loc);
       if (loc) {
+        // Track view count (once per session)
+        const viewKey = `viewed_${loc.id}`;
+        if (!sessionStorage.getItem(viewKey)) {
+          sessionStorage.setItem(viewKey, "true");
+          incrementLocationViewCount(loc.id).catch((err) => {
+            console.error("[LocationDetailsPage] View count error:", err);
+          });
+        }
+
         fetchPublishedLocations().then((all) => {
           setSimilar(
             all

@@ -55,6 +55,10 @@ export function useHostLocations(userId: string | undefined) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.locations.byHost(userId ?? ""),
       });
+      // Also invalidate published locations to update cards in marketing pages
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.locations.published(),
+      });
     },
   });
 
@@ -101,6 +105,10 @@ export function useHostLocations(userId: string | undefined) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.locations.byHost(userId ?? ""),
       });
+      // Also invalidate published locations to update cards in marketing pages
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.locations.published(),
+      });
     },
   });
 
@@ -134,6 +142,10 @@ export function useHostLocations(userId: string | undefined) {
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.locations.byHost(userId ?? ""),
+      });
+      // Also invalidate published locations to update cards in marketing pages
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.locations.published(),
       });
     },
   });
@@ -194,6 +206,10 @@ export function useHostLocations(userId: string | undefined) {
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.locations.byHost(userId ?? ""),
+      });
+      // Also invalidate published locations to update cards in marketing pages
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.locations.published(),
       });
     },
   });

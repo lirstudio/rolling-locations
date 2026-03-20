@@ -1,7 +1,8 @@
 "use client"
 
 import type { ColumnDef } from "@tanstack/react-table"
-import { EllipsisVertical, ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, ChevronDown } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,17 +18,23 @@ import {
 import type { User, UserRole } from "@/types"
 
 const roleBadgeClass: Record<UserRole, string> = {
-  admin: "bg-red-50 text-red-700 border-red-200",
-  host: "bg-blue-50 text-blue-700 border-blue-200",
-  creator: "bg-purple-50 text-purple-700 border-purple-200",
+  admin: "border-primary/30 bg-primary/10 text-primary",
+  host: "border-border bg-muted text-foreground",
+  creator: "border-border bg-accent text-accent-foreground",
   guest: "bg-muted text-muted-foreground",
 }
 
-const roleLabel: Record<UserRole, string> = {
-  admin: "מנהל",
-  host: "מארח",
-  creator: "יוצר",
-  guest: "אורח",
+/** next-intl `useTranslations("admin.users")` */
+type AdminUsersT = (key: string) => string
+
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "?"
 }
 
 interface ColumnActions {
@@ -35,45 +42,75 @@ interface ColumnActions {
   onDelete: (id: string) => void
 }
 
-export function getUserColumns(actions: ColumnActions): ColumnDef<User>[] {
+export function getUserColumns(
+  actions: ColumnActions,
+  t: AdminUsersT,
+  menuAlign: "start" | "end",
+  dateLocale: string
+): ColumnDef<User>[] {
+  const roleLabel = (r: UserRole) => t(`role.${r}`)
+
   return [
     {
-      accessorKey: "name",
+      id: "user",
+      accessorFn: (row) => row.name,
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="cursor-pointer -ms-3"
+          className="cursor-pointer -ms-3 font-medium text-muted-foreground uppercase tracking-wider"
         >
-          שם
+          {t("user")}
           <ArrowUpDown className="ms-2 size-3.5" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <div>
-          <p className="font-medium">{row.original.name}</p>
-          <p className="text-sm text-muted-foreground">{row.original.email}</p>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const u = row.original
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar className="size-10 bg-muted">
+              {u.avatarUrl ? (
+                <AvatarImage src={u.avatarUrl} alt="" />
+              ) : null}
+              <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+                {getInitials(u.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="font-medium text-foreground">{u.name}</p>
+              <p className="truncate text-sm text-muted-foreground" dir="ltr">
+                {u.email}
+              </p>
+            </div>
+          </div>
+        )
+      },
     },
     {
       accessorKey: "phone",
-      header: "טלפון",
+      header: () => (
+        <span className="font-medium text-muted-foreground uppercase tracking-wider">
+          {t("phone")}
+        </span>
+      ),
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.phone ?? "—"}</span>
+        <span className="text-sm" dir="ltr">
+          {row.original.phone ?? "—"}
+        </span>
       ),
     },
     {
       accessorKey: "role",
-      header: "תפקיד",
+      header: () => (
+        <span className="font-medium text-muted-foreground uppercase tracking-wider">
+          {t("role.label")}
+        </span>
+      ),
       cell: ({ row }) => {
         const role = row.original.role
         return (
-          <Badge
-            variant="outline"
-            className={roleBadgeClass[role]}
-          >
-            {roleLabel[role]}
+          <Badge variant="outline" className={roleBadgeClass[role]}>
+            {roleLabel(role)}
           </Badge>
         )
       },
@@ -81,40 +118,66 @@ export function getUserColumns(actions: ColumnActions): ColumnDef<User>[] {
         row.original.role === value,
     },
     {
+      accessorKey: "lastLoginAt",
+      header: () => (
+        <span className="font-medium text-nowrap text-muted-foreground uppercase tracking-wider">
+          {t("lastLogin")}
+        </span>
+      ),
+      cell: ({ row }) => {
+        const v = row.original.lastLoginAt
+        return (
+          <span className="text-sm font-medium text-foreground text-nowrap">
+            {v
+              ? new Date(v).toLocaleString(dateLocale, {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })
+              : "—"}
+          </span>
+        )
+      },
+    },
+    {
       accessorKey: "createdAt",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="cursor-pointer -ms-3"
+          className="cursor-pointer -ms-3 font-medium text-muted-foreground uppercase tracking-wider"
         >
-          הצטרף
+          {t("createdAt")}
           <ArrowUpDown className="ms-2 size-3.5" />
         </Button>
       ),
       cell: ({ row }) => (
-        <span className="text-sm">
-          {new Date(row.original.createdAt).toLocaleDateString("he-IL")}
+        <span className="text-nowrap text-sm text-muted-foreground">
+          {new Date(row.original.createdAt).toLocaleDateString(dateLocale)}
         </span>
       ),
     },
     {
       id: "actions",
-      header: "פעולות",
+      header: () => (
+        <span className="font-medium text-muted-foreground uppercase tracking-wider">
+          {t("actions")}
+        </span>
+      ),
       cell: ({ row }) => {
         const user = row.original
         const roles: UserRole[] = ["admin", "host", "creator", "guest"]
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8 cursor-pointer">
-                <EllipsisVertical className="size-4" />
+              <Button variant="ghost" size="sm" className="cursor-pointer gap-1">
+                {t("actionsMenu")}
+                <ChevronDown className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align={menuAlign}>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="cursor-pointer">
-                  שנה תפקיד
+                  {t("changeRole")}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   {roles.map((r) => (
@@ -124,7 +187,7 @@ export function getUserColumns(actions: ColumnActions): ColumnDef<User>[] {
                       disabled={r === user.role}
                       onClick={() => actions.onChangeRole(user.id, r)}
                     >
-                      {roleLabel[r]}
+                      {roleLabel(r)}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>
@@ -135,7 +198,7 @@ export function getUserColumns(actions: ColumnActions): ColumnDef<User>[] {
                 className="cursor-pointer"
                 onClick={() => actions.onDelete(user.id)}
               >
-                מחק משתמש
+                {t("deleteUser")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

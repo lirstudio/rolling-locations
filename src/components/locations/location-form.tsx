@@ -40,6 +40,7 @@ type MediaEntry = {
   publicUrl?: string;
   uploading: boolean;
   error?: string;
+  isFeatured?: boolean;
 };
 
 async function fetchAmenityCatalog(): Promise<string[]> {
@@ -57,8 +58,10 @@ async function fetchAmenityCatalog(): Promise<string[]> {
 // ── Component ────────────────────────────────────────────────────────────────
 
 interface LocationFormProps {
-  defaultValues?: Partial<LocationFormValues>;
-  onSubmit: (values: LocationFormValues) => void;
+  defaultValues?: Partial<LocationFormValues> & {
+    mediaGallery?: Array<{ url: string; isFeatured?: boolean }>;
+  };
+  onSubmit: (values: LocationFormValues & { mediaGallery: Array<{ url: string; isFeatured: boolean }> }) => void;
   isEdit?: boolean;
 }
 
@@ -107,12 +110,21 @@ export function LocationForm({
   // the useEffect race condition (effect runs after paint, button enabled
   // in the same render that marks uploading=false).
   const handleSubmit = form.handleSubmit((values) => {
-    const mediaUrls = mediaEntries
-      .filter((e) => e.publicUrl != null && !e.error)
-      .map((e) => e.publicUrl!);
+    const validEntries = mediaEntries.filter((e) => e.publicUrl != null && !e.error);
+    // Sort: featured image first, then others in their original order
+    const sortedEntries = [...validEntries].sort((a, b) => {
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+      return 0; // Keep original order for non-featured images
+    });
+    const mediaUrls = sortedEntries.map((e) => e.publicUrl!);
+    const mediaGallery = sortedEntries.map((e) => ({
+      url: e.publicUrl!,
+      isFeatured: e.isFeatured ?? false,
+    }));
     const valid = new Set(amenityCatalog);
     const amenities = (values.amenities ?? []).filter((a) => valid.has(a));
-    onSubmit({ ...values, amenities, mediaUrls });
+    onSubmit({ ...values, amenities, mediaUrls, mediaGallery });
   });
 
   // ── Category hierarchy ────────────────────────────────────────────────────
@@ -123,14 +135,39 @@ export function LocationForm({
 
   // ── Media file upload ─────────────────────────────────────────────────────
 
-  const [mediaEntries, setMediaEntries] = React.useState<MediaEntry[]>(() =>
-    (defaultValues?.mediaUrls ?? []).map((url) => ({
+  const [mediaEntries, setMediaEntries] = React.useState<MediaEntry[]>(() => {
+    // If mediaGallery is provided (edit mode), use it with isFeatured
+    if (defaultValues?.mediaGallery && defaultValues.mediaGallery.length > 0) {
+      const entries = defaultValues.mediaGallery.map((item) => ({
+        id: crypto.randomUUID(),
+        previewUrl: item.url,
+        publicUrl: item.url,
+        uploading: false,
+        isFeatured: item.isFeatured ?? false,
+      }));
+      // If no featured image exists, make the first one featured
+      const hasFeatured = entries.some((e) => e.isFeatured);
+      if (!hasFeatured && entries.length > 0) {
+        entries[0].isFeatured = true;
+      }
+      // Sort: featured image first
+      return entries.sort((a, b) => {
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        return 0;
+      });
+    }
+    // Otherwise, use mediaUrls (new mode or fallback)
+    const urls = defaultValues?.mediaUrls ?? [];
+    return urls.map((url, index) => ({
       id: crypto.randomUUID(),
       previewUrl: url,
       publicUrl: url,
       uploading: false,
-    }))
-  );
+      // Default: first image is featured if no featured image exists
+      isFeatured: index === 0,
+    }));
+  });
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const isUploading = mediaEntries.some((e) => e.uploading);
@@ -185,10 +222,39 @@ export function LocationForm({
   function removeEntry(id: string) {
     setMediaEntries((prev) => {
       const entry = prev.find((e) => e.id === id);
+      const wasFeatured = entry?.isFeatured;
       if (entry?.previewUrl.startsWith("blob:")) {
         URL.revokeObjectURL(entry.previewUrl);
       }
-      return prev.filter((e) => e.id !== id);
+      const remaining = prev.filter((e) => e.id !== id);
+      // If we removed the featured image, make the first remaining one featured
+      if (wasFeatured && remaining.length > 0) {
+        remaining[0].isFeatured = true;
+      }
+      return remaining;
+    });
+  }
+
+  function setFeaturedImage(id: string) {
+    setMediaEntries((prev) => {
+      // Find the entry to make featured
+      const featuredEntry = prev.find((e) => e.id === id);
+      if (!featuredEntry) return prev;
+
+      // Remove featured flag from all entries
+      const updated = prev.map((e) => ({
+        ...e,
+        isFeatured: e.id === id,
+      }));
+
+      // Move featured image to the beginning
+      const featuredIndex = updated.findIndex((e) => e.id === id);
+      if (featuredIndex > 0) {
+        const [featured] = updated.splice(featuredIndex, 1);
+        return [featured, ...updated];
+      }
+
+      return updated;
     });
   }
 
@@ -521,11 +587,41 @@ export function LocationForm({
                     )}
 
                     {/* Featured badge */}
-                    {index === 0 && !entry.uploading && !entry.error && (
+                    {entry.isFeatured && !entry.uploading && !entry.error && (
                       <span className="absolute bottom-1.5 start-1.5 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow">
                         <Star className="size-2.5 fill-current" />
                         {t("locations.mediaFeatured")}
                       </span>
+                    )}
+
+                    {/* Set as featured button */}
+                    {!entry.uploading && !entry.error && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className={`absolute bottom-1.5 end-1.5 size-7 rounded-full bg-white/90 backdrop-blur-sm transition-all ${
+                          entry.isFeatured
+                            ? "opacity-100 text-primary"
+                            : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary"
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setFeaturedImage(entry.id);
+                        }}
+                        aria-label={
+                          entry.isFeatured
+                            ? t("locations.removeFromFeatured")
+                            : t("locations.setAsFeatured")
+                        }
+                      >
+                        <Star
+                          className={`size-4 ${
+                            entry.isFeatured ? "fill-primary text-primary" : ""
+                          }`}
+                        />
+                      </Button>
                     )}
 
                     {/* Remove button */}

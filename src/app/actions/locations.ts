@@ -35,6 +35,7 @@ type LocationRow = {
   host_id: string | null;
   created_at: string;
   showcase_videos: string[] | null;
+  view_count: number | null;
   location_media?: MediaRow[];
 };
 
@@ -84,7 +85,13 @@ function fromDbRow(row: LocationRow): Location {
       lng: row.address_lng ?? undefined,
     },
     mediaGallery: mediaRows
-      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .sort((a, b) => {
+        // Featured image always first
+        if (a.is_featured && !b.is_featured) return -1;
+        if (!a.is_featured && b.is_featured) return 1;
+        // Then sort by sort_order
+        return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      })
       .map((m) => ({
         id: m.id,
         url: m.url,
@@ -99,6 +106,7 @@ function fromDbRow(row: LocationRow): Location {
     showcaseVideos: row.showcase_videos ?? [],
     status: row.status as "draft" | "published" | "paused",
     createdAt: row.created_at,
+    viewCount: row.view_count ?? undefined,
   };
 }
 
@@ -132,13 +140,14 @@ export async function saveLocation(location: Location): Promise<{ error?: string
   }
 
   if (location.mediaGallery.length > 0) {
+    // Featured image should always be first (sort_order: 0)
     const rows = location.mediaGallery.map((m, i) => ({
       id: m.id,
       location_id: location.id,
       url: m.url,
       type: m.type ?? "image",
       is_featured: m.isFeatured ?? i === 0,
-      sort_order: i,
+      sort_order: i, // Already sorted in form - featured first
     }));
 
     const { error: mediaError } = await db.from("location_media").insert(rows);
@@ -240,4 +249,96 @@ export async function getPublishedLocationCount(): Promise<number> {
     .select("*", { count: "exact", head: true })
     .eq("status", "published");
   return count ?? 0;
+}
+
+/**
+ * Increment view count for a location.
+ * Fire and forget - doesn't await to avoid blocking page load.
+ */
+export async function incrementLocationViewCount(locationId: string): Promise<void> {
+  const db = createAdminClient();
+  
+  // Fetch current value and increment
+  const { data: current } = await db
+    .from("locations")
+    .select("view_count")
+    .eq("id", locationId)
+    .single();
+  
+  if (current) {
+    await db
+      .from("locations")
+      .update({ view_count: (current.view_count ?? 0) + 1 })
+      .eq("id", locationId);
+  }
+  
+  // Don't revalidate cache - view counts are not critical for freshness
+}
+
+/**
+ * Fetch popularity stats (view count, booking count, favorite count) for multiple locations.
+ */
+export async function fetchLocationPopularityStats(
+  locationIds: string[]
+): Promise<
+  Array<{
+    locationId: string;
+    viewCount: number;
+    bookingCount: number;
+    favoriteCount: number;
+  }>
+> {
+  if (locationIds.length === 0) return [];
+
+  const db = createAdminClient();
+
+  // Fetch view counts from locations table
+  const { data: locationsData, error: locationsError } = await db
+    .from("locations")
+    .select("id, view_count")
+    .in("id", locationIds);
+
+  if (locationsError) {
+    console.error("[fetchLocationPopularityStats] locations error:", locationsError.message);
+    return [];
+  }
+
+  // Fetch booking request counts (all statuses count)
+  const { data: bookingsData, error: bookingsError } = await db
+    .from("booking_requests")
+    .select("location_id")
+    .in("location_id", locationIds);
+
+  if (bookingsError) {
+    console.error("[fetchLocationPopularityStats] bookings error:", bookingsError.message);
+  }
+
+  // Fetch favorite counts
+  const { data: favoritesData, error: favoritesError } = await db
+    .from("user_favorites")
+    .select("location_id")
+    .in("location_id", locationIds);
+
+  if (favoritesError) {
+    console.error("[fetchLocationPopularityStats] favorites error:", favoritesError.message);
+  }
+
+  // Aggregate counts
+  const bookingCounts = new Map<string, number>();
+  (bookingsData || []).forEach((b) => {
+    bookingCounts.set(b.location_id, (bookingCounts.get(b.location_id) || 0) + 1);
+  });
+
+  const favoriteCounts = new Map<string, number>();
+  (favoritesData || []).forEach((f) => {
+    favoriteCounts.set(f.location_id, (favoriteCounts.get(f.location_id) || 0) + 1);
+  });
+
+  // Build result array
+  return (locationsData || []).map((loc) => ({
+    locationId: loc.id,
+    viewCount: loc.view_count ?? 0,
+    bookingCount: bookingCounts.get(loc.id) ?? 0,
+    favoriteCount: favoriteCounts.get(loc.id) ?? 0,
+  }));
 }

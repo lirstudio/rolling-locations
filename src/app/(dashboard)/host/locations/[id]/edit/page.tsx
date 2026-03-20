@@ -24,12 +24,14 @@ export default function EditLocationPage() {
     );
   }
 
-  async function handleSubmit(values: LocationFormValues) {
-    const mediaGallery: MediaItem[] = (values.mediaUrls ?? []).map((url, index) => ({
+  async function handleSubmit(
+    values: LocationFormValues & { mediaGallery: Array<{ url: string; isFeatured: boolean }> }
+  ) {
+    const mediaGallery: MediaItem[] = values.mediaGallery.map((item) => ({
       id: crypto.randomUUID(),
-      url,
+      url: item.url,
       type: "image" as const,
-      isFeatured: index === 0,
+      isFeatured: item.isFeatured,
     }));
 
     await updateLocation(params.id, {
@@ -64,6 +66,10 @@ export default function EditLocationPage() {
             rules: location.rules ?? "",
             amenities: location.amenities ?? [],
             mediaUrls: location.mediaGallery.map((m) => m.url),
+            mediaGallery: location.mediaGallery.map((m) => ({
+              url: m.url,
+              isFeatured: m.isFeatured ?? false,
+            })),
             showcaseVideoUrls: location.showcaseVideos ?? [],
             status: location.status,
           }}

@@ -15,12 +15,14 @@ export default function NewLocationPage() {
   const user = useAuthStore((s) => s.user);
   const { addLocation } = useHostLocations(user?.id);
 
-  async function handleSubmit(values: LocationFormValues) {
-    const mediaGallery: MediaItem[] = (values.mediaUrls ?? []).map((url, index) => ({
+  async function handleSubmit(
+    values: LocationFormValues & { mediaGallery: Array<{ url: string; isFeatured: boolean }> }
+  ) {
+    const mediaGallery: MediaItem[] = values.mediaGallery.map((item) => ({
       id: crypto.randomUUID(),
-      url,
+      url: item.url,
       type: "image" as const,
-      isFeatured: index === 0,
+      isFeatured: item.isFeatured,
     }));
 
     const id = crypto.randomUUID();

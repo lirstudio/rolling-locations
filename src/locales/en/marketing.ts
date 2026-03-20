@@ -50,10 +50,10 @@ const marketing = {
   },
   featuredLocations: {
     title: "Featured Locations",
-    subtitle: "Book your stay for personalized experiences, luxurious amenities, or a relaxing getaway — a step towards unforgettable memories.",
     viewAll: "All Locations",
     fromPerDay: "From ₪{price}/day",
     available: "Available",
+    popularLocations: "Popular Locations",
   },
   stats: {
     locations: "Locations",
@@ -90,6 +90,8 @@ const marketing = {
     viewDetails: "View details",
     previousImage: "Previous image",
     nextImage: "Next image",
+    addToFavorites: "Add to favorites",
+    removeFromFavorites: "Remove from favorites",
   },
   locationsIndex: {
     title: "Discover Locations",

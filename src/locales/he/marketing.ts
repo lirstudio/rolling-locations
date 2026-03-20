@@ -50,10 +50,10 @@ const marketing = {
   },
   featuredLocations: {
     title: "לוקיישנים מומלצים",
-    subtitle: "הזמינו חוויה מותאמת אישית, שירותים יוקרתיים, או מנוחה מרעננת — צעד לקראת זיכרונות בלתי נשכחים.",
     viewAll: "כל הלוקיישנים",
     fromPerDay: "מ־{price} ₪ ליום",
     available: "זמין",
+    popularLocations: "לוקיישנים פופולארים",
   },
   stats: {
     locations: "לוקיישנים",
@@ -90,6 +90,8 @@ const marketing = {
     viewDetails: "לפרטים",
     previousImage: "תמונה קודמת",
     nextImage: "תמונה הבאה",
+    addToFavorites: "הוסף למועדפים",
+    removeFromFavorites: "הסר ממועדפים",
   },
   locationsIndex: {
     title: "גלה לוקיישנים",
