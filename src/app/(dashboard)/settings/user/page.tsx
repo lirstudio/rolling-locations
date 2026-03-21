@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Camera, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,8 @@ const userFormSchema = z.object({
 type UserFormValues = z.infer<typeof userFormSchema>;
 
 export default function UserSettingsPage() {
+  const locale = useLocale();
+  const dir = locale === "he" ? "rtl" : "ltr";
   const t = useTranslations("settings");
   const { user, updateUser, updateUserMetadata } = useAuthStore();
 
@@ -148,15 +150,18 @@ export default function UserSettingsPage() {
     .toUpperCase() ?? "U";
 
   return (
-    <div className="px-4 lg:px-6">
+    <div
+      dir={dir}
+      className="mx-auto w-full max-w-4xl px-4 lg:px-6"
+    >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card className="rounded-2xl border-border/60 shadow-card">
-            <CardHeader>
+            <CardHeader className="text-start">
               <CardTitle>{t("user.title")}</CardTitle>
               <CardDescription>{t("user.description")}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8">
+            <CardContent className="space-y-8 text-start">
               <div className="flex items-center gap-5">
                 <div className="relative shrink-0">
                   <button
@@ -187,7 +192,7 @@ export default function UserSettingsPage() {
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
+                      className="absolute -top-1 -end-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
                       aria-label={t("user.reset")}
                     >
                       <X className="h-3.5 w-3.5" />
@@ -246,7 +251,12 @@ export default function UserSettingsPage() {
                     <FormItem>
                       <FormLabel>{t("user.email")}</FormLabel>
                       <FormControl>
-                        <Input type="email" dir="ltr" {...field} />
+                        <Input
+                          type="email"
+                          dir="ltr"
+                          className="!text-end"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -259,7 +269,12 @@ export default function UserSettingsPage() {
                     <FormItem>
                       <FormLabel>{t("user.phone")}</FormLabel>
                       <FormControl>
-                        <Input type="tel" dir="ltr" {...field} />
+                        <Input
+                          type="tel"
+                          dir="ltr"
+                          className="!text-end"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -313,7 +328,7 @@ export default function UserSettingsPage() {
                 )}
               />
 
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3 justify-start">
                 <Button type="submit" className="rounded-full px-6 cursor-pointer">
                   {t("saveChanges")}
                 </Button>

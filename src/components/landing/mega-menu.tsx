@@ -124,8 +124,8 @@ export function MegaMenu() {
                   className="group block space-y-1 lg:space-y-2 hover:bg-accent rounded-md p-2 lg:p-3 -mx-2 lg:-mx-3 transition-colors my-0"
                 >
                   <div className="flex items-center gap-2 lg:gap-3">
-                    <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <span className="text-sm font-medium text-foreground group-hover:text-foreground transition-colors">
                       {item.title}
                     </span>
                   </div>

@@ -42,6 +42,14 @@ const settings = {
     he: "עברית",
     en: "English",
   },
+
+  notificationsMock: {
+    title: "הגדרות התראות (תצוגה מקדימה)",
+    description:
+      "העדפות אימייל אמיתיות נשמרות בהגדרות לפי תפקיד: מארח או יוצר תוכן. דף זה עדיין לא מחובר לשרת.",
+    linkHost: "הגדרות מארח",
+    linkCreator: "הגדרות יוצר",
+  },
 } as const;
 
 export default settings;

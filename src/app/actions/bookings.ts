@@ -7,6 +7,11 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { HostBookingEmail } from "@/emails/host-booking-notification";
 import { CreatorBookingEmail } from "@/emails/creator-booking-confirmation";
+import { getNotificationPreferencesByUserIdAdmin } from "@/lib/notification-preferences-admin";
+import {
+  markBookingLastStatusNotified,
+  sendCreatorBookingStatusEmail,
+} from "@/lib/send-booking-status-email";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -58,6 +63,8 @@ export interface DbBookingRequest {
   host_email: string | null;
   created_at: string;
   updated_at: string;
+  /** Set after a status-change email is sent (idempotency marker). */
+  last_status_notified?: string | null;
 }
 
 // ── Fetch all booking requests (admin-level; v1 has no per-host auth yet) ─────
@@ -95,36 +102,77 @@ export async function updateBookingStatusInDb(
   status: string
 ): Promise<{ error?: string }> {
   const db = createAdminClient();
-  const { error } = await db
+  const { data: row, error: fetchErr } = await db
     .from("booking_requests")
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", id);
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  if (error) {
-    console.error("[updateBookingStatusInDb] error:", error.message);
-    return { error: error.message };
+  if (fetchErr || !row) {
+    console.error("[updateBookingStatusInDb] fetch:", fetchErr?.message);
+    return { error: fetchErr?.message ?? "not_found" };
+  }
+
+  const prev = row as DbBookingRequest;
+  if (prev.status === status) {
+    return {};
+  }
+
+  const { data: updated, error: updateErr } = await db
+    .from("booking_requests")
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("status", prev.status)
+    .select("id")
+    .maybeSingle();
+
+  if (updateErr) {
+    console.error("[updateBookingStatusInDb] update:", updateErr.message);
+    return { error: updateErr.message };
+  }
+
+  if (!updated) {
+    return { error: "booking_status_conflict" };
+  }
+
+  const bookingAfter: DbBookingRequest = {
+    ...prev,
+    status,
+    updated_at: new Date().toISOString(),
+  };
+
+  try {
+    const emailResult = await sendCreatorBookingStatusEmail({
+      booking: bookingAfter,
+      newStatus: status,
+    });
+    if (emailResult.sent) {
+      await markBookingLastStatusNotified(id, status);
+    }
+  } catch (err) {
+    console.error("[updateBookingStatusInDb] status email failed:", err);
   }
 
   if (status === "approved") {
     try {
-      const booking = await fetchBookingRequestById(id);
-      if (booking) {
-        const { createBookingEvent } = await import("./google-calendar");
-        await createBookingEvent({
-          locationId: booking.location_id,
-          summary: `📸 Rollin — ${booking.location_title}`,
-          description: [
-            `Booking by ${booking.creator_name}`,
-            booking.creator_email,
-            booking.creator_phone ? `Phone: ${booking.creator_phone}` : "",
-            booking.notes ? `Notes: ${booking.notes}` : "",
-          ]
-            .filter(Boolean)
-            .join("\n"),
-          startDate: booking.start_date,
-          endDate: booking.end_date,
-        });
-      }
+      const { createBookingEvent } = await import("./google-calendar");
+      await createBookingEvent({
+        locationId: bookingAfter.location_id,
+        summary: `📸 Rollin — ${bookingAfter.location_title}`,
+        description: [
+          `Booking by ${bookingAfter.creator_name}`,
+          bookingAfter.creator_email,
+          bookingAfter.creator_phone ? `Phone: ${bookingAfter.creator_phone}` : "",
+          bookingAfter.notes ? `Notes: ${bookingAfter.notes}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        startDate: bookingAfter.start_date,
+        endDate: bookingAfter.end_date,
+      });
     } catch (err) {
       console.error("[updateBookingStatusInDb] write-back to GCal failed:", err);
     }
@@ -170,15 +218,20 @@ export async function createBookingRequest(
   const bookingId = (data as { id: string }).id;
 
   const hostEmailTarget = input.hostEmail ?? ADMIN_FALLBACK_HOST_EMAIL;
+  const hostPrefs = await getNotificationPreferencesByUserIdAdmin(input.hostId);
+  const hostRecipient =
+    hostPrefs.email_new_booking_request && hostEmailTarget
+      ? hostEmailTarget
+      : null;
 
   const displayStart = format(new Date(input.startDate), "EEEE, d MMMM yyyy", { locale: he });
   const displayEnd = format(new Date(input.endDate), "EEEE, d MMMM yyyy", { locale: he });
 
-  // 2. Send both emails in parallel – don't block on failure (host email only if target from input or env)
-  const hostPromise = hostEmailTarget
+  // 2. Send both emails in parallel – don't block on failure (host email respects prefs + target)
+  const hostPromise = hostRecipient
     ? resend.emails.send({
         from: FROM_EMAIL,
-        to: hostEmailTarget,
+        to: hostRecipient,
         subject: `בקשת הזמנה חדשה — ${input.locationTitle}`,
         react: React.createElement(HostBookingEmail, {
           locationTitle: input.locationTitle,

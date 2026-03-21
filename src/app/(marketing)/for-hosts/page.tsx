@@ -30,18 +30,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { MarketingFaqSection } from "@/components/marketing/marketing-faq-section";
 
 const SIGN_UP_URL = "/auth/sign-up";
 
 export default function ForHostsPage() {
   const t = useTranslations("marketing.forHostsPage");
-  const tFaq = useTranslations("marketing.faq");
   const tContact = useTranslations("marketing.contact");
   const [contactSent, setContactSent] = useState(false);
   const [contactError, setContactError] = useState<string | null>(null);
@@ -153,7 +147,7 @@ export default function ForHostsPage() {
                 key={i}
                 className="card-hover group relative rounded-2xl border border-border/60 bg-card p-7 sm:p-8 shadow-card"
               >
-                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-surface-hover text-primary transition-colors group-hover:bg-muted group-hover:text-foreground">
                   <b.icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-foreground">
@@ -219,9 +213,9 @@ export default function ForHostsPage() {
             {prepareItems.map((item, i) => (
               <div
                 key={i}
-                className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-all hover:border-primary/25 hover:shadow-card-hover"
+                className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-all hover:border-foreground/15 hover:shadow-card-hover"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-hover text-primary">
                   <item.icon className="h-5 w-5" />
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground pt-2">
@@ -259,42 +253,7 @@ export default function ForHostsPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="bg-background py-16 sm:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl text-center">
-              {tFaq("title")}
-            </h2>
-            <p className="mt-2 text-muted-foreground text-center">
-              {tFaq("subtitle")}
-            </p>
-
-            <Accordion type="single" collapsible className="mt-10">
-              {[
-                { q: "q1", a: "a1" },
-                { q: "q2", a: "a2" },
-                { q: "q3", a: "a3" },
-                { q: "q4", a: "a4" },
-              ].map(({ q, a }) => (
-                <AccordionItem key={q} value={q} className="border-b border-border">
-                  <AccordionTrigger className="text-start">
-                    {tFaq(q)}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {tFaq(a)}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-
-            <div className="mt-10 text-center">
-              <Button asChild>
-                <Link href="/locations">{tFaq("cta")}</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <MarketingFaqSection heading="h2" className="bg-background" />
 
       {/* ── Contact ── */}
       <section className="bg-muted/50 py-16 sm:py-24 border-y border-border/60">

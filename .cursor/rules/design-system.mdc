@@ -33,6 +33,8 @@ For secondary actions use `variant="outline"` or `variant="ghost"`.
 
 - Pages sit on `bg-background`.
 - Panels, cards, sidebars sit on `bg-muted`.
+- **Neutral row/card hover:** use `bg-surface-hover` (token `--surface-hover`) for interactive list rows, FAQ items, and similar — not `primary`.
+- **shadcn accent:** `--accent` is the same neutral wash as `--surface-hover`, so `hover:bg-accent` / menu rows / ghost buttons never pick up brand red.
 - Borders: always `border border-border` (1px). No heavy box-shadows.
 - Focus: rely on `ring` (= primary) for accessibility, never remove `focus-visible`.
 - Border radius: `--radius: 0.75rem` (12px). Use `rounded-xl` for cards/modals.

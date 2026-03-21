@@ -42,6 +42,14 @@ const settings = {
     he: "עברית",
     en: "English",
   },
+
+  notificationsMock: {
+    title: "Notifications (preview)",
+    description:
+      "Email preferences are saved from your role settings (host or creator). This page is not yet connected to the server.",
+    linkHost: "Host settings",
+    linkCreator: "Creator settings",
+  },
 } as const;
 
 export default settings;

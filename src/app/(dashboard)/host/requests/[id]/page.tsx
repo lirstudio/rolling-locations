@@ -17,6 +17,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,10 +96,19 @@ export default function RequestDetailPage() {
   async function handleStatusChange(status: string) {
     if (!request) return;
     setUpdating(true);
-    await updateBookingStatusInDb(request.id, status);
-    setRequest((prev) => prev ? { ...prev, status, updated_at: new Date().toISOString() } : prev);
-    setUpdating(false);
-    router.push("/host/requests");
+    try {
+      const result = await updateBookingStatusInDb(request.id, status);
+      if (result.error) {
+        toast.error(t("requests.statusUpdateConflict"));
+        return;
+      }
+      setRequest((prev) =>
+        prev ? { ...prev, status, updated_at: new Date().toISOString() } : prev
+      );
+      router.push("/host/requests");
+    } finally {
+      setUpdating(false);
+    }
   }
 
   if (request === undefined) {

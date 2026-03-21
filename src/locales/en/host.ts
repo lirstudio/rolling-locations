@@ -166,6 +166,8 @@ const host = {
     createdAt: "Created at",
     updatedAt: "Updated at",
     backToList: "Back to list",
+    statusUpdateConflict:
+      "Could not update — status changed. Refresh the page and try again.",
   },
   settings: {
     title: "Host Settings",
@@ -186,6 +188,7 @@ const host = {
     discard: "Discard",
     saveChanges: "Save Changes",
     saveSuccess: "Settings saved successfully",
+    saveError: "Could not save preferences. Please try again.",
     emailNotifications: "Email Notifications",
     newRequestNotification: "New booking request",
     requestStatusNotification: "Request status update",

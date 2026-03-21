@@ -219,7 +219,7 @@ export function SiteNav() {
           <NavigationMenu dir={locale === "he" ? "rtl" : "ltr"}>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 focus:bg-accent/50 data-[state=open]:bg-accent/50 h-9 px-4 py-2 text-sm font-medium cursor-pointer">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-surface-hover focus:bg-surface-hover data-[state=open]:bg-surface-hover h-9 px-4 py-2 text-sm font-medium cursor-pointer">
                   {t("whatToShoot")}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -283,7 +283,7 @@ export function SiteNav() {
               <button
                 type="button"
                 onClick={() => setShootMenuOpen((v) => !v)}
-                className="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                className="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-surface-hover hover:text-accent-foreground transition-colors cursor-pointer"
               >
                 {t("whatToShoot")}
                 <ChevronDown className={`size-4 transition-transform ${shootMenuOpen ? "rotate-180" : ""}`} />

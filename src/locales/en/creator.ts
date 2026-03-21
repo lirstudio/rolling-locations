@@ -63,6 +63,7 @@ const creator = {
     bio: "Bio",
     saveChanges: "Save Changes",
     saveSuccess: "Saved!",
+    saveError: "Could not save preferences. Please try again.",
     emailNotifications: "Email Notifications",
     bookingStatusNotification: "Booking status updates",
     newMessageNotification: "New messages from hosts",

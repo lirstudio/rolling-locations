@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarConfigProvider } from "@/contexts/sidebar-context";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { RadixDirectionProvider } from "@/components/providers/radix-direction-provider";
 import { heebo } from "@/lib/fonts";
 import heMessages from "@/locales/he";
 
@@ -30,15 +31,17 @@ export default function RootLayout({
     <html lang={locale} dir={locale === "he" ? "rtl" : "ltr"} className={`${heebo.variable} antialiased`}>
       <body className={heebo.className}>
         <NextIntlClientProvider locale={locale} messages={heMessages}>
-          <ThemeProvider defaultTheme="light" storageKey="rollin-theme">
-            <QueryProvider>
-              <AuthProvider>
-                <SidebarConfigProvider>
-                  {children}
-                </SidebarConfigProvider>
-              </AuthProvider>
-            </QueryProvider>
-          </ThemeProvider>
+          <RadixDirectionProvider>
+            <ThemeProvider defaultTheme="light" storageKey="rollin-theme">
+              <QueryProvider>
+                <AuthProvider>
+                  <SidebarConfigProvider>
+                    {children}
+                  </SidebarConfigProvider>
+                </AuthProvider>
+              </QueryProvider>
+            </ThemeProvider>
+          </RadixDirectionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

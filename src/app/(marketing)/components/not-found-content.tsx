@@ -27,7 +27,7 @@ function NotFoundContentInner({ copy }: { copy: NotFoundCopy }) {
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="text-center max-w-md">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 text-primary mb-6"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-hover text-primary mb-6"
             aria-hidden
           >
             <MapPinOff className="w-8 h-8" />
@@ -75,7 +75,7 @@ export function NotFoundContentMinimal({ copy }: { copy: NotFoundCopy }) {
   return (
     <div className="min-h-screen flex flex-col bg-background items-center justify-center px-4 py-16 text-center max-w-md mx-auto">
       <div
-        className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 text-primary mb-6"
+        className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-hover text-primary mb-6"
         aria-hidden
       >
         <MapPinOff className="w-8 h-8" />

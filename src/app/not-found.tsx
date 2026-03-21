@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16 text-center max-w-md mx-auto bg-background">
       <div
-        className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 text-primary mb-6"
+        className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-hover text-primary mb-6"
         aria-hidden
       >
         <MapPinOff className="w-8 h-8" />

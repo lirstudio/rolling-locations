@@ -25,6 +25,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-surface-hover: var(--surface-hover);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
@@ -69,22 +71,25 @@
   --primary: oklch(0.44 0.22 27);
   --primary-foreground: oklch(1 0 0);
 
-  /* Secondary / muted – neutral gray (no blue tint) */
-  --secondary: oklch(0.976 0.008 0);
+  /* Secondary / muted – achromatic (chroma 0) so large section fills never read pink */
+  --secondary: oklch(0.976 0 0);
   --secondary-foreground: oklch(0.28 0.005 195);
-  --muted: oklch(0.976 0.008 0);
+  --muted: oklch(0.976 0 0);
   --muted-foreground: oklch(0.51 0.018 0);
-
-  /* Accent */
-  --accent: oklch(0.955 0.01 0);
-  --accent-foreground: oklch(0.28 0.005 195);
 
   /* Destructive */
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
 
   /* Borders + inputs */
-  --border: oklch(0.912 0.008 0);
+  --border: oklch(0.912 0 0);
+  /* Softer card/section edges (marketing, accordions) — still neutral gray */
+  --border-subtle: oklch(0.94 0 0);
+  /* Neutral hover wash — chroma 0 so no pink/red cast over white cards */
+  --surface-hover: oklch(0.965 0 0);
+  /* Accent = same neutral wash (menus, ghost buttons, selects) — never primary/red */
+  --accent: var(--surface-hover);
+  --accent-foreground: oklch(0.28 0.005 195);
   --input: oklch(0.912 0.008 0);
   --ring: oklch(0.44 0.22 27);                 /* = primary */
 
@@ -119,10 +124,12 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
+  --border-subtle: oklch(1 0 0 / 7%);
+  --surface-hover: oklch(0.28 0 0);
+  --accent: var(--surface-hover);
+  --accent-foreground: oklch(0.985 0 0);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);

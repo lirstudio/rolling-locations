@@ -41,7 +41,7 @@ export function StatsSection() {
   return (
     <section className="py-12 sm:py-16 relative">
       {/* Background with transparency */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/8 via-transparent to-secondary/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-surface-hover/50 via-transparent to-surface-hover/30" />
       <DotPattern className="opacity-75" size="md" fadeStyle="circle" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -54,7 +54,7 @@ export function StatsSection() {
             >
               <CardContent className="p-6">
                 <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-primary/10 rounded-xl">
+                  <div className="p-3 bg-surface-hover rounded-xl">
                     <stat.icon className="h-6 w-6 text-primary" />
                   </div>
                 </div>

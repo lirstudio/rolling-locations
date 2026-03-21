@@ -166,6 +166,8 @@ const host = {
     createdAt: "נוצרה ב",
     updatedAt: "עודכנה ב",
     backToList: "חזרה לרשימה",
+    statusUpdateConflict:
+      "לא ניתן לעדכן — הסטטוס השתנה. רענן את הדף ונסה שוב.",
   },
   settings: {
     title: "הגדרות מארח",
@@ -186,6 +188,7 @@ const host = {
     discard: "ביטול",
     saveChanges: "שמור שינויים",
     saveSuccess: "ההגדרות נשמרו בהצלחה",
+    saveError: "לא ניתן לשמור את ההעדפות. נסה שוב.",
     emailNotifications: "התראות אימייל",
     newRequestNotification: "בקשת הזמנה חדשה",
     requestStatusNotification: "עדכון סטטוס בקשה",

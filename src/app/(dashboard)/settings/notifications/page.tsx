@@ -1,8 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useLocale, useTranslations } from "next-intl"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -51,6 +54,9 @@ const notificationsFormSchema = z.object({
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
 export default function NotificationSettings() {
+  const locale = useLocale()
+  const dir = locale === "he" ? "rtl" : "ltr"
+  const t = useTranslations("settings")
   const form = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema),
     defaultValues: {
@@ -83,13 +89,29 @@ export default function NotificationSettings() {
     },
   })
 
-  function onSubmit(data: NotificationsFormValues) {
-    console.log("Notifications settings submitted:", data)
-    // Here you would typically save the settings
+  function onSubmit(_data: NotificationsFormValues) {
+    toast.info(t("notificationsMock.description"))
   }
 
   return (
-    <div className="space-y-6 px-4 lg:px-6">
+    <div dir={dir} className="space-y-6 px-4 lg:px-6">
+        <Card className="border-dashed bg-muted/50">
+          <CardHeader className="text-start">
+            <CardTitle>{t("notificationsMock.title")}</CardTitle>
+            <CardDescription className="space-y-3">
+              <p>{t("notificationsMock.description")}</p>
+              <div className="flex flex-wrap gap-3 justify-start">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/host/settings">{t("notificationsMock.linkHost")}</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/creator/settings">{t("notificationsMock.linkCreator")}</Link>
+                </Button>
+              </div>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+
         <div>
           <h1 className="text-3xl font-bold">Notifications</h1>
           <p className="text-muted-foreground">

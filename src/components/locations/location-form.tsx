@@ -622,7 +622,7 @@ export function LocationForm({
                         className={`absolute bottom-1.5 end-1.5 size-7 rounded-full bg-white/90 backdrop-blur-sm transition-all ${
                           entry.isFeatured
                             ? "opacity-100 text-primary"
-                            : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary"
+                            : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground"
                         }`}
                         onClick={(e) => {
                           e.preventDefault();

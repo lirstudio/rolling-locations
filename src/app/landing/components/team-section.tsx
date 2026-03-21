@@ -172,7 +172,7 @@ export function TeamSection() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 cursor-pointer hover:text-primary"
+                      className="h-8 w-8 cursor-pointer hover:text-foreground"
                       asChild
                     >
                       <a
@@ -187,7 +187,7 @@ export function TeamSection() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 cursor-pointer hover:text-primary"
+                      className="h-8 w-8 cursor-pointer hover:text-foreground"
                       asChild
                     >
                       <a
@@ -202,7 +202,7 @@ export function TeamSection() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 cursor-pointer hover:text-primary"
+                      className="h-8 w-8 cursor-pointer hover:text-foreground"
                       asChild
                     >
                       <a

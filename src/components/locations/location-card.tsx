@@ -249,7 +249,7 @@ export function LocationCard({
               className={`h-4 w-4 transition-colors ${
                 isFavorite
                   ? "fill-primary text-primary"
-                  : "text-muted-foreground hover:text-primary"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             />
           </button>

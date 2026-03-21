@@ -63,6 +63,7 @@ const creator = {
     bio: "אודות",
     saveChanges: "שמור שינויים",
     saveSuccess: "נשמר!",
+    saveError: "לא ניתן לשמור את ההעדפות. נסה שוב.",
     emailNotifications: "התראות אימייל",
     bookingStatusNotification: "עדכוני סטטוס הזמנה",
     newMessageNotification: "הודעות חדשות ממארחים",

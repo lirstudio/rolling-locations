@@ -39,7 +39,7 @@ export function HowItWorks() {
                   <span className="absolute top-4 start-4 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-sm">
                     {i + 1}
                   </span>
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-surface-hover text-primary mb-5">
                     <Icon className="h-8 w-8" />
                   </div>
                   <h3 className="font-semibold text-foreground text-lg">
@@ -50,7 +50,7 @@ export function HowItWorks() {
                   </p>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="hidden lg:block w-7 shrink-0 self-center h-0 border-t-2 border-dashed border-primary/25" aria-hidden />
+                  <div className="hidden lg:block w-7 shrink-0 self-center h-0 border-t-2 border-dashed border-border" aria-hidden />
                 )}
               </div>
             );

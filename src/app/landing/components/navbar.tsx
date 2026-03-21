@@ -94,7 +94,7 @@ export function LandingNavbar() {
               <NavigationMenuItem key={item.name}>
                 {item.hasMegaMenu ? (
                   <>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:text-primary focus:text-primary cursor-pointer">
+                    <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:text-foreground focus:text-foreground cursor-pointer">
                       {item.name}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -103,7 +103,7 @@ export function LandingNavbar() {
                   </>
                 ) : (
                   <NavigationMenuLink
-                    className="group inline-flex h-10 w-max items-center justify-center px-4 py-2 text-sm font-medium transition-colors hover:text-primary focus:text-primary focus:outline-none cursor-pointer"
+                    className="group inline-flex h-10 w-max items-center justify-center px-4 py-2 text-sm font-medium transition-colors hover:text-foreground focus:text-foreground focus:outline-none cursor-pointer"
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault()
                       if (item.href.startsWith('#')) {

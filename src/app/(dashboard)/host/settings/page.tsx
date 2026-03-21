@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,6 +37,12 @@ import {
 } from "@/components/ui/form";
 import { useAuthStore } from "@/stores/auth-store";
 import { uploadAvatar } from "@/lib/upload-avatar";
+import {
+  getNotificationPreferences,
+  upsertNotificationPreferences,
+} from "@/app/actions/notification-preferences";
+import { DEFAULT_NOTIFICATION_PREFERENCES } from "@/types/notification-preferences";
+import type { NotificationPreferencesInput } from "@/types/notification-preferences";
 
 const profileSchema = z.object({
   displayName: z.string().min(1),
@@ -48,6 +54,8 @@ const profileSchema = z.object({
 type ProfileValues = z.infer<typeof profileSchema>;
 
 export default function HostSettingsPage() {
+  const locale = useLocale();
+  const dir = locale === "he" ? "rtl" : "ltr";
   const t = useTranslations("host");
   const { user, updateUser, updateUserMetadata } = useAuthStore();
 
@@ -79,11 +87,16 @@ export default function HostSettingsPage() {
     }
   }, [user, form]);
 
-  const [notifications, setNotifications] = useState({
-    newRequest: true,
-    requestStatus: true,
-    marketing: false,
-  });
+  const [notifications, setNotifications] =
+    useState<NotificationPreferencesInput>(DEFAULT_NOTIFICATION_PREFERENCES);
+
+  useEffect(() => {
+    getNotificationPreferences().then((r) => {
+      if (r.prefs) {
+        setNotifications(r.prefs);
+      }
+    });
+  }, []);
 
   function onSubmit(data: ProfileValues) {
     updateUser({
@@ -144,7 +157,12 @@ export default function HostSettingsPage() {
     }
   };
 
-  function handleSaveNotifications() {
+  async function handleSaveNotifications() {
+    const result = await upsertNotificationPreferences(notifications);
+    if (result.error) {
+      toast.error(t("settings.saveError"));
+      return;
+    }
     toast.success(t("settings.saveSuccess"));
   }
 
@@ -157,30 +175,35 @@ export default function HostSettingsPage() {
       .toUpperCase() ?? "U";
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <h1 className="text-2xl font-bold tracking-tight">
+    <div
+      dir={dir}
+      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 lg:px-6"
+    >
+      <h1 className="text-start text-2xl font-bold tracking-tight">
         {t("settings.title")}
       </h1>
 
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList>
-          <TabsTrigger value="profile">{t("settings.profile")}</TabsTrigger>
-          <TabsTrigger value="notifications">
-            {t("settings.notifications")}
-          </TabsTrigger>
-        </TabsList>
+      <Tabs dir={dir} defaultValue="profile" className="w-full">
+        <div className="flex w-full justify-start">
+          <TabsList>
+            <TabsTrigger value="profile">{t("settings.profile")}</TabsTrigger>
+            <TabsTrigger value="notifications">
+              {t("settings.notifications")}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="profile" className="mt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
-                <CardHeader>
+                <CardHeader className="text-start">
                   <CardTitle>{t("settings.profile")}</CardTitle>
                   <CardDescription>
                     {t("settings.profileDescription")}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent className="space-y-8 text-start">
                   <div className="flex items-center gap-5">
                     <div className="relative shrink-0">
                       <button
@@ -211,7 +234,7 @@ export default function HostSettingsPage() {
                         <button
                           type="button"
                           onClick={handleResetPhoto}
-                          className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
+                          className="absolute -top-1 -end-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:bg-destructive/90 cursor-pointer"
                           aria-label={t("settings.resetPhoto")}
                         >
                           <X className="h-3.5 w-3.5" />
@@ -239,7 +262,7 @@ export default function HostSettingsPage() {
 
                   <Separator />
 
-                  <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
                     <FormField
                       control={form.control}
                       name="displayName"
@@ -260,7 +283,12 @@ export default function HostSettingsPage() {
                         <FormItem>
                           <FormLabel>{t("settings.email")}</FormLabel>
                           <FormControl>
-                            <Input type="email" dir="ltr" {...field} />
+                            <Input
+                              type="email"
+                              dir="ltr"
+                              className="!text-end"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -270,10 +298,15 @@ export default function HostSettingsPage() {
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="sm:col-span-2">
                           <FormLabel>{t("settings.phone")}</FormLabel>
                           <FormControl>
-                            <Input type="tel" dir="ltr" {...field} />
+                            <Input
+                              type="tel"
+                              dir="ltr"
+                              className="!text-end"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -299,7 +332,7 @@ export default function HostSettingsPage() {
                     )}
                   />
 
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-3 justify-start">
                     <Button type="submit" className="cursor-pointer">
                       {t("settings.saveChanges")}
                     </Button>
@@ -320,13 +353,13 @@ export default function HostSettingsPage() {
 
         <TabsContent value="notifications" className="mt-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="text-start">
               <CardTitle>{t("settings.notifications")}</CardTitle>
               <CardDescription>
                 {t("settings.notificationsDescription")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 text-start">
               <h3 className="text-sm font-medium">
                 {t("settings.emailNotifications")}
               </h3>
@@ -338,11 +371,11 @@ export default function HostSettingsPage() {
                   </Label>
                   <Switch
                     id="newRequest"
-                    checked={notifications.newRequest}
+                    checked={notifications.email_new_booking_request}
                     onCheckedChange={(checked) =>
                       setNotifications((n) => ({
                         ...n,
-                        newRequest: checked,
+                        email_new_booking_request: checked,
                       }))
                     }
                   />
@@ -353,11 +386,11 @@ export default function HostSettingsPage() {
                   </Label>
                   <Switch
                     id="requestStatus"
-                    checked={notifications.requestStatus}
+                    checked={notifications.email_booking_status}
                     onCheckedChange={(checked) =>
                       setNotifications((n) => ({
                         ...n,
-                        requestStatus: checked,
+                        email_booking_status: checked,
                       }))
                     }
                   />
@@ -368,17 +401,17 @@ export default function HostSettingsPage() {
                   </Label>
                   <Switch
                     id="marketing"
-                    checked={notifications.marketing}
+                    checked={notifications.email_marketing}
                     onCheckedChange={(checked) =>
                       setNotifications((n) => ({
                         ...n,
-                        marketing: checked,
+                        email_marketing: checked,
                       }))
                     }
                   />
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3 justify-start">
                 <Button
                   type="button"
                   onClick={handleSaveNotifications}

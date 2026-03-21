@@ -53,25 +53,25 @@ const kpiConfig = [
   {
     key: "pendingRequests" as const,
     icon: Inbox,
-    colorBg: "bg-primary/10",
+    colorBg: "bg-surface-hover",
     colorIcon: "text-primary",
   },
   {
     key: "activeListings" as const,
     icon: MapPin,
-    colorBg: "bg-primary/10",
+    colorBg: "bg-surface-hover",
     colorIcon: "text-primary",
   },
   {
     key: "approvedThisMonth" as const,
     icon: CheckCircle,
-    colorBg: "bg-primary/10",
+    colorBg: "bg-surface-hover",
     colorIcon: "text-primary",
   },
   {
     key: "totalRevenue" as const,
     icon: DollarSign,
-    colorBg: "bg-primary/10",
+    colorBg: "bg-surface-hover",
     colorIcon: "text-primary",
   },
 ];
@@ -199,7 +199,7 @@ export default function HostOverviewPage() {
         <Card className="rounded-2xl border-dashed border-2 bg-muted/30">
           <CardContent className="flex items-center justify-between gap-4 py-5 px-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-hover">
                 <MapPin className="h-5 w-5 text-primary" />
               </div>
               <div>

@@ -71,7 +71,7 @@ export function BlogSection() {
                     onClick={e => e.preventDefault()}
                     className="cursor-pointer"
                   >
-                    <h3 className="text-xl font-bold hover:text-primary transition-colors">{blog.title}</h3>
+                    <h3 className="text-xl font-bold hover:text-foreground transition-colors">{blog.title}</h3>
                   </a>
                   <p className="text-muted-foreground">{blog.description}</p>
                   <a

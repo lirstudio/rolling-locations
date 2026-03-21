@@ -199,7 +199,7 @@ export function OnboardingForm() {
                 {step === 0 && (
                   <>
                     <CardHeader className="pb-2 text-center">
-                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-hover">
                         <Sparkles className="h-7 w-7 text-primary" />
                       </div>
                       <CardTitle className="text-2xl tracking-tight">
@@ -235,7 +235,7 @@ export function OnboardingForm() {
                 {step === 1 && (
                   <>
                     <CardHeader className="pb-2 text-center">
-                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-hover">
                         <User className="h-7 w-7 text-primary" />
                       </div>
                       <CardTitle className="text-xl tracking-tight">
@@ -352,7 +352,7 @@ export function OnboardingForm() {
                                   />
                                   <Label
                                     htmlFor="role-creator"
-                                    className="flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-border p-6 transition-all hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5"
+                                    className="flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-border p-6 transition-all hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-surface-hover"
                                   >
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                                       <Camera className="h-6 w-6 text-muted-foreground" />
@@ -374,7 +374,7 @@ export function OnboardingForm() {
                                   />
                                   <Label
                                     htmlFor="role-host"
-                                    className="flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-border p-6 transition-all hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5"
+                                    className="flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-border p-6 transition-all hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-surface-hover"
                                   >
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                                       <MapPin className="h-6 w-6 text-muted-foreground" />

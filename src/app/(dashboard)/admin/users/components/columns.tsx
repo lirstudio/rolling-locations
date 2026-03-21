@@ -18,7 +18,7 @@ import {
 import type { User, UserRole } from "@/types"
 
 const roleBadgeClass: Record<UserRole, string> = {
-  admin: "border-primary/30 bg-primary/10 text-primary",
+  admin: "border-primary/30 bg-surface-hover text-primary",
   host: "border-border bg-muted text-foreground",
   creator: "border-border bg-accent text-accent-foreground",
   guest: "bg-muted text-muted-foreground",
@@ -72,7 +72,7 @@ export function getUserColumns(
               {u.avatarUrl ? (
                 <AvatarImage src={u.avatarUrl} alt="" />
               ) : null}
-              <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+              <AvatarFallback className="bg-surface-hover font-semibold text-primary">
                 {getInitials(u.name)}
               </AvatarFallback>
             </Avatar>
